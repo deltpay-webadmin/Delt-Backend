@@ -439,7 +439,7 @@ export function DeltBackendLayout() {
 
   return (
     <NavigationContext.Provider value={{ navigate: handleNavigate, currentPage }}>
-      <div className="flex h-screen bg-[#F8FAFC] font-['DM_Sans']">
+      <div className="flex h-screen bg-canvas font-sans">
 
         {/* ═══ Left Sidebar ═══ */}
         <aside className="hidden lg:flex flex-col w-[220px] bg-white border-r border-gray-200 shrink-0">
@@ -449,10 +449,10 @@ export function DeltBackendLayout() {
               onClick={() => handleNavigate('/')}
               className="flex items-center gap-2.5 group"
             >
-              <div className="w-7 h-7 bg-[#4318FF] rounded-[6px] flex items-center justify-center">
+              <div className="w-7 h-7 bg-brand rounded-[6px] flex items-center justify-center">
                 <span className="text-white text-xs font-bold">D</span>
               </div>
-              <span className="text-[15px] font-bold text-gray-900 group-hover:text-[#4318FF] transition-colors">
+              <span className="text-[15px] font-bold text-gray-900 group-hover:text-brand transition-colors">
                 Delt
               </span>
             </button>
@@ -465,7 +465,7 @@ export function DeltBackendLayout() {
               onClick={() => handleNavigate('/')}
               className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                 currentPage === '/'
-                  ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                  ? 'text-brand bg-brand/[0.06] font-semibold'
                   : 'text-gray-700 hover:bg-gray-50 font-medium'
               }`}
             >
@@ -479,7 +479,7 @@ export function DeltBackendLayout() {
                 onClick={() => handleNavigate('/workspace')}
                 className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                   currentPage === '/workspace'
-                    ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                    ? 'text-brand bg-brand/[0.06] font-semibold'
                     : 'text-gray-700 hover:bg-gray-50 font-medium'
                 }`}
               >
@@ -499,7 +499,7 @@ export function DeltBackendLayout() {
                     onClick={() => handleNavigate(item.path)}
                     className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                       active
-                        ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                        ? 'text-brand bg-brand/[0.06] font-semibold'
                         : 'text-gray-700 hover:bg-gray-50 font-medium'
                     }`}
                   >
@@ -521,9 +521,9 @@ export function DeltBackendLayout() {
                       onClick={() => toggleSection(section.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors ${
                         hasActiveChild && !isExpanded
-                          ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                          ? 'text-brand bg-brand/[0.06] font-semibold'
                           : hasActiveChild
-                            ? 'text-[#4318FF] font-semibold'
+                            ? 'text-brand font-semibold'
                             : 'text-gray-700 hover:bg-gray-50 font-medium'
                       }`}
                     >
@@ -543,7 +543,7 @@ export function DeltBackendLayout() {
                               onClick={() => handleNavigate(child.path)}
                               className={`w-full text-left px-2.5 py-[6px] rounded-[6px] text-[13px] transition-colors block ${
                                 active
-                                  ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                                  ? 'text-brand bg-brand/[0.06] font-semibold'
                                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-normal'
                               }`}
                             >
@@ -577,8 +577,8 @@ export function DeltBackendLayout() {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="w-full flex items-center gap-2.5 px-2 py-2 rounded-[6px] hover:bg-gray-50 transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-[#4318FF]/10 flex items-center justify-center shrink-0">
-                  <span className="text-[#4318FF] text-xs font-semibold">{user.initials}</span>
+                <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+                  <span className="text-brand text-xs font-semibold">{user.initials}</span>
                 </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">{user.name}</p>
@@ -631,7 +631,7 @@ export function DeltBackendLayout() {
                 onClick={() => handleNavigate('/')}
                 className="lg:hidden flex items-center gap-2 mr-auto"
               >
-                <div className="w-7 h-7 bg-[#4318FF] rounded-[6px] flex items-center justify-center">
+                <div className="w-7 h-7 bg-brand rounded-[6px] flex items-center justify-center">
                   <span className="text-white text-xs font-bold">D</span>
                 </div>
                 <span className="text-[15px] font-bold text-gray-900">Delt</span>
@@ -692,7 +692,7 @@ export function DeltBackendLayout() {
                     {i < arr.length - 1 ? (
                       <button
                         onClick={() => handleNavigate(crumb.path)}
-                        className="text-gray-500 hover:text-[#4318FF] transition-colors"
+                        className="text-gray-500 hover:text-brand transition-colors"
                       >
                         {i === 0 ? <Home className="w-4 h-4" /> : crumb.label}
                       </button>
@@ -718,7 +718,7 @@ export function DeltBackendLayout() {
             <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-white flex flex-col shadow-xl">
               <div className="flex items-center justify-between px-5 h-14 border-b border-gray-100 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 bg-[#4318FF] rounded-[6px] flex items-center justify-center">
+                  <div className="w-7 h-7 bg-brand rounded-[6px] flex items-center justify-center">
                     <span className="text-white text-xs font-bold">D</span>
                   </div>
                   <span className="text-[15px] font-bold text-gray-900">Delt</span>
@@ -734,7 +734,7 @@ export function DeltBackendLayout() {
                   onClick={() => handleNavigate('/')}
                   className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                     currentPage === '/'
-                      ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                      ? 'text-brand bg-brand/[0.06] font-semibold'
                       : 'text-gray-700 hover:bg-gray-50 font-medium'
                   }`}
                 >
@@ -748,7 +748,7 @@ export function DeltBackendLayout() {
                     onClick={() => handleNavigate('/workspace')}
                     className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                       currentPage === '/workspace'
-                        ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                        ? 'text-brand bg-brand/[0.06] font-semibold'
                         : 'text-gray-700 hover:bg-gray-50 font-medium'
                     }`}
                   >
@@ -767,7 +767,7 @@ export function DeltBackendLayout() {
                         onClick={() => handleNavigate(item.path)}
                         className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
                           active
-                            ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                            ? 'text-brand bg-brand/[0.06] font-semibold'
                             : 'text-gray-700 hover:bg-gray-50 font-medium'
                         }`}
                       >
@@ -787,9 +787,9 @@ export function DeltBackendLayout() {
                           onClick={() => toggleSection(section.id)}
                           className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors ${
                             hasActiveChild && !isExpanded
-                              ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                              ? 'text-brand bg-brand/[0.06] font-semibold'
                               : hasActiveChild
-                                ? 'text-[#4318FF] font-semibold'
+                                ? 'text-brand font-semibold'
                                 : 'text-gray-700 hover:bg-gray-50 font-medium'
                           }`}
                         >
@@ -807,7 +807,7 @@ export function DeltBackendLayout() {
                                   onClick={() => handleNavigate(child.path)}
                                   className={`w-full text-left px-2.5 py-[6px] rounded-[6px] text-[13px] transition-colors block ${
                                     active
-                                      ? 'text-[#4318FF] bg-[#4318FF]/[0.06] font-semibold'
+                                      ? 'text-brand bg-brand/[0.06] font-semibold'
                                       : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-normal'
                                   }`}
                                 >
@@ -826,8 +826,8 @@ export function DeltBackendLayout() {
               {/* Mobile sidebar bottom */}
               <div className="border-t border-gray-100 px-3 py-3">
                 <div className="flex items-center gap-2.5 px-2 py-2">
-                  <div className="w-8 h-8 rounded-full bg-[#4318FF]/10 flex items-center justify-center shrink-0">
-                    <span className="text-[#4318FF] text-xs font-semibold">{user.initials}</span>
+                  <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+                    <span className="text-brand text-xs font-semibold">{user.initials}</span>
                   </div>
                   <div className="min-w-0">
                     <p className="text-[13px] font-semibold text-gray-900 truncate">{user.name}</p>
@@ -869,7 +869,7 @@ export function DeltBackendLayout() {
                           <button
                             key={item.path}
                             onClick={() => { handleNavigate(item.path); setCmdPaletteOpen(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-700 hover:bg-[#4318FF]/5 hover:text-[#4318FF] transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-gray-700 hover:bg-brand/5 hover:text-brand transition-colors"
                           >
                             <CmdIcon className="w-4 h-4 text-gray-400" />
                             <span className="flex-1 text-left">{item.label}</span>

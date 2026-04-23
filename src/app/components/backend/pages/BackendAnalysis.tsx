@@ -203,7 +203,7 @@ export function BackendAnalysis() {
                 onClick={() => setActiveView(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] ${
                   activeView === t.key
-                    ? 'text-[#4318FF] border-[#4318FF]'
+                    ? 'text-brand border-brand'
                     : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -230,7 +230,7 @@ export function BackendAnalysis() {
                   onClick={() => inputRef.current?.click()}
                   className={`relative border-2 border-dashed rounded-[8px] p-10 text-center cursor-pointer transition-colors ${
                     dragOver
-                      ? 'border-[#4318FF] bg-[#4318FF]/5'
+                      ? 'border-brand bg-brand/5'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
                   }`}
                 >
@@ -244,9 +244,9 @@ export function BackendAnalysis() {
                   />
                   <div className="flex flex-col items-center gap-3">
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                      dragOver ? 'bg-[#4318FF]/10' : 'bg-gray-100'
+                      dragOver ? 'bg-brand/10' : 'bg-gray-100'
                     }`}>
-                      <Upload className={`w-6 h-6 ${dragOver ? 'text-[#4318FF]' : 'text-gray-400'}`} />
+                      <Upload className={`w-6 h-6 ${dragOver ? 'text-brand' : 'text-gray-400'}`} />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-700">
@@ -280,7 +280,7 @@ export function BackendAnalysis() {
                   <button
                     onClick={analyze}
                     disabled={!files.length || status === 'uploading' || status === 'analyzing'}
-                    className="px-5 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {status === 'uploading' || status === 'analyzing' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -314,14 +314,14 @@ export function BackendAnalysis() {
 
                 {/* Auto-lead created banner */}
                 {leadBannerVisible && autoLeadCreated && (
-                  <div className="bg-[#4318FF]/5 border border-[#4318FF]/20 rounded-[8px] px-5 py-4 flex items-center justify-between">
+                  <div className="bg-brand/5 border border-brand/20 rounded-[8px] px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[#4318FF]/10 flex items-center justify-center shrink-0">
-                        <UserPlus className="w-4.5 h-4.5 text-[#4318FF]" />
+                      <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
+                        <UserPlus className="w-4.5 h-4.5 text-brand" />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">
-                          Lead auto-created: <span className="text-[#4318FF]">{autoLeadName}</span>
+                          Lead auto-created: <span className="text-brand">{autoLeadName}</span>
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
                           Added to pipeline as <span className="font-medium">New Lead</span> · Statement attached · Savings proposal linked
@@ -331,7 +331,7 @@ export function BackendAnalysis() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => navigate('/leads')}
-                        className="px-3.5 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
                       >
                         View in Pipeline
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -351,7 +351,7 @@ export function BackendAnalysis() {
                   <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-100">
                       <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#4318FF]" />
+                        <FileText className="w-4 h-4 text-brand" />
                         Extracted Data
                       </h2>
                     </div>
@@ -415,7 +415,7 @@ export function BackendAnalysis() {
                             <tr className="bg-gray-50">
                               <th className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide px-3 py-2.5"></th>
                               <th className="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide px-3 py-2.5">Current</th>
-                              <th className="text-right text-[11px] font-semibold text-[#4318FF] uppercase tracking-wide px-3 py-2.5">With Delt</th>
+                              <th className="text-right text-[11px] font-semibold text-brand uppercase tracking-wide px-3 py-2.5">With Delt</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100">
@@ -449,7 +449,7 @@ export function BackendAnalysis() {
 
                       {/* CTA buttons */}
                       <div className="mt-auto pt-5 flex items-center gap-3">
-                        <button className="flex-1 px-4 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center justify-center gap-2">
+                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
                           <Download className="w-4 h-4" />
                           Generate Proposal PDF
                         </button>
@@ -462,7 +462,7 @@ export function BackendAnalysis() {
                             Lead Created — View
                           </button>
                         ) : (
-                          <button className="flex-1 px-4 py-2.5 bg-white text-[#4318FF] text-sm font-medium rounded-[6px] border border-[#4318FF] hover:bg-[#4318FF]/5 transition-colors flex items-center justify-center gap-2">
+                          <button className="flex-1 px-4 py-2.5 bg-white text-brand text-sm font-medium rounded-[6px] border border-brand hover:bg-brand/5 transition-colors flex items-center justify-center gap-2">
                             <UserPlus className="w-4 h-4" />
                             Create Lead
                           </button>
@@ -501,7 +501,7 @@ export function BackendAnalysis() {
                         <td className="pl-5 pr-3 py-3 text-sm font-medium text-gray-900">{row.merchantName}</td>
                         <td className="px-3 py-3 text-sm text-gray-500">{row.dateAnalyzed}</td>
                         <td className="px-3 py-3 text-sm text-gray-700 text-right tabular-nums">{row.currentRate}%</td>
-                        <td className="px-3 py-3 text-sm text-[#4318FF] text-right font-medium tabular-nums">{row.proposedRate}%</td>
+                        <td className="px-3 py-3 text-sm text-brand text-right font-medium tabular-nums">{row.proposedRate}%</td>
                         <td className="px-3 py-3 text-right">
                           <span className="text-sm font-medium text-emerald-600 tabular-nums">{fmtWhole(row.savings)}/yr</span>
                         </td>
@@ -532,7 +532,7 @@ function MetaField({ label, value, highlight, warn }: { label: string; value: st
     <div className="bg-gray-50 rounded-[6px] px-3 py-2.5">
       <p className="text-[11px] text-gray-500 font-medium mb-0.5">{label}</p>
       <p className={`text-sm font-semibold ${
-        highlight ? 'text-[#4318FF]' : warn ? 'text-amber-600' : 'text-gray-900'
+        highlight ? 'text-brand' : warn ? 'text-amber-600' : 'text-gray-900'
       }`}>
         {value}
         {warn && <AlertCircle className="inline w-3.5 h-3.5 ml-1 -mt-0.5" />}

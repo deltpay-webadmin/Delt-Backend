@@ -151,7 +151,7 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
   return (
     <div onClick={onView} className="bg-white rounded-[8px] border border-gray-200 p-3 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group">
       <div className="flex items-start justify-between mb-2">
-        <span className="text-[10px] font-mono text-[#4318FF]">{app.applicationId}</span>
+        <span className="text-[10px] font-mono text-brand">{app.applicationId}</span>
         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${risk.bg} ${risk.text} ${risk.border}`}>{app.riskScore}</span>
       </div>
       <h4 className="text-xs font-semibold text-gray-900 mb-0.5">{app.businessName}</h4>
@@ -250,7 +250,7 @@ export function BackendUnderwriting() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -267,7 +267,7 @@ export function BackendUnderwriting() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <Plus className="w-3.5 h-3.5" /> New Application
           </button>
         </div>
@@ -276,7 +276,7 @@ export function BackendUnderwriting() {
       {/* KPI Row */}
       <div className="grid grid-cols-5 gap-3">
         {[
-          { label: 'In Pipeline', value: inQueueCount, sub: `${APPLICATIONS.length} total`, color: 'border-t-[#4318FF]', icon: FileText },
+          { label: 'In Pipeline', value: inQueueCount, sub: `${APPLICATIONS.length} total`, color: 'border-t-brand', icon: FileText },
           { label: 'Avg Decision Time', value: `${avgDaysToDecision}d`, sub: 'SLA: 5 business days', color: 'border-t-blue-500', icon: Clock },
           { label: 'Approval Rate', value: `${approvalRate}%`, sub: `${approvedCount} of ${totalDecided} decided`, color: 'border-t-emerald-500', icon: CheckCircle },
           { label: 'Pipeline Value', value: `$${(pipelineValue / 1000).toFixed(0)}K`, sub: `${APPLICATIONS.filter(a => a.stage !== 'Declined').length} active deals`, color: 'border-t-amber-500', icon: DollarSign },
@@ -301,7 +301,7 @@ export function BackendUnderwriting() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search applications..."
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
         </div>
         {viewMode === 'table' && (
           <div className="flex items-center gap-1 overflow-x-auto">
@@ -312,7 +312,7 @@ export function BackendUnderwriting() {
               return (
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
-                    isActive ? (cfg ? `${cfg.bg} ${cfg.color} ${cfg.border}` : 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20') : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                    isActive ? (cfg ? `${cfg.bg} ${cfg.color} ${cfg.border}` : 'bg-brand/5 text-brand border-brand/20') : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{tab} <span className="ml-0.5 opacity-70">{count}</span></button>
               );
             })}
@@ -410,7 +410,7 @@ export function BackendUnderwriting() {
                   return (
                     <tr key={app.id} className={`hover:bg-gray-50/50 transition-colors ${overSLA && !['Approved', 'Declined'].includes(app.stage) ? 'bg-red-50/20' : ''}`}>
                       <td className="px-3 py-3">
-                        <span className="text-[10px] font-mono font-semibold text-[#4318FF] cursor-pointer hover:underline" onClick={() => navigate(`/underwriting/${app.id}`)}>{app.applicationId}</span>
+                        <span className="text-[10px] font-mono font-semibold text-brand cursor-pointer hover:underline" onClick={() => navigate(`/underwriting/${app.id}`)}>{app.applicationId}</span>
                       </td>
                       <td className="px-3 py-3">
                         <p className="text-xs font-semibold text-gray-900">{app.businessName}</p>
@@ -448,7 +448,7 @@ export function BackendUnderwriting() {
                         <span className={`text-[10px] font-medium ${overSLA && !['Approved', 'Declined'].includes(app.stage) ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>{app.daysInStage}d</span>
                       </td>
                       <td className="px-3 py-3">
-                        <button onClick={() => navigate(`/underwriting/${app.id}`)} className="p-1 hover:bg-indigo-50 rounded text-gray-400 hover:text-[#4318FF]">
+                        <button onClick={() => navigate(`/underwriting/${app.id}`)} className="p-1 hover:bg-indigo-50 rounded text-gray-400 hover:text-brand">
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                       </td>

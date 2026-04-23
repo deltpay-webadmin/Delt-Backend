@@ -29,7 +29,7 @@ const CATEGORY_CONFIG: Record<ReportCategory, { color: string; bg: string; icon:
   portfolio: { color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', icon: Wallet, label: 'Portfolio' },
   compliance: { color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', icon: Shield, label: 'Compliance' },
   operations: { color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200', icon: BarChart3, label: 'Operations' },
-  products: { color: 'text-[#4318FF]', bg: 'bg-indigo-50 border-indigo-200', icon: Globe, label: 'Products' },
+  products: { color: 'text-brand', bg: 'bg-indigo-50 border-indigo-200', icon: Globe, label: 'Products' },
 };
 
 const FORMAT_LABELS: Record<ReportFormat, { label: string; icon: React.ElementType }> = {
@@ -119,7 +119,7 @@ export function BackendReports() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <BarChart3 className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -127,7 +127,7 @@ export function BackendReports() {
             <p className="text-sm text-gray-500">{REPORTS.length} reports &middot; {REPORTS.filter(r => r.schedule).length} scheduled</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> Custom Report
         </button>
       </div>
@@ -149,11 +149,11 @@ export function BackendReports() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search reports..."
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1">
               <button onClick={() => setCategoryFilter('all')}
-                className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${categoryFilter === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
+                className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${categoryFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
               {Object.entries(CATEGORY_CONFIG).map(([k, v]) => {
                 const Icon = v.icon;
                 return (
@@ -199,7 +199,7 @@ export function BackendReports() {
                           {report.formats.map(f => {
                             const fcfg = FORMAT_LABELS[f];
                             return (
-                              <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-[#4318FF]/5 hover:text-[#4318FF] border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
+                              <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
                                 <Download className="w-2.5 h-2.5" />{fcfg.label}
                               </button>
                             );
@@ -237,7 +237,7 @@ export function BackendReports() {
                       {report.schedule && <span className="text-[9px] text-gray-400 flex items-center gap-0.5 whitespace-nowrap"><Clock className="w-2.5 h-2.5" />{report.schedule}</span>}
                       <div className="flex items-center gap-1">
                         {report.formats.map(f => (
-                          <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-[#4318FF]/5 hover:text-[#4318FF] border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
+                          <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
                             <Download className="w-2.5 h-2.5" />{FORMAT_LABELS[f].label}
                           </button>
                         ))}
@@ -287,7 +287,7 @@ export function BackendReports() {
               <div className="w-20 shrink-0 flex items-center gap-1">
                 {exp.status === 'ready' && (
                   <>
-                    <button className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-[#4318FF]" /></button>
+                    <button className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-brand" /></button>
                     <button className="p-1 hover:bg-gray-100 rounded" title="Email"><Mail className="w-3.5 h-3.5 text-gray-400" /></button>
                     <button className="p-1 hover:bg-gray-100 rounded" title="Preview"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
                   </>

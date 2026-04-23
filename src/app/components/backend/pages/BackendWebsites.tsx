@@ -44,7 +44,7 @@ const STATUS_CONFIG: Record<SiteStatus, { color: string; bg: string; label: stri
 
 const PLAN_CONFIG: Record<PlanTier, { color: string; bg: string; label: string; price: string }> = {
   starter: { color: 'text-gray-600', bg: 'bg-gray-50', label: 'Starter', price: '$29/mo' },
-  business: { color: 'text-[#4318FF]', bg: 'bg-indigo-50', label: 'Business', price: '$79/mo' },
+  business: { color: 'text-brand', bg: 'bg-indigo-50', label: 'Business', price: '$79/mo' },
   premium: { color: 'text-amber-700', bg: 'bg-amber-50', label: 'Premium', price: '$149/mo' },
 };
 
@@ -168,17 +168,17 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
         {/* Actions */}
         <div className="px-5 py-3 border-t border-gray-200 flex items-center gap-2">
           {site.status === 'live' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Edit3 className="w-3.5 h-3.5" /> Edit Site
             </button>
           )}
           {site.status === 'building' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Layers className="w-3.5 h-3.5" /> Continue Building
             </button>
           )}
           {site.status === 'draft' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Zap className="w-3.5 h-3.5" /> Start Build
             </button>
           )}
@@ -222,7 +222,7 @@ export function BackendWebsites() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <Globe className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -230,7 +230,7 @@ export function BackendWebsites() {
             <p className="text-sm text-gray-500">Manage merchant websites, domains, and analytics</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> New Site
         </button>
       </div>
@@ -239,7 +239,7 @@ export function BackendWebsites() {
       <div className="grid grid-cols-4 gap-3">
         {[
           { label: 'Live Sites', value: liveSites, sub: `of ${WEBSITES.length} total`, color: 'border-t-emerald-500', icon: Globe },
-          { label: 'Website MRR', value: `$${totalMRR.toLocaleString()}`, sub: `${WEBSITES.length} subscriptions`, color: 'border-t-[#4318FF]', icon: BarChart3 },
+          { label: 'Website MRR', value: `$${totalMRR.toLocaleString()}`, sub: `${WEBSITES.length} subscriptions`, color: 'border-t-brand', icon: BarChart3 },
           { label: 'Total Page Views', value: totalViews.toLocaleString(), sub: 'last 30 days', color: 'border-t-blue-500', icon: Eye },
           { label: 'Avg Conversion', value: `${avgConversion.toFixed(1)}%`, sub: 'across live sites', color: 'border-t-amber-500', icon: TrendingUp },
         ].map((kpi, i) => {
@@ -262,13 +262,13 @@ export function BackendWebsites() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search sites..."
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
         </div>
         <div className="flex items-center gap-1">
           {(['all', 'live', 'building', 'draft', 'suspended'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
-                statusFilter === s ? (s === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
               }`}>{s === 'all' ? 'All' : STATUS_CONFIG[s].label}</button>
           ))}
         </div>

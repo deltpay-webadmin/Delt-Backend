@@ -424,7 +424,7 @@ function AskTab({
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 max-w-xl mx-auto text-center">
             <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5">
-              <Sparkles className="w-7 h-7 text-[#4318FF]" />
+              <Sparkles className="w-7 h-7 text-brand" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Ask Lens anything</h2>
             <p className="text-sm text-gray-500 mb-8">
@@ -437,13 +437,13 @@ function AskTab({
                   <button
                     key={i}
                     onClick={() => handleSend(prompt.text)}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-[8px] text-left hover:border-[#4318FF]/30 hover:bg-indigo-50/30 transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-[8px] text-left hover:border-brand/30 hover:bg-indigo-50/30 transition-all group"
                   >
                     <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
-                      <Icon className="w-4 h-4 text-[#4318FF]" />
+                      <Icon className="w-4 h-4 text-brand" />
                     </div>
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">{prompt.text}</span>
-                    <ArrowRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-[#4318FF] transition-colors" />
+                    <ArrowRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-brand transition-colors" />
                   </button>
                 );
               })}
@@ -455,14 +455,14 @@ function AskTab({
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'user' ? (
-                  <div className="max-w-md px-4 py-3 bg-[#4318FF] text-white rounded-2xl rounded-br-md text-sm">
+                  <div className="max-w-md px-4 py-3 bg-brand text-white rounded-2xl rounded-br-md text-sm">
                     {msg.content}
                   </div>
                 ) : (
                   <div className="max-w-2xl">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-1">
-                        <Brain className="w-4 h-4 text-[#4318FF]" />
+                        <Brain className="w-4 h-4 text-brand" />
                       </div>
                       <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-md px-5 py-4">
                         {/* Markdown-ish render */}
@@ -525,13 +525,13 @@ function AskTab({
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Ask Lens about your portfolio..."
-                className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF] focus:bg-white transition-colors"
+                className="w-full pl-4 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand focus:bg-white transition-colors"
               />
               <button
                 onClick={() => handleSend()}
                 disabled={!chatInput.trim()}
                 className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-[6px] flex items-center justify-center transition-all ${
-                  chatInput.trim() ? 'bg-[#4318FF] hover:bg-[#3311DD]' : 'bg-gray-200'
+                  chatInput.trim() ? 'bg-brand hover:bg-brand-hover' : 'bg-gray-200'
                 }`}
               >
                 <Send className="w-4 h-4 text-white" />

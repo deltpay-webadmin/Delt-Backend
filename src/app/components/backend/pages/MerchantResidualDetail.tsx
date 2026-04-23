@@ -246,18 +246,18 @@ export function MerchantResidualDetail() {
   ];
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F8FAFC]">
+    <div className="h-full overflow-y-auto bg-canvas">
       <div className="max-w-[1440px] mx-auto px-6 py-6">
         {/* ── Breadcrumb + Back ── */}
         <div className="mb-1">
           <div className="flex items-center gap-1.5 text-sm text-gray-400 mb-2">
-            <button onClick={() => navigate('/residuals')} className="text-[#4318FF] hover:underline font-medium">Residuals</button>
+            <button onClick={() => navigate('/residuals')} className="text-brand hover:underline font-medium">Residuals</button>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-gray-600 font-medium">{M.name}</span>
           </div>
           <button
             onClick={() => navigate('/residuals')}
-            className="inline-flex items-center gap-1.5 text-sm text-[#4318FF] hover:text-[#3311DD] font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-brand hover:text-brand-hover font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Residuals
@@ -277,7 +277,7 @@ export function MerchantResidualDetail() {
             <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
               <span>MID: <span className="font-mono text-xs text-gray-700 font-medium">{M.mid}</span></span>
               <span>MCC: <span className="font-medium text-gray-700">{M.mcc}</span></span>
-              <span>Agent: <span className="font-medium text-[#4318FF]">{M.agent}</span> ({M.agentSplit}% split)</span>
+              <span>Agent: <span className="font-medium text-brand">{M.agent}</span> ({M.agentSplit}% split)</span>
               <span>Processor: <span className="font-medium text-gray-700">{M.processor}</span></span>
             </div>
           </div>
@@ -285,7 +285,7 @@ export function MerchantResidualDetail() {
             <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
               <Edit3 className="w-4 h-4" /> Edit
             </button>
-            <button className="px-3.5 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-medium hover:bg-[#3311DD] inline-flex items-center gap-2 transition-colors">
+            <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
               <Download className="w-4 h-4" /> Export Statement
             </button>
           </div>
@@ -310,7 +310,7 @@ export function MerchantResidualDetail() {
                 onClick={() => setActiveTab(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-1.5 ${
                   activeTab === t.key
-                    ? 'text-[#4318FF] border-[#4318FF]'
+                    ? 'text-brand border-brand'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
@@ -394,13 +394,13 @@ export function MerchantResidualDetail() {
                   <tbody>
                     {residuals.map((r, i) => (
                       <tr key={i} className={`border-b border-gray-50 hover:bg-gray-50/50 ${i === 0 ? 'bg-indigo-50/30' : ''}`}>
-                        <td className={`px-3 py-2.5 text-sm font-semibold ${i === 0 ? 'text-[#4318FF]' : 'text-gray-900'}`}>{r.month}</td>
+                        <td className={`px-3 py-2.5 text-sm font-semibold ${i === 0 ? 'text-brand' : 'text-gray-900'}`}>{r.month}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-900">{fmt0(r.volume)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-600">{fmtNum(r.txns)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-900">{fmt(r.grossRev)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-red-600">{fmt(r.procFees)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums font-semibold text-gray-900">{fmt(r.netRev)}</td>
-                        <td className="px-3 py-2.5 text-sm tabular-nums text-[#4318FF]">{fmt(r.agentShare)}</td>
+                        <td className="px-3 py-2.5 text-sm tabular-nums text-brand">{fmt(r.agentShare)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums font-semibold text-emerald-600">{fmt(r.deltNet)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-700">{fmtPct(r.effRate)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-700">{fmt(r.avgTicket)}</td>
@@ -422,7 +422,7 @@ export function MerchantResidualDetail() {
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center gap-1">
                         <div
-                          className={`w-full max-w-[24px] rounded ${isLast ? 'bg-[#4318FF]' : 'bg-[#4318FF]/20'}`}
+                          className={`w-full max-w-[24px] rounded ${isLast ? 'bg-brand' : 'bg-brand/20'}`}
                           style={{ height: `${Math.max((r.volume / mx) * 100, 6)}%`, transition: 'height 0.5s ease' }}
                         />
                         <span className="text-[9px] text-gray-400">{r.month.slice(0, 3)}</span>
@@ -459,7 +459,7 @@ export function MerchantResidualDetail() {
               {/* Agent Commission */}
               <Card title="Agent Commission Structure">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-[8px] bg-indigo-50 flex items-center justify-center text-sm font-bold text-[#4318FF]">
+                  <div className="w-9 h-9 rounded-[8px] bg-indigo-50 flex items-center justify-center text-sm font-bold text-brand">
                     {M.agent.split(' ').map(w => w[0]).join('')}
                   </div>
                   <div>
@@ -470,7 +470,7 @@ export function MerchantResidualDetail() {
                 <div className="bg-gray-50 rounded-[8px] p-3 flex gap-3">
                   <div className="flex-1 text-center">
                     <p className="text-[10px] text-gray-500 mb-0.5">Agent</p>
-                    <p className="text-base font-bold text-[#4318FF]">{fmt(latestMonth.agentShare)}</p>
+                    <p className="text-base font-bold text-brand">{fmt(latestMonth.agentShare)}</p>
                   </div>
                   <div className="w-px bg-gray-200" />
                   <div className="flex-1 text-center">
@@ -498,7 +498,7 @@ export function MerchantResidualDetail() {
                   onClick={() => { setVerifyMode(!verifyMode); setExpandedVerifyRow(null); setShowSchedule(false); }}
                   className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-[6px] text-sm font-medium transition-all ${
                     verifyMode
-                      ? 'bg-[#4318FF] text-white shadow-sm'
+                      ? 'bg-brand text-white shadow-sm'
                       : 'border border-gray-200 text-gray-600 bg-white hover:bg-gray-50'
                   }`}
                 >
@@ -542,7 +542,7 @@ export function MerchantResidualDetail() {
                     <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-200/60">
                       <button
                         onClick={() => setShowSchedule(!showSchedule)}
-                        className="px-3 py-1.5 rounded-[6px] text-xs font-semibold bg-white border border-gray-200 text-[#4318FF] hover:bg-indigo-50 transition-colors"
+                        className="px-3 py-1.5 rounded-[6px] text-xs font-semibold bg-white border border-gray-200 text-brand hover:bg-indigo-50 transition-colors"
                       >
                         {showSchedule ? 'Hide' : 'View'} Published Rates
                       </button>
@@ -793,7 +793,7 @@ export function MerchantResidualDetail() {
                 <div className="space-y-4">
                   {[
                     { label: 'Current Effective Rate', rate: latestMonth.effRate, monthlyCost: latestMonth.volume * latestMonth.effRate, color: 'bg-gray-600', tag: 'Current' },
-                    { label: 'Delt Standard (IC+)', rate: 0.0295, monthlyCost: latestMonth.volume * 0.0295, color: 'bg-[#4318FF]', tag: 'Delt' },
+                    { label: 'Delt Standard (IC+)', rate: 0.0295, monthlyCost: latestMonth.volume * 0.0295, color: 'bg-brand', tag: 'Delt' },
                     { label: 'Market Benchmark (MCC 5812)', rate: 0.0355, monthlyCost: latestMonth.volume * 0.0355, color: 'bg-gray-400', tag: 'Market' },
                   ].map((r, i) => (
                     <div key={i}>
@@ -835,7 +835,7 @@ export function MerchantResidualDetail() {
                     { label: 'Merchant Effective Rate', value: fmtPct(latestMonth.effRate), bar: latestMonth.effRate, color: 'bg-gray-700' },
                     { label: 'Blended IC + Assessments', value: fmtPct(totalInterchangeCost / latestMonth.volume), bar: totalInterchangeCost / latestMonth.volume, color: 'bg-red-500' },
                     { label: 'Gross Margin (Spread)', value: fmtPct(latestMonth.effRate - totalInterchangeCost / latestMonth.volume), bar: latestMonth.effRate - totalInterchangeCost / latestMonth.volume, color: 'bg-emerald-500' },
-                    { label: 'Net Margin After Agent', value: fmtPct(latestMonth.deltNet / latestMonth.volume), bar: latestMonth.deltNet / latestMonth.volume, color: 'bg-[#4318FF]' },
+                    { label: 'Net Margin After Agent', value: fmtPct(latestMonth.deltNet / latestMonth.volume), bar: latestMonth.deltNet / latestMonth.volume, color: 'bg-brand' },
                   ].map((r, i) => (
                     <div key={i}>
                       <div className="flex justify-between mb-1.5">
@@ -864,7 +864,7 @@ export function MerchantResidualDetail() {
                   <div key={i} className="border border-gray-200 rounded-[8px] p-4 grid grid-cols-2 md:grid-cols-5 gap-4 hover:bg-gray-50/50 transition-colors">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <Monitor className="w-4 h-4 text-[#4318FF]" />
+                        <Monitor className="w-4 h-4 text-brand" />
                         <span className="text-sm font-bold text-gray-900">{eq.device}</span>
                       </div>
                       <span className="text-[11px] text-gray-400 font-mono">{eq.serial}</span>
@@ -927,7 +927,7 @@ export function MerchantResidualDetail() {
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-600">{new Date(cb.resolution + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                        <td className="px-3 py-2.5"><span className="text-xs text-[#4318FF] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open Dispute <ChevronRight className="w-3 h-3" /></span></td>
+                        <td className="px-3 py-2.5"><span className="text-xs text-brand font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">Open Dispute <ChevronRight className="w-3 h-3" /></span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -1036,7 +1036,7 @@ export function MerchantResidualDetail() {
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center gap-1">
                         <div
-                          className={`w-full max-w-[28px] rounded ${isLast ? 'bg-[#4318FF]' : 'bg-[#4318FF]/20'}`}
+                          className={`w-full max-w-[28px] rounded ${isLast ? 'bg-brand' : 'bg-brand/20'}`}
                           style={{ height: `${Math.max((b.amount / mx) * 100, 8)}%`, transition: 'height 0.5s ease' }}
                         />
                         <span className="text-[9px] text-gray-400">{b.date.split(' ')[1]}</span>
@@ -1086,12 +1086,12 @@ export function MerchantResidualDetail() {
                       ].map((e, i) => (
                         <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                           <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${e.attached ? 'bg-[#4318FF] border-[#4318FF]' : 'border-gray-300'}`}>
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${e.attached ? 'bg-brand border-brand' : 'border-gray-300'}`}>
                               {e.attached && <CheckCircle className="w-3 h-3 text-white" />}
                             </div>
                             <span className={`text-sm ${e.attached ? 'text-gray-900' : 'text-gray-500'}`}>{e.doc}</span>
                           </div>
-                          <button className="text-xs text-[#4318FF] font-medium hover:underline">{e.attached ? 'View' : 'Upload'}</button>
+                          <button className="text-xs text-brand font-medium hover:underline">{e.attached ? 'View' : 'Upload'}</button>
                         </div>
                       ))}
                     </div>
@@ -1110,8 +1110,8 @@ export function MerchantResidualDetail() {
                       ].map((s, i, arr) => (
                         <div key={i} className="flex items-start gap-3">
                           <div className="flex flex-col items-center">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${s.done ? 'bg-[#4318FF] text-white' : 'bg-gray-200 text-gray-500'}`}>{i + 1}</div>
-                            {i < arr.length - 1 && <div className={`w-px h-6 ${s.done ? 'bg-[#4318FF]' : 'bg-gray-200'}`} />}
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${s.done ? 'bg-brand text-white' : 'bg-gray-200 text-gray-500'}`}>{i + 1}</div>
+                            {i < arr.length - 1 && <div className={`w-px h-6 ${s.done ? 'bg-brand' : 'bg-gray-200'}`} />}
                           </div>
                           <div className="pb-3"><p className={`text-sm font-medium ${s.done ? 'text-gray-900' : 'text-gray-400'}`}>{s.step}</p><p className="text-xs text-gray-400">{s.date}</p></div>
                         </div>
@@ -1120,7 +1120,7 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors">Submit Representment</button>}
+                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
                   <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
                 </div>
               </div>
@@ -1158,7 +1158,7 @@ function Card({ title, sub, children, right }: { title: string; sub?: string; ch
 
 function KpiCard({ label, value, sub, accent, delta }: { label: string; value: string; sub?: string; accent: string; delta?: number }) {
   const accentMap: Record<string, string> = {
-    indigo: 'border-t-[#4318FF]', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
+    indigo: 'border-t-brand', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
     red: 'border-t-red-500', blue: 'border-t-blue-500',
   };
   return (
