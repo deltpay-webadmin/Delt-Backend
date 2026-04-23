@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ArrowLeft,
   Building2,
@@ -15,6 +16,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { useUnderwriting, underwritingActions } from '../crmStore';
 
 interface InfoFieldProps {
   label: string;
@@ -128,22 +130,83 @@ function InputField({ label, value, onChange, type = 'text', suffix, disabled }:
 }
 
 export function UnderwritingDetail() {
-  const { navigate } = useAppNavigate();
+  const { navigate, currentPage } = useAppNavigate();
+  const allApps = useUnderwriting();
+
+  // Extract id from /underwriting/{id}
+  const appIdFromUrl = currentPage.startsWith('/underwriting/') ? currentPage.split('/underwriting/')[1] : '';
+  const storeApp = allApps.find(a => a.id === appIdFromUrl) || allApps[0];
+
   const [factorRate, setFactorRate] = useState('1.20');
   const [loanPercent, setLoanPercent] = useState('80');
   const [term, setTerm] = useState('12');
   const [paymentType, setPaymentType] = useState('daily');
   const [originationFee, setOriginationFee] = useState('2.5');
+  const [returnNote, setReturnNote] = useState('');
+  const [returnOpen, setReturnOpen] = useState(false);
 
-  const application = {
-    id: 'UW-2026-0143',
-    businessName: 'Sunrise Cafe & Bakery',
-    ownerName: 'Michael Roberts',
-    industry: 'Food & Beverage',
-    yearsInBusiness: '5.2',
-    creditScore: 682,
-    monthlyRevenue: '$37,500',
-    requestedAmount: '$125,000',
+  const application = storeApp
+    ? {
+        id: storeApp.applicationId,
+        storeId: storeApp.id,
+        businessName: storeApp.businessName,
+        ownerName: storeApp.reviewer,
+        industry: storeApp.industry,
+        yearsInBusiness: (storeApp.monthsInBusiness / 12).toFixed(1),
+        creditScore: storeApp.creditScore,
+        monthlyRevenue: `$${storeApp.monthlyRevenue.toLocaleString()}`,
+        requestedAmount: `$${storeApp.requestedAmount.toLocaleString()}`,
+        stage: storeApp.stage,
+      }
+    : {
+        id: 'UW-2026-0143',
+        storeId: '',
+        businessName: 'Sunrise Cafe & Bakery',
+        ownerName: 'Michael Roberts',
+        industry: 'Food & Beverage',
+        yearsInBusiness: '5.2',
+        creditScore: 682,
+        monthlyRevenue: '$37,500',
+        requestedAmount: '$125,000',
+        stage: 'Received' as const,
+      };
+
+  const canDecide = application.stage !== 'Approved' && application.stage !== 'Declined';
+
+  const onApprove = () => {
+    if (!application.storeId) return;
+    underwritingActions.approve(application.storeId);
+    toast.success(`${application.businessName} approved`, { description: `${application.requestedAmount} cleared to fund.` });
+    navigate('/underwriting');
+  };
+
+  const onApproveConditions = () => {
+    if (!application.storeId) return;
+    underwritingActions.approve(application.storeId);
+    toast.success(`${application.businessName} approved with conditions`, {
+      description: 'Stipulations will be sent to merchant for docs & e-sign.',
+    });
+    navigate('/underwriting');
+  };
+
+  const onDecline = () => {
+    if (!application.storeId) return;
+    underwritingActions.decline(application.storeId);
+    toast.error(`${application.businessName} declined`, { description: 'Adverse-action letter queued.' });
+    navigate('/underwriting');
+  };
+
+  const onReturnForInfo = () => {
+    if (!returnNote.trim()) {
+      setReturnOpen(true);
+      return;
+    }
+    if (!application.storeId) return;
+    underwritingActions.setStage(application.storeId, 'Doc Collection');
+    toast.info(`Returned to Doc Collection`, { description: returnNote.trim() });
+    setReturnNote('');
+    setReturnOpen(false);
+    navigate('/underwriting');
   };
 
   const residualHistory = [
@@ -600,19 +663,51 @@ export function UnderwritingDetail() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg lg:pl-64 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center gap-3 justify-end">
-            <button className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+            {returnOpen && (
+              <div className="flex-1 max-w-md flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                <input
+                  autoFocus
+                  value={returnNote}
+                  onChange={e => setReturnNote(e.target.value)}
+                  placeholder="What's missing from the applicant?"
+                  className="flex-1 bg-transparent text-xs focus:outline-none placeholder:text-amber-600"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') onReturnForInfo();
+                    if (e.key === 'Escape') { setReturnOpen(false); setReturnNote(''); }
+                  }}
+                />
+                <button onClick={onReturnForInfo} className="text-xs font-medium text-amber-700 hover:text-amber-900">Send</button>
+              </div>
+            )}
+            <button
+              disabled={!canDecide}
+              onClick={() => setReturnOpen(v => !v)}
+              className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Info className="w-4 h-4" />
               Return for Info
             </button>
-            <button className="px-6 py-2.5 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors flex items-center gap-2">
+            <button
+              disabled={!canDecide}
+              onClick={onDecline}
+              className="px-6 py-2.5 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <X className="w-4 h-4" />
               Decline
             </button>
-            <button className="px-6 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700 transition-colors flex items-center gap-2">
+            <button
+              disabled={!canDecide}
+              onClick={onApproveConditions}
+              className="px-6 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <AlertTriangle className="w-4 h-4" />
               Approve with Conditions
             </button>
-            <button className="px-6 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700 transition-colors flex items-center gap-2">
+            <button
+              disabled={!canDecide}
+              onClick={onApprove}
+              className="px-6 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Check className="w-4 h-4" />
               Approve
             </button>
