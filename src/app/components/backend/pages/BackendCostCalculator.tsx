@@ -252,7 +252,7 @@ export function BackendCostCalculator() {
                 } ${canClick ? 'cursor-pointer' : 'cursor-default opacity-40'}`}
               >
                 <span className={`w-5.5 h-5.5 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                  isActive ? 'bg-[#4318FF] text-white' : isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'
+                  isActive ? 'bg-brand text-white' : isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'
                 }`} style={{ width: 22, height: 22 }}>
                   {isDone ? '✓' : s.n}
                 </span>
@@ -273,7 +273,7 @@ export function BackendCostCalculator() {
                   <input
                     type="text" value={merchantName} onChange={e => setMerchantName(e.target.value)}
                     placeholder="e.g. Mario's Pizzeria"
-                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-[8px] text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-[8px] text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                   />
                 </FieldGroup>
 
@@ -286,7 +286,7 @@ export function BackendCostCalculator() {
                         onClick={() => { setMerchantType(mt.key); setCardRatio(''); }}
                         className={`flex flex-col items-center gap-1.5 p-3 rounded-[8px] border transition-all text-center ${
                           merchantType === mt.key
-                            ? 'border-[#4318FF] bg-indigo-50/50'
+                            ? 'border-brand bg-indigo-50/50'
                             : 'border-gray-200 hover:border-gray-300 bg-white'
                         }`}
                       >
@@ -306,7 +306,7 @@ export function BackendCostCalculator() {
                         onClick={() => setVolumeBand(band.key)}
                         className={`px-3 py-1.5 rounded-[6px] text-xs font-medium font-mono transition-all ${
                           volumeBand === band.key
-                            ? 'bg-[#4318FF] text-white'
+                            ? 'bg-brand text-white'
                             : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-300'
                         }`}
                       >
@@ -353,7 +353,7 @@ export function BackendCostCalculator() {
                           key={r.key}
                           onClick={() => setReceptivity(r.key)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-[8px] border transition-all text-left ${
-                            active ? 'border-[#4318FF] bg-indigo-50/30' : 'border-gray-200 bg-white hover:bg-gray-50'
+                            active ? 'border-brand bg-indigo-50/30' : 'border-gray-200 bg-white hover:bg-gray-50'
                           }`}
                         >
                           <span className="w-3 h-3 rounded-full shrink-0" style={{ background: r.color, boxShadow: active ? `0 0 10px ${r.color}50` : 'none' }} />
@@ -393,21 +393,21 @@ export function BackendCostCalculator() {
                       <label className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1 block">Avg Ticket $</label>
                       <input type="number" value={avgTicket} onChange={e => setAvgTicket(e.target.value)}
                         placeholder={bandData ? `~$${AVG_TICKET_PRESETS[bandData.key]}` : '—'}
-                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                       />
                     </div>
                     <div className="flex-1">
                       <label className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1 block">Current Rate %</label>
                       <input type="number" step="0.01" value={currentRate} onChange={e => setCurrentRate(e.target.value)}
                         placeholder="e.g. 3.50"
-                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                       />
                     </div>
                     <div className="flex-1">
                       <label className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1 block">Card %</label>
                       <input type="number" value={cardRatio} onChange={e => setCardRatio(e.target.value)}
                         placeholder={mtData ? `~${mtData.cardRatioDefault}%` : '70'}
-                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                        className="w-full px-2.5 py-2 bg-white border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                       />
                     </div>
                   </div>
@@ -417,7 +417,7 @@ export function BackendCostCalculator() {
 
             {canAdvanceTo2 && (
               <div className="flex justify-end pt-5 border-t border-gray-100 mt-6">
-                <button onClick={() => setStep(2)} className="px-6 py-2.5 bg-[#4318FF] text-white text-sm font-semibold rounded-[6px] hover:bg-[#3311DD] transition-colors inline-flex items-center gap-2">
+                <button onClick={() => setStep(2)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
                   Continue to Pricing <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -433,7 +433,7 @@ export function BackendCostCalculator() {
               <button
                 onClick={() => setProgram('cash_discount')}
                 className={`relative flex items-center gap-3 p-4 rounded-[8px] border text-left transition-all ${
-                  isCashDiscount ? 'border-[#4318FF] bg-indigo-50/30' : 'border-gray-200 bg-white hover:bg-gray-50'
+                  isCashDiscount ? 'border-brand bg-indigo-50/30' : 'border-gray-200 bg-white hover:bg-gray-50'
                 }`}
               >
                 <span className="text-xl">💰</span>
@@ -442,7 +442,7 @@ export function BackendCostCalculator() {
                   <p className="text-[11px] text-gray-500">0% effective rate — fee to card customers</p>
                 </div>
                 {isCashDiscount && (
-                  <span className="absolute top-2 right-2.5 text-[9px] font-bold tracking-wide text-[#4318FF] bg-indigo-100 px-2 py-0.5 rounded">RECOMMENDED</span>
+                  <span className="absolute top-2 right-2.5 text-[9px] font-bold tracking-wide text-brand bg-indigo-100 px-2 py-0.5 rounded">RECOMMENDED</span>
                 )}
               </button>
               <button
@@ -479,13 +479,13 @@ export function BackendCostCalculator() {
                       <div className="w-px h-16 bg-gray-200" />
                       <div className="flex-1 px-4">
                         <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Service Fee to Card Customers</p>
-                        <p className="text-5xl font-bold text-gray-900 font-mono leading-none">{cdPricing?.serviceFee.toFixed(2)}<span className="text-xl text-[#4318FF] ml-0.5">%</span></p>
+                        <p className="text-5xl font-bold text-gray-900 font-mono leading-none">{cdPricing?.serviceFee.toFixed(2)}<span className="text-xl text-brand ml-0.5">%</span></p>
                         <p className="text-[9px] text-gray-400 uppercase tracking-wide mt-2">non-cash adjustment</p>
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <p className="text-6xl font-bold text-gray-900 font-mono leading-none">{frPricing?.rate.toFixed(2)}<span className="text-2xl text-[#4318FF] ml-0.5">%</span></p>
+                      <p className="text-6xl font-bold text-gray-900 font-mono leading-none">{frPricing?.rate.toFixed(2)}<span className="text-2xl text-brand ml-0.5">%</span></p>
                       <p className="text-sm text-gray-500 font-mono mt-2">+ ${frPricing?.perTxn.toFixed(2)} per transaction</p>
                     </div>
                   )}
@@ -494,7 +494,7 @@ export function BackendCostCalculator() {
                     <p className="inline-block mt-4 text-xs font-mono text-gray-500 bg-gray-100 px-3 py-1 rounded-[6px]">${cdPricing.monthlyFee}/mo program fee</p>
                   )}
 
-                  <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-[#4318FF] font-medium">
+                  <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-brand font-medium">
                     <Lock className="w-3 h-3" /> Matrix-locked — no discretionary adjustments
                   </div>
                 </div>
@@ -511,7 +511,7 @@ export function BackendCostCalculator() {
               {/* Delt Economics Sidebar */}
               <div className="bg-gray-50 border border-gray-200 rounded-[8px] p-4 space-y-3 h-fit">
                 <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4318FF]" /> Delt Economics <span className="text-gray-400 font-normal normal-case text-[9px]">(internal)</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand" /> Delt Economics <span className="text-gray-400 font-normal normal-case text-[9px]">(internal)</span>
                 </div>
 
                 {isCashDiscount ? (
@@ -550,7 +550,7 @@ export function BackendCostCalculator() {
 
             <div className="flex justify-between pt-5 border-t border-gray-100">
               <button onClick={() => setStep(1)} className="px-4 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-500 bg-white hover:bg-gray-50 font-medium">← Back</button>
-              <button onClick={() => setStep(3)} className="px-6 py-2.5 bg-[#4318FF] text-white text-sm font-semibold rounded-[6px] hover:bg-[#3311DD] transition-colors inline-flex items-center gap-2">
+              <button onClick={() => setStep(3)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
                 View Playbook <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -568,7 +568,7 @@ export function BackendCostCalculator() {
                   {merchantName || mtData?.label} · {RECEPTIVITY_LEVELS.find(r => r.key === receptivity)?.label} · CD Fit: {cdScore}/100
                 </p>
               </div>
-              <span className="text-[11px] font-semibold text-[#4318FF] bg-indigo-100 px-3 py-1.5 rounded-[6px] whitespace-nowrap">
+              <span className="text-[11px] font-semibold text-brand bg-indigo-100 px-3 py-1.5 rounded-[6px] whitespace-nowrap">
                 {isCashDiscount ? 'Cash Discount' : 'Flat Rate'} · {bandData?.label}/mo
               </span>
             </div>
@@ -576,7 +576,7 @@ export function BackendCostCalculator() {
             {/* Opening Move */}
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <span className="w-6 h-6 rounded-full bg-indigo-100 text-[#4318FF] flex items-center justify-center text-xs font-bold font-mono">1</span>
+                <span className="w-6 h-6 rounded-full bg-indigo-100 text-brand flex items-center justify-center text-xs font-bold font-mono">1</span>
                 <span className="text-sm font-semibold text-gray-700">Opening Move</span>
               </div>
               <div className="bg-white border border-gray-200 rounded-[8px] p-4">
@@ -588,7 +588,7 @@ export function BackendCostCalculator() {
             {strategy.keyObjections.length > 0 && (
               <div>
                 <div className="flex items-center gap-2.5 mb-3">
-                  <span className="w-6 h-6 rounded-full bg-indigo-100 text-[#4318FF] flex items-center justify-center text-xs font-bold font-mono">2</span>
+                  <span className="w-6 h-6 rounded-full bg-indigo-100 text-brand flex items-center justify-center text-xs font-bold font-mono">2</span>
                   <span className="text-sm font-semibold text-gray-700">Handle These Objections</span>
                   <span className="text-[11px] text-gray-400">Most likely for this merchant profile</span>
                 </div>
@@ -599,17 +599,17 @@ export function BackendCostCalculator() {
                     if (!obj) return null;
                     const isOpen = expandedObj === objKey;
                     return (
-                      <div key={objKey} className={`border rounded-[8px] overflow-hidden transition-colors ${isOpen ? 'border-[#4318FF]/20' : 'border-gray-200'}`}>
+                      <div key={objKey} className={`border rounded-[8px] overflow-hidden transition-colors ${isOpen ? 'border-brand/20' : 'border-gray-200'}`}>
                         <button onClick={() => setExpandedObj(isOpen ? null : objKey)} className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 text-left transition-colors">
                           <span className="text-sm font-semibold text-gray-800">{obj.title}</span>
                           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isOpen && (
                           <div className="px-4 pb-4 space-y-3 bg-white">
-                            <p className="text-xs font-semibold text-[#4318FF] italic">{obj.reframe}</p>
+                            <p className="text-xs font-semibold text-brand italic">{obj.reframe}</p>
                             <div>
                               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">What to say:</p>
-                              <div className="text-sm text-gray-700 leading-relaxed p-3 bg-indigo-50/50 rounded-[6px] border-l-3 border-[#4318FF]" style={{ borderLeft: '3px solid #4318FF' }}>
+                              <div className="text-sm text-gray-700 leading-relaxed p-3 bg-indigo-50/50 rounded-[6px] border-l-3 border-brand" style={{ borderLeft: '3px solid #4318FF' }}>
                                 {obj.talk}
                               </div>
                             </div>
@@ -627,14 +627,14 @@ export function BackendCostCalculator() {
                     const obj = OBJECTIONS[objKey];
                     const isOpen = expandedObj === objKey;
                     return (
-                      <div key={objKey} className={`border rounded-[8px] overflow-hidden opacity-60 transition-colors ${isOpen ? 'border-[#4318FF]/15 opacity-100' : 'border-gray-100'}`}>
+                      <div key={objKey} className={`border rounded-[8px] overflow-hidden opacity-60 transition-colors ${isOpen ? 'border-brand/15 opacity-100' : 'border-gray-100'}`}>
                         <button onClick={() => setExpandedObj(isOpen ? null : objKey)} className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 text-left transition-colors">
                           <span className="text-sm font-medium text-gray-600">{obj.title}</span>
                           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isOpen && (
                           <div className="px-4 pb-4 space-y-3 bg-white">
-                            <p className="text-xs font-semibold text-[#4318FF] italic">{obj.reframe}</p>
+                            <p className="text-xs font-semibold text-brand italic">{obj.reframe}</p>
                             <div>
                               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">What to say:</p>
                               <div className="text-sm text-gray-700 leading-relaxed p-3 bg-indigo-50/50 rounded-[6px]" style={{ borderLeft: '3px solid #4318FF' }}>

@@ -164,7 +164,7 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
   return (
     <div className="px-6 py-5 border-b border-gray-200">
       <div className="flex items-center gap-2 mb-3">
-        <Package className="w-4 h-4 text-[#4318FF]" />
+        <Package className="w-4 h-4 text-brand" />
         <p className="text-xs text-gray-500 font-medium">Welcome Bundle</p>
       </div>
 
@@ -181,7 +181,7 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors"
           >
             <Gift className="w-3.5 h-3.5" />
             Assign Bundle
@@ -246,15 +246,15 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
                 return (
                   <React.Fragment key={s}>
                     <div className="flex flex-col items-center flex-1">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isComplete ? 'bg-[#4318FF] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isComplete ? 'bg-brand text-white' : 'bg-gray-100 text-gray-400'}`}>
                         {icons[s]}
                       </div>
-                      <p className={`text-[9px] mt-1 text-center leading-tight ${isComplete ? 'text-[#4318FF] font-medium' : 'text-gray-400'}`}>
+                      <p className={`text-[9px] mt-1 text-center leading-tight ${isComplete ? 'text-brand font-medium' : 'text-gray-400'}`}>
                         {s === 'Credit Issued' ? 'Issued' : s === 'Order Placed' ? 'Ordered' : s}
                       </p>
                     </div>
                     {i < 3 && (
-                      <div className={`h-0.5 w-4 shrink-0 rounded-full ${thisIdx < currentIdx ? 'bg-[#4318FF]' : 'bg-gray-200'}`} />
+                      <div className={`h-0.5 w-4 shrink-0 rounded-full ${thisIdx < currentIdx ? 'bg-brand' : 'bg-gray-200'}`} />
                     )}
                   </React.Fragment>
                 );
@@ -1016,7 +1016,7 @@ export function BackendLeads() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC]">
+    <div className="h-full flex flex-col bg-canvas">
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-6">
         <div className="flex items-center justify-between">

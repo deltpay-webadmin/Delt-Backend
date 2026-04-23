@@ -86,7 +86,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
       onClick={onClick}
       className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
         active
-          ? 'bg-[#4318FF] text-white border-[#4318FF]'
+          ? 'bg-brand text-white border-brand'
           : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
       }`}
     >
@@ -169,7 +169,7 @@ export function BackendMerchants() {
           <h1 className="text-2xl font-bold text-gray-900">All Merchants</h1>
           <p className="text-sm text-gray-500 mt-0.5">{total} merchants across all products and plans</p>
         </div>
-        <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2">
+        <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Add Merchant
         </button>
@@ -178,7 +178,7 @@ export function BackendMerchants() {
       {/* ── Summary Cards ── */}
       <div className="px-6 pb-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <Card label="Total Merchants" value={total.toString()} icon={<Store className="w-4 h-4 text-[#4318FF]" />} />
+          <Card label="Total Merchants" value={total.toString()} icon={<Store className="w-4 h-4 text-brand" />} />
           <Card label="Subscription Revenue" value={fmt(totalSubRevenue)} sub="/month" icon={<CreditCard className="w-4 h-4 text-blue-600" />} />
           <Card label="Capital Deployed" value={fmt(totalCapitalDeployed)} icon={<Banknote className="w-4 h-4 text-violet-600" />} />
           <Card label="Outstanding Balance" value={fmt(totalOutstanding)} icon={<DollarSign className="w-4 h-4 text-amber-600" />} />
@@ -196,7 +196,7 @@ export function BackendMerchants() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search merchants..."
-              className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+              className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
             />
           </div>
 
@@ -242,8 +242,8 @@ export function BackendMerchants() {
                 {/* Merchant */}
                 <td className="pl-6 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#4318FF]/5 flex items-center justify-center shrink-0 group-hover:bg-[#4318FF]/10 transition-colors">
-                      <Building2 className="w-4 h-4 text-[#4318FF]" />
+                    <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center shrink-0 group-hover:bg-brand/10 transition-colors">
+                      <Building2 className="w-4 h-4 text-brand" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{m.name}</p>
@@ -384,7 +384,7 @@ function Dropdown({ value, onChange, options, label }: { value: string; onChange
     <select
       value={value}
       onChange={e => onChange(e.target.value)}
-      className="px-2.5 py-[7px] bg-white border border-gray-200 rounded-[6px] text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF] appearance-none pr-7"
+      className="px-2.5 py-[7px] bg-white border border-gray-200 rounded-[6px] text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand appearance-none pr-7"
       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
     >
       {options.map(o => (

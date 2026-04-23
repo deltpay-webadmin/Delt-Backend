@@ -359,7 +359,7 @@ export function BackendOutreach() {
                 {AUTO_TRIGGERS.filter(t => t.status === 'active').length} automations live
               </span>
             </div>
-            <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Campaign
             </button>
           </div>
@@ -368,7 +368,7 @@ export function BackendOutreach() {
         {/* ── Top KPIs ── */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: 'Total Sent', value: metrics.totalSent.toLocaleString(), accent: 'border-t-[#4318FF]', sub: `${CAMPAIGNS.filter(c => c.status !== 'draft').length} campaigns` },
+            { label: 'Total Sent', value: metrics.totalSent.toLocaleString(), accent: 'border-t-brand', sub: `${CAMPAIGNS.filter(c => c.status !== 'draft').length} campaigns` },
             { label: 'Open Rate', value: fmtPct(metrics.openRate), accent: 'border-t-blue-500', sub: `${metrics.totalOpened.toLocaleString()} opened` },
             { label: 'Click Rate', value: fmtPct(metrics.clickRate), accent: 'border-t-purple-500', sub: `${metrics.totalClicked.toLocaleString()} clicks` },
             { label: 'Response Rate', value: fmtPct(metrics.responseRate), accent: 'border-t-emerald-500', sub: `${metrics.totalResponded} responses` },
@@ -390,14 +390,14 @@ export function BackendOutreach() {
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-2 ${
-                  activeTab === t.key ? 'text-[#4318FF] border-[#4318FF]' : 'text-gray-500 border-transparent hover:text-gray-700'
+                  activeTab === t.key ? 'text-brand border-brand' : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
                 <t.icon className="w-3.5 h-3.5" />
                 {t.label}
                 {t.badge !== undefined && (
                   <span className={`text-[10px] tabular-nums px-1.5 py-px rounded-full ${
-                    activeTab === t.key ? 'bg-[#4318FF]/10 text-[#4318FF]' : 'bg-gray-100 text-gray-500'
+                    activeTab === t.key ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-500'
                   }`}>{t.badge}</span>
                 )}
               </button>
@@ -451,20 +451,20 @@ export function BackendOutreach() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search campaigns, templates, segments..."
-                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
               </div>
               <div className="flex items-center gap-1.5">
                 {['all', 'email', 'sms', 'portal_cta'].map(ch => (
                   <button key={ch} onClick={() => setChannelFilter(ch)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-[6px] transition-colors ${
-                      channelFilter === ch ? 'bg-[#4318FF] text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                      channelFilter === ch ? 'bg-brand text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}>
                     {ch === 'all' ? 'All' : channelIcon[ch as Channel].label}
                   </button>
                 ))}
               </div>
               <select value={agentFilter} onChange={e => setAgentFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20">
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20">
                 <option value="all">All Agents</option>
                 <option value="Sarah M.">Sarah M.</option>
                 <option value="Lyndon R.">Lyndon R.</option>
@@ -580,7 +580,7 @@ export function BackendOutreach() {
         {activeTab === 'bulk' && (
           <div className="space-y-5">
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-[8px] border border-indigo-200 p-4 flex items-start gap-3">
-              <Layers className="w-5 h-5 text-[#4318FF] mt-0.5 shrink-0" />
+              <Layers className="w-5 h-5 text-brand mt-0.5 shrink-0" />
               <div>
                 <h3 className="text-sm font-bold text-gray-900">Segmented Bulk Campaigns</h3>
                 <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
@@ -605,7 +605,7 @@ export function BackendOutreach() {
                         <button key={i} onClick={() => setBulkSegment(seg.label)}
                           className={`text-left px-3 py-2.5 rounded-[6px] border transition-all ${
                             bulkSegment === seg.label
-                              ? 'border-[#4318FF] bg-[#4318FF]/5 ring-1 ring-[#4318FF]/20'
+                              ? 'border-brand bg-brand/5 ring-1 ring-brand/20'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                           }`}>
                           <p className="text-sm text-gray-900 font-medium">{seg.label}</p>
@@ -620,7 +620,7 @@ export function BackendOutreach() {
                     <label className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-2 block">2. Choose Template</label>
                     <div className="flex items-center gap-2">
                       <select value={bulkTemplate} onChange={e => setBulkTemplate(e.target.value)}
-                        className="flex-1 px-3 py-2.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]">
+                        className="flex-1 px-3 py-2.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
                         <option value="">Select a template...</option>
                         {templates.map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
@@ -649,7 +649,7 @@ export function BackendOutreach() {
                           </div>
                         )}
                         <div className="px-3 py-3 bg-white max-h-[180px] overflow-y-auto">
-                          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-['DM_Sans'] leading-relaxed">{TEMPLATE_PREVIEWS[bulkTemplate].body}</pre>
+                          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{TEMPLATE_PREVIEWS[bulkTemplate].body}</pre>
                         </div>
                         <div className="px-3 py-2 bg-gray-50 border-t border-gray-100">
                           <p className="text-[9px] text-gray-400">Merge fields like {'{{merchant_name}}'} will be auto-populated per recipient</p>
@@ -669,7 +669,7 @@ export function BackendOutreach() {
                           <button key={ch} onClick={() => setBulkChannel(ch)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-[6px] border text-sm font-medium transition-all ${
                               bulkChannel === ch
-                                ? 'border-[#4318FF] bg-[#4318FF]/5 text-[#4318FF] ring-1 ring-[#4318FF]/20'
+                                ? 'border-brand bg-brand/5 text-brand ring-1 ring-brand/20'
                                 : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                             }`}>
                             <Icon className="w-4 h-4" />{c.label}
@@ -685,7 +685,7 @@ export function BackendOutreach() {
                       {bulkSegment && (
                         <p className="text-xs text-gray-500">
                           Sending to <span className="font-bold text-gray-900">{segments.find(s => s.label === bulkSegment)?.count || 0}</span> merchants
-                          {bulkTemplate && <> using <span className="font-semibold text-[#4318FF]">{bulkTemplate}</span></>}
+                          {bulkTemplate && <> using <span className="font-semibold text-brand">{bulkTemplate}</span></>}
                         </p>
                       )}
                     </div>
@@ -694,7 +694,7 @@ export function BackendOutreach() {
                       disabled={!bulkSegment || !bulkTemplate}
                       className={`px-5 py-2.5 text-sm font-medium rounded-[6px] flex items-center gap-2 transition-colors ${
                         bulkSegment && bulkTemplate
-                          ? 'bg-[#4318FF] text-white hover:bg-[#3311DD]'
+                          ? 'bg-brand text-white hover:bg-brand-hover'
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}>
                       <Send className="w-4 h-4" /> Send Campaign
@@ -747,7 +747,7 @@ export function BackendOutreach() {
                   This is where the CRM starts working <strong>for</strong> you instead of you working the CRM.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] flex items-center gap-1.5 shrink-0">
+              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Rule
               </button>
             </div>
@@ -758,7 +758,7 @@ export function BackendOutreach() {
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Active Rules</p>
                 <p className="text-xl font-bold text-gray-900">{AUTO_TRIGGERS.filter(t => t.status === 'active').length}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-[#4318FF] p-4">
+              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Fired</p>
                 <p className="text-xl font-bold text-gray-900">{AUTO_TRIGGERS.reduce((s, t) => s + t.firedCount, 0)}</p>
               </div>
@@ -849,7 +849,7 @@ export function BackendOutreach() {
                   Create multi-step automated campaigns that nurture merchants over time. Each sequence is triggered by a condition and sends messages at defined intervals.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] flex items-center gap-1.5 shrink-0">
+              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Sequence
               </button>
             </div>
@@ -860,7 +860,7 @@ export function BackendOutreach() {
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Active Sequences</p>
                 <p className="text-xl font-bold text-gray-900">{DRIP_SEQUENCES.filter(d => d.status === 'active').length}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-[#4318FF] p-4">
+              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Currently Enrolled</p>
                 <p className="text-xl font-bold text-gray-900">{DRIP_SEQUENCES.reduce((s, d) => s + d.enrolled, 0)}</p>
               </div>
@@ -956,7 +956,7 @@ export function BackendOutreach() {
                             );
                           })}
                         </div>
-                        <button className="mt-3 ml-13 text-sm text-[#4318FF] hover:underline font-medium flex items-center gap-1.5">
+                        <button className="mt-3 ml-13 text-sm text-brand hover:underline font-medium flex items-center gap-1.5">
                           <Plus className="w-3.5 h-3.5" /> Add Step
                         </button>
                       </div>
@@ -989,7 +989,7 @@ export function BackendOutreach() {
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Impressions</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{PORTAL_CTAS.reduce((s, c) => s + c.impressions, 0).toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-[#4318FF] p-4">
+              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Clicks</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{PORTAL_CTAS.reduce((s, c) => s + c.clicks, 0)}</p>
               </div>
@@ -1119,8 +1119,8 @@ export function BackendOutreach() {
                 <div key={agent.agent} className="bg-white rounded-[8px] border border-gray-200">
                   <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#4318FF]/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-[#4318FF]">{agent.avatar}</span>
+                      <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center">
+                        <span className="text-sm font-bold text-brand">{agent.avatar}</span>
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-900">{agent.agent}</p>
@@ -1133,7 +1133,7 @@ export function BackendOutreach() {
                         { label: 'SMS', value: agent.smsSent, color: 'text-emerald-600' },
                         { label: 'Responses', value: agent.responses, color: 'text-purple-600' },
                         { label: 'Tasks', value: agent.tasksCreated, color: 'text-amber-600' },
-                        { label: 'Follow-Ups', value: agent.followUpsCompleted, color: 'text-[#4318FF]' },
+                        { label: 'Follow-Ups', value: agent.followUpsCompleted, color: 'text-brand' },
                       ].map((m, i) => (
                         <div key={i} className="text-center">
                           <p className={`text-lg font-bold tabular-nums ${m.color}`}>{m.value}</p>
@@ -1171,7 +1171,7 @@ export function BackendOutreach() {
           <p className="text-xs text-gray-400">
             {CAMPAIGNS.length} campaigns — {OUTREACH_EVENTS.length} outreach events — {AUTO_TRIGGERS.filter(t => t.status === 'active').length} active automations
           </p>
-          <p className="text-xs text-gray-400"><span className="text-[#4318FF] font-bold">delt</span>pay.com</p>
+          <p className="text-xs text-gray-400"><span className="text-brand font-bold">delt</span>pay.com</p>
         </div>
       </div>
 
@@ -1197,11 +1197,11 @@ export function BackendOutreach() {
               </div>
             )}
             <div className="px-5 py-4 max-h-[400px] overflow-y-auto">
-              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-['DM_Sans'] leading-relaxed">{TEMPLATE_PREVIEWS[previewTemplate].body}</pre>
+              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">{TEMPLATE_PREVIEWS[previewTemplate].body}</pre>
             </div>
             <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 rounded-b-[8px] flex items-center justify-between">
               <p className="text-[10px] text-gray-400">Merge fields (e.g. {'{{merchant_name}}'}) auto-populated per recipient</p>
-              <button onClick={() => setPreviewTemplate(null)} className="px-3 py-1.5 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">Close</button>
+              <button onClick={() => setPreviewTemplate(null)} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Close</button>
             </div>
           </div>
         </div>
@@ -1213,8 +1213,8 @@ export function BackendOutreach() {
           <div className="absolute inset-0 bg-black/30" onClick={() => setShowBulkConfirm(false)} />
           <div className="relative bg-white rounded-[8px] shadow-2xl border border-gray-200 w-full max-w-md mx-4 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#4318FF]/10 flex items-center justify-center">
-                <Send className="w-5 h-5 text-[#4318FF]" />
+              <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center">
+                <Send className="w-5 h-5 text-brand" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Confirm Send</h3>
@@ -1225,11 +1225,11 @@ export function BackendOutreach() {
               <div className="flex justify-between"><span className="text-gray-500">Segment:</span><span className="font-medium text-gray-900">{bulkSegment}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Template:</span><span className="font-medium text-gray-900">{bulkTemplate}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Channel:</span><span className="font-medium text-gray-900">{channelIcon[bulkChannel].label}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Recipients:</span><span className="font-bold text-[#4318FF]">{segments.find(s => s.label === bulkSegment)?.count || 0} merchants</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Recipients:</span><span className="font-bold text-brand">{segments.find(s => s.label === bulkSegment)?.count || 0} merchants</span></div>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] flex items-center justify-center gap-2">
+              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center justify-center gap-2">
                 <Send className="w-4 h-4" /> Send Now
               </button>
             </div>

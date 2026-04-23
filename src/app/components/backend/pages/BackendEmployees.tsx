@@ -233,8 +233,8 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
         <div className="bg-white border-b border-gray-200 px-6 py-5">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#4318FF]/10 flex items-center justify-center">
-                <span className="text-[#4318FF] text-lg font-semibold">{employee.initials}</span>
+              <div className="w-12 h-12 rounded-full bg-brand/10 flex items-center justify-center">
+                <span className="text-brand text-lg font-semibold">{employee.initials}</span>
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">{employee.name}</h2>
@@ -259,7 +259,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
               key={tab}
               onClick={() => setDetailTab(tab)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors capitalize ${
-                detailTab === tab ? 'border-[#4318FF] text-[#4318FF]' : 'border-transparent text-gray-500 hover:text-gray-900'
+                detailTab === tab ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-900'
               }`}
             >
               {tab === 'info' ? 'Details' : tab === 'reviews' ? 'Reviews' : tab}
@@ -373,8 +373,8 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                   </div>
                 </div>
               ))}
-              <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF] resize-none" rows={3} />
-              <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3614d0] transition-colors">Add Note</button>
+              <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
+              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Add Note</button>
             </div>
           )}
 
@@ -404,7 +404,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                         <span className="text-xs text-gray-600">{metric.label}</span>
                         <div className="flex gap-0.5">
                           {[1,2,3,4,5].map(n => (
-                            <div key={n} className={`w-3 h-3 rounded-full ${n <= metric.score ? 'bg-[#4318FF]' : 'bg-gray-200'}`} />
+                            <div key={n} className={`w-3 h-3 rounded-full ${n <= metric.score ? 'bg-brand' : 'bg-gray-200'}`} />
                           ))}
                         </div>
                       </div>
@@ -438,14 +438,14 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               </div>
 
-              <button className="w-full px-4 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3614d0] transition-colors">Start New Review</button>
+              <button className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Start New Review</button>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3614d0] transition-colors flex items-center justify-center gap-2">
+          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
             <Edit className="w-4 h-4" /> Edit Employee
           </button>
           <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">
@@ -476,7 +476,7 @@ export function BackendEmployees() {
   );
 
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC]">
+    <div className="h-full flex flex-col bg-canvas">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-6">
         <div className="flex items-center justify-between">
@@ -484,7 +484,7 @@ export function BackendEmployees() {
             <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
             <p className="text-sm text-gray-600 mt-1">{totalEmployees} active employees across all departments</p>
           </div>
-          <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3614d0] transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Employee
           </button>
         </div>
@@ -509,16 +509,16 @@ export function BackendEmployees() {
                 placeholder="Search by name, role, or department..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               />
             </div>
-            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]">
+            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
               <option>All Departments</option><option>Engineering</option><option>Sales</option><option>Operations</option><option>Support</option>
             </select>
-            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]">
+            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
               <option>All Types</option><option>Full-Time</option><option>Part-Time</option><option>Contractor</option>
             </select>
-            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]">
+            <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
               <option>All Status</option><option>Active</option><option>On Leave</option><option>Terminated</option>
             </select>
           </div>
@@ -545,8 +545,8 @@ export function BackendEmployees() {
                   <tr key={emp.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#4318FF]/10 flex items-center justify-center shrink-0">
-                          <span className="text-[#4318FF] text-xs font-semibold">{emp.initials}</span>
+                        <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+                          <span className="text-brand text-xs font-semibold">{emp.initials}</span>
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">{emp.name}</p>

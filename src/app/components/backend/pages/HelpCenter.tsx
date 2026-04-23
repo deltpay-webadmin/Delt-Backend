@@ -120,13 +120,13 @@ function SectionHeader({ title }: { title: string }) {
 function Card({ card }: { card: ArticleCard }) {
   const Icon = card.icon;
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-6 hover:border-[#4318FF]/30 hover:shadow-[0_2px_12px_rgba(67,24,255,0.06)] transition-all group">
-      <div className="w-10 h-10 bg-[#4318FF]/[0.06] rounded-[8px] flex items-center justify-center mb-4 group-hover:bg-[#4318FF]/10 transition-colors">
-        <Icon className="w-5 h-5 text-[#4318FF]" />
+    <div className="bg-white rounded-[8px] border border-gray-200 p-6 hover:border-brand/30 hover:shadow-[0_2px_12px_rgba(67,24,255,0.06)] transition-all group">
+      <div className="w-10 h-10 bg-brand/[0.06] rounded-[8px] flex items-center justify-center mb-4 group-hover:bg-brand/10 transition-colors">
+        <Icon className="w-5 h-5 text-brand" />
       </div>
       <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{card.title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed mb-4">{card.description}</p>
-      <button className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4318FF] hover:text-[#3614d0] transition-colors group/link">
+      <button className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-hover transition-colors group/link">
         Read
         <ArrowRight className="w-3.5 h-3.5 translate-x-0 group-hover/link:translate-x-0.5 transition-transform" />
       </button>
@@ -182,13 +182,13 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/25 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="absolute inset-y-0 right-0 w-full max-w-3xl bg-[#FAFBFD] shadow-2xl flex flex-col">
+      <div className="absolute inset-y-0 right-0 w-full max-w-3xl bg-canvas-muted shadow-2xl flex flex-col">
         {/* ── Header ── */}
         <div className="bg-white border-b border-gray-200 px-8 pt-7 pb-6 shrink-0">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#4318FF]/[0.08] rounded-[8px] flex items-center justify-center">
-                <HelpCircle className="w-5 h-5 text-[#4318FF]" />
+              <div className="w-9 h-9 bg-brand/[0.08] rounded-[8px] flex items-center justify-center">
+                <HelpCircle className="w-5 h-5 text-brand" />
               </div>
               <h1 className="text-xl font-bold text-gray-900">Help Center</h1>
             </div>
@@ -206,7 +206,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search articles, guides, and FAQs..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF] transition-colors placeholder:text-gray-400"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors placeholder:text-gray-400"
             />
             {searchQuery && (
               <button
@@ -231,7 +231,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
                 <p className="text-sm text-gray-500">Try a different search term or browse the sections below.</p>
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="mt-4 text-sm font-medium text-[#4318FF] hover:text-[#3614d0]"
+                  className="mt-4 text-sm font-medium text-brand hover:text-brand-hover"
                 >
                   Clear search
                 </button>
@@ -298,15 +298,15 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
             {!q && (
               <section>
                 <div className="bg-white rounded-[8px] border border-gray-200 p-8 text-center">
-                  <div className="w-12 h-12 bg-[#4318FF]/[0.06] rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="w-6 h-6 text-[#4318FF]" />
+                  <div className="w-12 h-12 bg-brand/[0.06] rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="w-6 h-6 text-brand" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1.5">Still need help?</h3>
                   <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
                     Can't find what you're looking for? Our support team is available Monday–Friday, 9 AM–6 PM EST.
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-5 py-2.5 bg-[#4318FF] text-white text-sm font-semibold rounded-[6px] hover:bg-[#3614d0] transition-colors flex items-center gap-2">
+                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />
                       Contact Support
                     </button>
