@@ -1,47 +1,14 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
-  Search, FileText, Clock, TrendingUp, DollarSign, AlertTriangle, Eye,
-  LayoutGrid, List, ChevronRight, User, Store, Filter, Plus,
-  Banknote, Shield, Calendar, CreditCard, Building2, ArrowRight,
-  CheckCircle, XCircle, AlertCircle, MoreHorizontal, Phone,
-  FileCheck, Brain, GripVertical, ChevronDown,
+  Search, FileText, Clock, DollarSign, AlertTriangle, Eye,
+  LayoutGrid, List, Plus,
+  Shield,
+  CheckCircle, XCircle,
+  ChevronDown,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
-
-// ── Types ──
-type UWStage = 'Received' | 'Doc Collection' | 'Bank Review' | 'Credit Analysis' | 'Committee' | 'Approved' | 'Declined';
-type ProductType = 'MCA' | 'Term Loan' | 'Line of Credit' | 'Revenue Based';
-
-interface Application {
-  id: string;
-  applicationId: string;
-  businessName: string;
-  dba?: string;
-  industry: string;
-  state: string;
-  productType: ProductType;
-  requestedAmount: number;
-  monthlyRevenue: number;
-  avgDailyBalance: number;
-  monthsInBusiness: number;
-  creditScore: number;
-  existingPositions: number;
-  submissionDate: string;
-  reviewer: string;
-  reviewerInitials: string;
-  riskScore: number;
-  stage: UWStage;
-  daysInStage: number;
-  slaThreshold: number;
-  factorRate?: number;
-  proposedPayback?: number;
-  dailyPayment?: number;
-  holdbackPct?: number;
-  disclosureState?: string;
-  missingDocs?: string[];
-  notes?: string;
-  source: string;
-}
+import { useUnderwriting, underwritingActions, type UWStage, type ProductType, type UWApplication as Application } from '../crmStore';
 
 const STAGES: UWStage[] = ['Received', 'Doc Collection', 'Bank Review', 'Credit Analysis', 'Committee', 'Approved', 'Declined'];
 
@@ -55,7 +22,7 @@ const STAGE_CONFIG: Record<UWStage, { color: string; bg: string; border: string;
   'Declined': { color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', dot: 'bg-red-500' },
 };
 
-const APPLICATIONS: Application[] = [
+const _legacyApps: Application[] = [
   {
     id: 'app-001', applicationId: 'UW-2026-0147', businessName: 'TechForward Solutions', dba: 'TechForward', industry: 'IT Services', state: 'NY',
     productType: 'MCA', requestedAmount: 200000, monthlyRevenue: 85000, avgDailyBalance: 14200, monthsInBusiness: 48, creditScore: 712,
@@ -135,6 +102,7 @@ const APPLICATIONS: Application[] = [
     notes: 'Negative cash flow trend. Multiple NSFs on bank statements. Adverse action sent.',
   },
 ];
+void _legacyApps;
 
 const fmt = (n: number) => `$${n.toLocaleString()}`;
 
@@ -215,10 +183,12 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
 // ── Main ──
 export function BackendUnderwriting() {
   const { navigate } = useAppNavigate();
+  const APPLICATIONS = useUnderwriting();
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
   const [activeTab, setActiveTab] = useState<'All' | UWStage>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [reviewerFilter, setReviewerFilter] = useState('All');
+  const [newAppOpen, setNewAppOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return APPLICATIONS.filter(app => {
@@ -230,7 +200,7 @@ export function BackendUnderwriting() {
       }
       return true;
     });
-  }, [activeTab, searchQuery, reviewerFilter]);
+  }, [APPLICATIONS, activeTab, searchQuery, reviewerFilter]);
 
   const inQueueCount = APPLICATIONS.filter(a => !['Approved', 'Declined'].includes(a.stage)).length;
   const approvedCount = APPLICATIONS.filter(a => a.stage === 'Approved').length;
@@ -240,6 +210,25 @@ export function BackendUnderwriting() {
   const pipelineValue = APPLICATIONS.filter(a => !['Declined'].includes(a.stage)).reduce((s, a) => s + a.requestedAmount, 0);
   const overSLACount = APPLICATIONS.filter(a => a.daysInStage >= a.slaThreshold && !['Approved', 'Declined'].includes(a.stage)).length;
   const avgDaysToDecision = totalDecided > 0 ? (APPLICATIONS.filter(a => ['Approved', 'Declined'].includes(a.stage)).reduce((s, a) => s + a.daysInStage, 0) / totalDecided).toFixed(1) : '—';
+
+  const handleAdvance = (app: Application) => {
+    const order: UWStage[] = ['Received', 'Doc Collection', 'Bank Review', 'Credit Analysis', 'Committee', 'Approved'];
+    const idx = order.indexOf(app.stage);
+    if (idx < 0 || idx === order.length - 1) return;
+    const next = order[idx + 1];
+    underwritingActions.setStage(app.id, next);
+    toast.success(`${app.businessName} → ${next}`);
+  };
+
+  const handleApprove = (app: Application) => {
+    underwritingActions.approve(app.id);
+    toast.success(`${app.businessName} approved`, { description: `${fmt(app.requestedAmount)} ${app.productType}` });
+  };
+
+  const handleDecline = (app: Application) => {
+    underwritingActions.decline(app.id);
+    toast.error(`${app.businessName} declined`);
+  };
 
   const tabs: Array<'All' | UWStage> = ['All', ...STAGES];
 
@@ -267,7 +256,10 @@ export function BackendUnderwriting() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button
+            onClick={() => setNewAppOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover"
+          >
             <Plus className="w-3.5 h-3.5" /> New Application
           </button>
         </div>
@@ -409,6 +401,7 @@ export function BackendUnderwriting() {
                   const overSLA = app.daysInStage >= app.slaThreshold;
                   return (
                     <tr key={app.id} className={`hover:bg-gray-50/50 transition-colors ${overSLA && !['Approved', 'Declined'].includes(app.stage) ? 'bg-red-50/20' : ''}`}>
+                      {/* Inline stage select for quick transitions */}
                       <td className="px-3 py-3">
                         <span className="text-[10px] font-mono font-semibold text-brand cursor-pointer hover:underline" onClick={() => navigate(`/underwriting/${app.id}`)}>{app.applicationId}</span>
                       </td>
@@ -433,7 +426,18 @@ export function BackendUnderwriting() {
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${risk.bg} ${risk.text} ${risk.border}`}>{app.riskScore}</span>
                       </td>
                       <td className="px-3 py-3">
-                        <span className={`text-[10px] font-semibold px-2 py-1 rounded ${scfg.bg} ${scfg.color}`}>{app.stage}</span>
+                        <select
+                          value={app.stage}
+                          onClick={e => e.stopPropagation()}
+                          onChange={e => {
+                            const next = e.target.value as UWStage;
+                            underwritingActions.setStage(app.id, next);
+                            toast.success(`${app.businessName} → ${next}`);
+                          }}
+                          className={`text-[10px] font-semibold px-2 py-1 rounded border border-transparent focus:outline-none focus:ring-1 focus:ring-brand cursor-pointer ${scfg.bg} ${scfg.color}`}
+                        >
+                          {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
                       </td>
                       <td className="px-3 py-3 text-[10px] font-mono text-gray-600">{app.factorRate ? `${app.factorRate}x` : '—'}</td>
                       <td className="px-3 py-3">
@@ -448,9 +452,28 @@ export function BackendUnderwriting() {
                         <span className={`text-[10px] font-medium ${overSLA && !['Approved', 'Declined'].includes(app.stage) ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>{app.daysInStage}d</span>
                       </td>
                       <td className="px-3 py-3">
-                        <button onClick={() => navigate(`/underwriting/${app.id}`)} className="p-1 hover:bg-indigo-50 rounded text-gray-400 hover:text-brand">
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
+                          <button onClick={() => navigate(`/underwriting/${app.id}`)} title="Open" className="p-1 hover:bg-indigo-50 rounded text-gray-400 hover:text-brand">
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          {!['Approved', 'Declined'].includes(app.stage) && (
+                            <>
+                              <button onClick={() => handleAdvance(app)} title="Advance stage" className="p-1 hover:bg-blue-50 rounded text-gray-400 hover:text-blue-600">
+                                <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                              </button>
+                              {app.stage === 'Committee' && (
+                                <>
+                                  <button onClick={() => handleApprove(app)} title="Approve" className="p-1 hover:bg-emerald-50 rounded text-gray-400 hover:text-emerald-600">
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button onClick={() => handleDecline(app)} title="Decline" className="p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-600">
+                                    <XCircle className="w-3.5 h-3.5" />
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -467,6 +490,13 @@ export function BackendUnderwriting() {
         </div>
       )}
 
+      {newAppOpen && (
+        <NewApplicationModal onClose={() => setNewAppOpen(false)} onCreated={app => {
+          setNewAppOpen(false);
+          toast.success(`Application ${app.applicationId} created`, { description: app.businessName });
+        }} />
+      )}
+
       {/* Legend */}
       <div className="flex items-center justify-between text-[10px] text-gray-400">
         <div className="flex items-center gap-4">
@@ -478,6 +508,94 @@ export function BackendUnderwriting() {
         </div>
         <p>{APPLICATIONS.length} total applications</p>
       </div>
+    </div>
+  );
+}
+
+// ── New Application Modal ──
+function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCreated: (app: Application) => void }) {
+  const [businessName, setBusinessName] = useState('');
+  const [industry, setIndustry] = useState('Restaurant');
+  const [state, setState] = useState('NY');
+  const [productType, setProductType] = useState<ProductType>('MCA');
+  const [requestedAmount, setRequestedAmount] = useState('50000');
+  const [monthlyRevenue, setMonthlyRevenue] = useState('30000');
+  const [creditScore, setCreditScore] = useState('650');
+  const [monthsInBusiness, setMonthsInBusiness] = useState('24');
+  const [source, setSource] = useState('Direct — Website');
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!businessName.trim()) return;
+    const created = underwritingActions.create({
+      businessName: businessName.trim(),
+      industry,
+      state,
+      productType,
+      requestedAmount: Number(requestedAmount) || 0,
+      monthlyRevenue: Number(monthlyRevenue) || 0,
+      creditScore: Number(creditScore) || 600,
+      monthsInBusiness: Number(monthsInBusiness) || 0,
+      source,
+    });
+    onCreated(created);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
+      <form onClick={e => e.stopPropagation()} onSubmit={submit} className="bg-white rounded-[10px] shadow-xl w-full max-w-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-900">New Underwriting Application</h2>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+        </div>
+        <div className="px-5 py-4 grid grid-cols-2 gap-3">
+          <div className="col-span-2">
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Business Name</label>
+            <input required value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Bakery LLC" className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Industry</label>
+            <input value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">State</label>
+            <input value={state} onChange={e => setState(e.target.value)} maxLength={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] uppercase" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Product Type</label>
+            <select value={productType} onChange={e => setProductType(e.target.value as ProductType)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white">
+              <option>MCA</option>
+              <option>Term Loan</option>
+              <option>Line of Credit</option>
+              <option>Revenue Based</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Source</label>
+            <input value={source} onChange={e => setSource(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Requested Amount ($)</label>
+            <input type="number" value={requestedAmount} onChange={e => setRequestedAmount(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Monthly Revenue ($)</label>
+            <input type="number" value={monthlyRevenue} onChange={e => setMonthlyRevenue(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Credit Score</label>
+            <input type="number" value={creditScore} onChange={e => setCreditScore(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-700 mb-1">Months in Business</label>
+            <input type="number" value={monthsInBusiness} onChange={e => setMonthsInBusiness(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-[6px] hover:bg-white">Cancel</button>
+          <button type="submit" className="px-4 py-2 text-sm bg-brand text-white rounded-[6px] hover:bg-brand-hover">Create Application</button>
+        </div>
+      </form>
     </div>
   );
 }

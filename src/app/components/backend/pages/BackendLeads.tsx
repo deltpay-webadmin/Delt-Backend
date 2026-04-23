@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Plus,
   Search,
@@ -34,7 +35,17 @@ import {
   ChevronDown,
   UserPlus,
   Truck,
+  XCircle,
 } from 'lucide-react';
+import {
+  useLeads,
+  useReferrals,
+  useReferralProgram,
+  leadActions,
+  referralActions,
+  programActions,
+  type Lead as StoreLead,
+} from '../crmStore';
 
 // ── Full pipeline stages ──
 const ALL_STAGES = [
@@ -57,35 +68,7 @@ interface StepDetail {
   completedAt: string | null;
 }
 
-interface Lead {
-  id: string;
-  businessName: string;
-  industry: string;
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  type: 'MCA' | 'Residual' | 'Leasing';
-  source: string;
-  monthlySales: string;
-  amountRequested: string;
-  score: number;
-  status: 'New' | 'In Progress' | 'Won' | 'Lost';
-  priority: 'High' | 'Medium' | 'Low';
-  lastActivity: string;
-  assignedAgent: string;
-  stage: StageName;
-  timeline: Array<{
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    user: string;
-    timestamp: string;
-  }>;
-  notes: string;
-  blocker?: string;
-  stepDetails?: StepDetail[];
-  referredBy?: string;
-}
+type Lead = StoreLead;
 
 // ── Referral types ──
 interface Referral {
@@ -137,28 +120,19 @@ function bundleStatusCls(status: BundleStatus) {
 
 // ── Welcome Bundle Section ──
 function WelcomeBundleSection({ lead }: { lead: Lead }) {
-  const [assigned, setAssigned] = useState<{ bundleName: string; amount: number; dateIssued: string; expiration: string; status: BundleStatus } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const assigned = lead.bundle || null;
 
   const handleAssign = (bundle: typeof BUNDLE_OPTIONS[0]) => {
-    const now = new Date();
-    const exp = new Date(now);
-    exp.setDate(exp.getDate() + 30);
-    setAssigned({
-      bundleName: bundle.name,
-      amount: bundle.amount,
-      dateIssued: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      expiration: exp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      status: 'Credit Issued',
-    });
+    leadActions.assignBundle(lead.id, { name: bundle.name, amount: bundle.amount });
+    toast.success(`${bundle.name} assigned to ${lead.businessName}`);
     setDropdownOpen(false);
   };
 
   const cycleStatus = () => {
     if (!assigned) return;
-    const idx = BUNDLE_STATUSES.indexOf(assigned.status);
-    const next = BUNDLE_STATUSES[Math.min(idx + 1, BUNDLE_STATUSES.length - 1)];
-    setAssigned({ ...assigned, status: next });
+    leadActions.cycleBundleStatus(lead.id);
+    toast.success('Bundle status advanced');
   };
 
   return (
@@ -362,7 +336,50 @@ function StageProgress({ stage, stepDetails }: { stage: StageName; stepDetails?:
 // ── Lead Detail Panel ──
 function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => void }) {
   const [activeTab, setActiveTab] = useState<'activity' | 'notes' | 'tasks'>('activity');
+  const [newNote, setNewNote] = useState('');
+  const [newTask, setNewTask] = useState('');
   if (!lead) return null;
+
+  const handleAdvanceStage = () => {
+    const idx = ALL_STAGES.indexOf(lead.stage);
+    if (idx >= ALL_STAGES.length - 1) {
+      toast.info('Lead is already at final stage');
+      return;
+    }
+    leadActions.advanceStage(lead.id);
+    toast.success(`Advanced to ${ALL_STAGES[idx + 1]}`);
+  };
+
+  const handleSubmitApp = () => {
+    if (ALL_STAGES.indexOf(lead.stage) >= ALL_STAGES.indexOf('Application Submitted')) {
+      toast.info('Application already submitted');
+      return;
+    }
+    leadActions.submitApplication(lead.id);
+    toast.success('Application submitted — routed to onboarding');
+  };
+
+  const handleMarkLost = () => {
+    if (lead.status === 'Lost') { toast.info('Lead already lost'); return; }
+    leadActions.markLost(lead.id);
+    toast.success('Lead marked as lost');
+  };
+
+  const handleAddNote = () => {
+    const body = newNote.trim();
+    if (!body) { toast.error('Note cannot be empty'); return; }
+    leadActions.addNote(lead.id, body);
+    setNewNote('');
+    toast.success('Note added');
+  };
+
+  const handleAddTask = () => {
+    const title = newTask.trim();
+    if (!title) { toast.error('Task title required'); return; }
+    leadActions.addTask(lead.id, title, 'No due date');
+    setNewTask('');
+    toast.success('Task added');
+  };
 
   const postApp = isPostApplication(lead.stage);
   const currentIdx = stageIndex(lead.stage);
@@ -531,7 +548,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
             <div className="space-y-4">
               {lead.timeline.map((item, index) => (
                 <div key={index} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">{item.icon}</div>
+                  <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                    {item.icon || <Clock className="w-4 h-4 text-indigo-600" />}
+                  </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{item.title}</p>
                     <p className="text-xs text-gray-600 mt-1">{item.description}</p>
@@ -547,32 +566,76 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
           )}
           {activeTab === 'notes' && (
             <div className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-amber-600 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-900">{lead.notes}</p>
-                    <p className="text-xs text-gray-500 mt-2">Added by {lead.assignedAgent} • 2 days ago</p>
+              {lead.notes && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-amber-600 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">{lead.notes}</p>
+                      <p className="text-xs text-gray-500 mt-2">Added by {lead.assignedAgent}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <textarea placeholder="Add a new note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none" rows={4} />
-              <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors">Add Note</button>
+              )}
+              {(lead.extraNotes || []).map(n => (
+                <div key={n.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <MessageSquare className="w-5 h-5 text-indigo-500 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900 whitespace-pre-wrap">{n.body}</p>
+                      <p className="text-xs text-gray-500 mt-2">Added by {n.author} • {n.timestamp}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <textarea
+                value={newNote}
+                onChange={e => setNewNote(e.target.value)}
+                placeholder="Add a new note..."
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                rows={4}
+              />
+              <button
+                onClick={handleAddNote}
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Add Note
+              </button>
             </div>
           )}
           {activeTab === 'tasks' && (
             <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-lg">
-                <input type="checkbox" className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                <div className="flex-1"><p className="text-sm font-medium text-gray-900">Follow up call scheduled</p><p className="text-xs text-gray-500 mt-1">Due tomorrow at 2:00 PM</p></div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-lg">
-                <input type="checkbox" className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded" defaultChecked />
-                <div className="flex-1"><p className="text-sm font-medium text-gray-500 line-through">Request bank statements</p><p className="text-xs text-gray-500 mt-1">Completed yesterday</p></div>
-              </div>
-              <div className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-lg">
-                <input type="checkbox" className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                <div className="flex-1"><p className="text-sm font-medium text-gray-900">Send proposal to client</p><p className="text-xs text-gray-500 mt-1">Due in 3 days</p></div>
+              {(lead.tasks || []).map(t => (
+                <div key={t.id} className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() => leadActions.toggleTask(lead.id, t.id)}
+                    className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <p className={`text-sm font-medium ${t.done ? 'text-gray-500 line-through' : 'text-gray-900'}`}>{t.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t.due}</p>
+                  </div>
+                </div>
+              ))}
+              {(lead.tasks || []).length === 0 && (
+                <p className="text-xs text-gray-400 text-center py-4">No tasks yet</p>
+              )}
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  value={newTask}
+                  onChange={e => setNewTask(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleAddTask()}
+                  placeholder="New task title..."
+                  className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+                <button
+                  onClick={handleAddTask}
+                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap"
+                >
+                  Add Task
+                </button>
               </div>
             </div>
           )}
@@ -581,9 +644,24 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
         {/* Action Buttons */}
         <div className="bg-white border-t border-gray-200 px-6 py-4">
           <div className="flex items-center gap-3">
-            <button className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">Next Stage</button>
-            <button className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[6px] hover:bg-emerald-700 transition-colors">Submit Application</button>
-            <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Mark Lost</button>
+            <button
+              onClick={handleAdvanceStage}
+              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors"
+            >
+              Next Stage
+            </button>
+            <button
+              onClick={handleSubmitApp}
+              className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[6px] hover:bg-emerald-700 transition-colors"
+            >
+              Submit Application
+            </button>
+            <button
+              onClick={handleMarkLost}
+              className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors"
+            >
+              Mark Lost
+            </button>
           </div>
         </div>
       </div>
@@ -593,17 +671,51 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
 
 // ── Referrals Tab ──
 function ReferralsTab() {
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [rewardAmount, setRewardAmount] = useState('100');
-  const [freeMonths, setFreeMonths] = useState('1');
-  const [planTier, setPlanTier] = useState('Growth');
+  const program = useReferralProgram();
+  const referrals = useReferrals();
 
-  const referrals: Referral[] = [
-    { id: 'REF-001', referringMerchant: 'Metro Diner Group', referredBusiness: 'Valley Pizza Co', referralCode: 'METRO-2024A', date: 'Mar 28, 2026', status: 'Converted', rewardStatus: 'Paid', rewardAmount: '$100' },
-    { id: 'REF-002', referringMerchant: 'Coastal Seafood Inc', referredBusiness: 'Harbor Fish Market', referralCode: 'COAST-7X91', date: 'Apr 2, 2026', status: 'Contacted', rewardStatus: 'Pending', rewardAmount: '$100' },
-    { id: 'REF-003', referringMerchant: 'Bright Auto Sales', referredBusiness: 'Sunrise Auto Body', referralCode: 'BRIGHT-KQ33', date: 'Apr 5, 2026', status: 'Pending', rewardStatus: 'Pending', rewardAmount: '$100' },
-    { id: 'REF-004', referringMerchant: 'Lakeside Catering', referredBusiness: 'Greenfield Events LLC', referralCode: 'LAKE-PP82', date: 'Feb 15, 2026', status: 'Expired', rewardStatus: 'N/A', rewardAmount: '—' },
-  ];
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState(String(program.rewardAmount));
+  const [freeMonths, setFreeMonths] = useState(String(program.freeMonths));
+  const [planTier, setPlanTier] = useState<string>(program.planTier);
+
+  // Re-sync local edit state when modal opens
+  React.useEffect(() => {
+    if (editModalOpen) {
+      setRewardAmount(String(program.rewardAmount));
+      setFreeMonths(String(program.freeMonths));
+      setPlanTier(program.planTier);
+    }
+  }, [editModalOpen, program.rewardAmount, program.freeMonths, program.planTier]);
+
+  const saveProgram = () => {
+    programActions.update({
+      rewardAmount: Number(rewardAmount) || 0,
+      freeMonths: Number(freeMonths) || 0,
+      planTier: planTier as typeof program.planTier,
+    });
+    setEditModalOpen(false);
+    toast.success('Referral offer updated', {
+      description: `$${rewardAmount} + ${freeMonths} month${Number(freeMonths) === 1 ? '' : 's'} free ${planTier}`,
+    });
+  };
+
+  const contactReferral = (r: Referral) => {
+    referralActions.setStatus(r.id, 'Contacted');
+    toast.success(`${r.referredBusiness} contacted`, { description: `Outreach sent to ${r.referringMerchant}'s referral.` });
+  };
+
+  const convertReferral = (r: Referral) => {
+    referralActions.setStatus(r.id, 'Converted');
+    toast.success(`${r.referredBusiness} converted`, { description: 'Reward is now pending payout.' });
+  };
+
+  const payReward = (r: Referral) => {
+    referralActions.payReward(r.id);
+    toast.success(`Reward paid to ${r.referringMerchant}`, { description: `${r.rewardAmount} credited.` });
+  };
+
+  const convertedThisMonth = referrals.filter(r => r.status === 'Converted').length;
 
   const refStatusCls = (s: string) => {
     switch (s) {
@@ -635,9 +747,9 @@ function ReferralsTab() {
             <h3 className="text-lg font-semibold">Refer a Business</h3>
             <p className="text-indigo-200 text-sm mt-1">For every successful referral that gets funded, both parties receive:</p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
-              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">${rewardAmount} Account Credit</span>
+              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">${program.rewardAmount} Account Credit</span>
               <span className="text-indigo-300">+</span>
-              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">{freeMonths} Month{Number(freeMonths) > 1 ? 's' : ''} Free {planTier}</span>
+              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">{program.freeMonths} Month{program.freeMonths > 1 ? 's' : ''} Free {program.planTier}</span>
             </div>
           </div>
           <button onClick={() => setEditModalOpen(true)} className="px-4 py-2 bg-white text-indigo-700 text-sm font-semibold rounded-[6px] hover:bg-indigo-50 transition-colors shrink-0 flex items-center gap-1.5">
@@ -650,7 +762,7 @@ function ReferralsTab() {
       <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-200">
           <h3 className="text-sm font-semibold text-gray-900">Referral Activity</h3>
-          <p className="text-xs text-gray-500 mt-0.5">{referrals.length} referrals &middot; 1 converted this month</p>
+          <p className="text-xs text-gray-500 mt-0.5">{referrals.length} referrals &middot; {convertedThisMonth} converted</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -663,6 +775,7 @@ function ReferralsTab() {
                 <th className="text-center px-5 py-3 text-xs text-gray-500 font-medium">Status</th>
                 <th className="text-center px-5 py-3 text-xs text-gray-500 font-medium">Reward Status</th>
                 <th className="text-right px-5 py-3 text-xs text-gray-500 font-medium">Reward Amount</th>
+                <th className="text-center px-5 py-3 text-xs text-gray-500 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -679,6 +792,28 @@ function ReferralsTab() {
                     <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${rewardCls(r.rewardStatus)}`}>{r.rewardStatus}</span>
                   </td>
                   <td className="px-5 py-3 text-right font-medium text-gray-900">{r.rewardAmount}</td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center justify-center gap-1">
+                      {r.status === 'Pending' && (
+                        <button onClick={() => contactReferral(r)} title="Mark as contacted" className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600">
+                          <Phone className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {(r.status === 'Pending' || r.status === 'Contacted') && (
+                        <button onClick={() => convertReferral(r)} title="Mark as converted" className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-600">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {r.status === 'Converted' && r.rewardStatus === 'Pending' && (
+                        <button onClick={() => payReward(r)} title="Pay reward" className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-700">
+                          <DollarSign className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {r.status === 'Expired' && (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -715,7 +850,7 @@ function ReferralsTab() {
               </div>
             </div>
             <div className="flex items-center gap-3 mt-5">
-              <button onClick={() => setEditModalOpen(false)} className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
+              <button onClick={saveProgram} className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
               <button onClick={() => setEditModalOpen(false)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Cancel</button>
             </div>
           </div>
@@ -729,245 +864,19 @@ function ReferralsTab() {
 // Main Component
 // ════════════════════════════════
 export function BackendLeads() {
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [mainTab, setMainTab] = useState<'leads' | 'referrals'>('leads');
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [typeFilter, setTypeFilter] = useState<string>('All');
+  const [stageFilter, setStageFilter] = useState<string>('All');
+  const [agentFilter, setAgentFilter] = useState<string>('All');
+  const [newLeadOpen, setNewLeadOpen] = useState(false);
 
+  const leads = useLeads();
+  const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
-  const leads: Lead[] = [
-    {
-      id: 'lead-001',
-      businessName: 'Green Valley Auto Repair',
-      industry: 'Automotive',
-      contactName: 'Robert Martinez',
-      contactEmail: 'robert@greenvalleyauto.com',
-      contactPhone: '(555) 123-4567',
-      type: 'MCA',
-      source: 'Website Inquiry',
-      monthlySales: '$45,000',
-      amountRequested: '$75,000',
-      score: 82,
-      status: 'In Progress',
-      priority: 'High',
-      lastActivity: '2 hours ago',
-      assignedAgent: 'Sarah Johnson',
-      stage: 'Qualified',
-      timeline: [
-        { icon: <Phone className="w-4 h-4 text-indigo-600" />, title: 'Follow-up call completed', description: 'Discussed terms and pricing structure', user: 'Sarah Johnson', timestamp: '2 hours ago' },
-        { icon: <FileText className="w-4 h-4 text-indigo-600" />, title: 'Bank statements received', description: '6 months of statements uploaded', user: 'System', timestamp: '1 day ago' },
-        { icon: <Mail className="w-4 h-4 text-indigo-600" />, title: 'Initial email sent', description: 'Introduced Delt Pay services', user: 'Sarah Johnson', timestamp: '3 days ago' },
-      ],
-      notes: 'Strong financials. Owner is motivated and ready to move forward. Prefers daily payment option. Consider offering 1.15 factor rate.',
-      referredBy: 'Metro Diner Group',
-    },
-    {
-      id: 'lead-002',
-      businessName: 'Urban Wellness Spa',
-      industry: 'Health & Wellness',
-      contactName: 'Jennifer Lee',
-      contactEmail: 'jlee@urbanwellness.com',
-      contactPhone: '(555) 234-5678',
-      type: 'Leasing',
-      source: 'Referral Partner',
-      monthlySales: '$62,000',
-      amountRequested: '$120,000',
-      score: 91,
-      status: 'In Progress',
-      priority: 'High',
-      lastActivity: '4 hours ago',
-      assignedAgent: 'Michael Chen',
-      stage: 'Underwriting',
-      blocker: 'Missing tax return — requested from merchant twice, no response',
-      stepDetails: [
-        { stage: 'Application Submitted', completedAt: 'Apr 1, 9:00 AM' },
-        { stage: 'Bank Verification', completedAt: 'Apr 1, 4:30 PM' },
-        { stage: 'Identity Verification', completedAt: 'Apr 2, 10:20 AM' },
-        { stage: 'Underwriting', completedAt: null },
-        { stage: 'Docs & E-Sign', completedAt: null },
-        { stage: 'Funded', completedAt: null },
-      ],
-      timeline: [
-        { icon: <FileText className="w-4 h-4 text-indigo-600" />, title: 'Tax return requested (2nd)', description: 'Emailed and SMS reminder sent', user: 'Michael Chen', timestamp: '1 day ago' },
-        { icon: <CheckCircle className="w-4 h-4 text-emerald-600" />, title: 'ID verified', description: 'Identity verification passed', user: 'System', timestamp: 'Apr 2' },
-        { icon: <Phone className="w-4 h-4 text-indigo-600" />, title: 'Discovery call', description: 'Discussed equipment needs and financing', user: 'Michael Chen', timestamp: '2 days ago' },
-      ],
-      notes: 'Excellent credit profile. Looking to lease new spa equipment worth $120K. Stuck waiting on tax docs.',
-      referredBy: 'Coastal Seafood Inc',
-    },
-    {
-      id: 'lead-003',
-      businessName: 'Lakeside Bistro',
-      industry: 'Food & Beverage',
-      contactName: 'David Thompson',
-      contactEmail: 'david@lakesidebistro.com',
-      contactPhone: '(555) 345-6789',
-      type: 'MCA',
-      source: 'Cold Outreach',
-      monthlySales: '$28,000',
-      amountRequested: '$50,000',
-      score: 58,
-      status: 'New',
-      priority: 'Medium',
-      lastActivity: '1 day ago',
-      assignedAgent: 'Sarah Johnson',
-      stage: 'New',
-      timeline: [
-        { icon: <User className="w-4 h-4 text-indigo-600" />, title: 'Lead created', description: 'Added to pipeline from cold outreach', user: 'Sarah Johnson', timestamp: '1 day ago' },
-      ],
-      notes: 'Initial contact made. Waiting for callback to schedule discovery call.',
-    },
-    {
-      id: 'lead-004',
-      businessName: 'TechStart Solutions',
-      industry: 'Technology',
-      contactName: 'Amanda Rodriguez',
-      contactEmail: 'arodriguez@techstart.io',
-      contactPhone: '(555) 456-7890',
-      type: 'Residual',
-      source: 'LinkedIn',
-      monthlySales: '$180,000',
-      amountRequested: '$250,000',
-      score: 95,
-      status: 'Won',
-      priority: 'High',
-      lastActivity: '3 days ago',
-      assignedAgent: 'James Miller',
-      stage: 'Funded',
-      stepDetails: [
-        { stage: 'Application Submitted', completedAt: 'Mar 20, 11:00 AM' },
-        { stage: 'Bank Verification', completedAt: 'Mar 20, 5:45 PM' },
-        { stage: 'Identity Verification', completedAt: 'Mar 21, 9:30 AM' },
-        { stage: 'Underwriting', completedAt: 'Mar 22, 2:00 PM' },
-        { stage: 'Docs & E-Sign', completedAt: 'Mar 24, 10:15 AM' },
-        { stage: 'Funded', completedAt: 'Mar 25, 9:00 AM' },
-      ],
-      timeline: [
-        { icon: <CheckCircle className="w-4 h-4 text-emerald-600" />, title: 'Deal funded', description: 'Funds disbursed — $250K', user: 'System', timestamp: 'Mar 25' },
-        { icon: <FileText className="w-4 h-4 text-indigo-600" />, title: 'Docs signed', description: 'E-sign completed by merchant', user: 'System', timestamp: 'Mar 24' },
-      ],
-      notes: 'Excellent deal closed. Strong residual opportunity with their payment volume.',
-    },
-    {
-      id: 'lead-005',
-      businessName: 'Coastal Construction LLC',
-      industry: 'Construction',
-      contactName: 'Mark Stevens',
-      contactEmail: 'mstevens@coastalconstruction.com',
-      contactPhone: '(555) 567-8901',
-      type: 'MCA',
-      source: 'Trade Show',
-      monthlySales: '$95,000',
-      amountRequested: '$150,000',
-      score: 72,
-      status: 'In Progress',
-      priority: 'Medium',
-      lastActivity: '6 hours ago',
-      assignedAgent: 'Michael Chen',
-      stage: 'Bank Verification',
-      blocker: 'Awaiting Plaid link — merchant has not connected bank account',
-      stepDetails: [
-        { stage: 'Application Submitted', completedAt: 'Apr 8, 10:30 AM' },
-        { stage: 'Bank Verification', completedAt: null },
-        { stage: 'Identity Verification', completedAt: null },
-        { stage: 'Underwriting', completedAt: null },
-        { stage: 'Docs & E-Sign', completedAt: null },
-        { stage: 'Funded', completedAt: null },
-      ],
-      timeline: [
-        { icon: <Phone className="w-4 h-4 text-indigo-600" />, title: 'Plaid link SMS sent', description: 'Reminded merchant to connect bank', user: 'Michael Chen', timestamp: '6 hours ago' },
-        { icon: <User className="w-4 h-4 text-indigo-600" />, title: 'Met at trade show', description: 'Collected business card and initial interest', user: 'Michael Chen', timestamp: '4 days ago' },
-      ],
-      notes: 'Seasonal business. Needs capital for equipment purchase. Awaiting bank connection.',
-    },
-    {
-      id: 'lead-006',
-      businessName: 'Metro Pet Care',
-      industry: 'Pet Services',
-      contactName: 'Lisa Parker',
-      contactEmail: 'lisa@metropetcare.com',
-      contactPhone: '(555) 678-9012',
-      type: 'MCA',
-      source: 'Referral Partner',
-      monthlySales: '$38,000',
-      amountRequested: '$60,000',
-      score: 45,
-      status: 'Lost',
-      priority: 'Low',
-      lastActivity: '2 weeks ago',
-      assignedAgent: 'Sarah Johnson',
-      stage: 'Qualified',
-      timeline: [
-        { icon: <AlertCircle className="w-4 h-4 text-red-600" />, title: 'Lead marked lost', description: 'Credit score too low for approval', user: 'Sarah Johnson', timestamp: '2 weeks ago' },
-        { icon: <Phone className="w-4 h-4 text-indigo-600" />, title: 'Qualification call', description: 'Identified credit issues', user: 'Sarah Johnson', timestamp: '3 weeks ago' },
-      ],
-      notes: 'Credit score below 620. Recommended to reapply in 6 months after improving credit.',
-    },
-    {
-      id: 'lead-007',
-      businessName: 'Pinnacle Dental Group',
-      industry: 'Healthcare',
-      contactName: 'Dr. Sarah Mills',
-      contactEmail: 'smills@pinnacledental.com',
-      contactPhone: '(555) 789-0123',
-      type: 'MCA',
-      source: 'Website Inquiry',
-      monthlySales: '$110,000',
-      amountRequested: '$200,000',
-      score: 88,
-      status: 'In Progress',
-      priority: 'High',
-      lastActivity: '1 day ago',
-      assignedAgent: 'James Miller',
-      stage: 'Docs & E-Sign',
-      blocker: 'E-sign link sent — awaiting merchant signature on funding agreement',
-      stepDetails: [
-        { stage: 'Application Submitted', completedAt: 'Apr 3, 2:10 PM' },
-        { stage: 'Bank Verification', completedAt: 'Apr 3, 6:30 PM' },
-        { stage: 'Identity Verification', completedAt: 'Apr 4, 8:45 AM' },
-        { stage: 'Underwriting', completedAt: 'Apr 6, 10:00 AM' },
-        { stage: 'Docs & E-Sign', completedAt: null },
-        { stage: 'Funded', completedAt: null },
-      ],
-      timeline: [
-        { icon: <Mail className="w-4 h-4 text-indigo-600" />, title: 'E-sign link emailed', description: 'Funding agreement sent for signature', user: 'System', timestamp: '1 day ago' },
-        { icon: <CheckCircle className="w-4 h-4 text-emerald-600" />, title: 'Underwriting approved', description: '$200K approved at 1.25 factor', user: 'System', timestamp: 'Apr 6' },
-      ],
-      notes: 'Strong dental practice. Underwriting approved quickly. Awaiting final signature.',
-    },
-    {
-      id: 'lead-008',
-      businessName: 'Summit Freight Services',
-      industry: 'Logistics',
-      contactName: 'Carlos Reyes',
-      contactEmail: 'creyes@summitfreight.com',
-      contactPhone: '(555) 890-1234',
-      type: 'MCA',
-      source: 'Cold Outreach',
-      monthlySales: '$72,000',
-      amountRequested: '$100,000',
-      score: 67,
-      status: 'In Progress',
-      priority: 'Medium',
-      lastActivity: '12 hours ago',
-      assignedAgent: 'Sarah Johnson',
-      stage: 'Identity Verification',
-      blocker: 'ID photo blurry — re-upload requested via SMS',
-      stepDetails: [
-        { stage: 'Application Submitted', completedAt: 'Apr 6, 11:00 AM' },
-        { stage: 'Bank Verification', completedAt: 'Apr 6, 5:15 PM' },
-        { stage: 'Identity Verification', completedAt: null },
-        { stage: 'Underwriting', completedAt: null },
-        { stage: 'Docs & E-Sign', completedAt: null },
-        { stage: 'Funded', completedAt: null },
-      ],
-      timeline: [
-        { icon: <Phone className="w-4 h-4 text-indigo-600" />, title: 'SMS sent for ID re-upload', description: 'Photo too blurry for verification', user: 'System', timestamp: '12 hours ago' },
-        { icon: <CheckCircle className="w-4 h-4 text-emerald-600" />, title: 'Bank verified via Plaid', description: 'Bank account connected successfully', user: 'System', timestamp: 'Apr 6' },
-      ],
-      notes: 'Freight company with steady revenue. Stuck on ID verification — blurry photo.',
-    },
-  ];
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -1001,6 +910,36 @@ export function BackendLeads() {
   const conversionRate = totalLeads > 0 ? ((wonLeads / totalLeads) * 100).toFixed(1) : '0.0';
   const avgTimeToFunded = 5.2;
 
+  const filteredLeads = useMemo(() => {
+    return leads.filter(l => {
+      if (statusFilter !== 'All' && l.status !== statusFilter) return false;
+      if (typeFilter !== 'All' && l.type !== typeFilter) return false;
+      if (stageFilter !== 'All' && l.stage !== stageFilter) return false;
+      if (agentFilter !== 'All' && l.assignedAgent !== agentFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        if (
+          !l.businessName.toLowerCase().includes(q) &&
+          !l.contactName.toLowerCase().includes(q) &&
+          !l.industry.toLowerCase().includes(q)
+        ) return false;
+      }
+      return true;
+    });
+  }, [leads, statusFilter, typeFilter, stageFilter, agentFilter, searchQuery]);
+
+  const setSelectedLead = (lead: Lead | null) => setSelectedLeadId(lead ? lead.id : null);
+
+  const selectClass = (status: string) => {
+    switch (status) {
+      case 'New': return 'bg-blue-50 text-blue-700';
+      case 'In Progress': return 'bg-amber-50 text-amber-700';
+      case 'Won': return 'bg-emerald-50 text-emerald-700';
+      case 'Lost': return 'bg-gray-100 text-gray-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   const stageBadgeCls = (stage: StageName) => {
     if (isPostApplication(stage)) {
       switch (stage) {
@@ -1024,7 +963,10 @@ export function BackendLeads() {
             <h1 className="text-2xl font-bold text-gray-900">Sales Leads</h1>
             <p className="text-sm text-gray-600 mt-1">{totalLeads} total leads in pipeline</p>
           </div>
-          <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-2">
+          <button
+            onClick={() => setNewLeadOpen(true)}
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
             New Lead
           </button>
@@ -1082,18 +1024,44 @@ export function BackendLeads() {
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
-              <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                <option>All Status</option><option>New</option><option>In Progress</option><option>Won</option><option>Lost</option>
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="All">All Status</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
               </select>
-              <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                <option>All Types</option><option>MCA</option><option>Residual</option><option>Leasing</option>
+              <select
+                value={typeFilter}
+                onChange={e => setTypeFilter(e.target.value)}
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="All">All Types</option>
+                <option value="MCA">MCA</option>
+                <option value="Residual">Residual</option>
+                <option value="Leasing">Leasing</option>
               </select>
-              <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                <option>All Stages</option>
-                {ALL_STAGES.map(s => <option key={s}>{s}</option>)}
+              <select
+                value={stageFilter}
+                onChange={e => setStageFilter(e.target.value)}
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="All">All Stages</option>
+                {ALL_STAGES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              <select className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                <option>All Agents</option><option>Sarah Johnson</option><option>Michael Chen</option><option>James Miller</option>
+              <select
+                value={agentFilter}
+                onChange={e => setAgentFilter(e.target.value)}
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="All">All Agents</option>
+                {[...new Set(leads.map(l => l.assignedAgent))].map(a => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
               </select>
               {/* View Mode Toggle */}
               <div className="flex items-center bg-gray-100 rounded-lg p-0.5 shrink-0">
@@ -1107,7 +1075,7 @@ export function BackendLeads() {
           {viewMode === 'kanban' ? (
             <div className="flex gap-4 overflow-x-auto pb-4">
               {ALL_STAGES.map(stage => {
-                const stageLeads = leads.filter(l => l.stage === stage);
+                const stageLeads = filteredLeads.filter(l => l.stage === stage);
                 return (
                   <div key={stage} className="flex-shrink-0 w-72">
                     <div className="bg-gray-100 rounded-t-[8px] px-4 py-3 flex items-center justify-between">
@@ -1164,7 +1132,14 @@ export function BackendLeads() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {leads.map(lead => {
+                  {filteredLeads.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="px-5 py-12 text-center text-sm text-gray-400">
+                        No leads match your filters
+                      </td>
+                    </tr>
+                  )}
+                  {filteredLeads.map(lead => {
                     return (
                       <tr
                         key={lead.id}
@@ -1200,8 +1175,12 @@ export function BackendLeads() {
                         <td className="px-5 py-4">
                           <select
                             value={lead.status}
-                            onChange={e => { e.stopPropagation(); }}
-                            className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 ${getStatusColor(lead.status)}`}
+                            onChange={e => {
+                              e.stopPropagation();
+                              leadActions.setStatus(lead.id, e.target.value as any);
+                              toast.success(`${lead.businessName} set to ${e.target.value}`);
+                            }}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 ${selectClass(lead.status)}`}
                             onClick={e => e.stopPropagation()}
                           >
                             <option value="New">New</option>
@@ -1234,6 +1213,132 @@ export function BackendLeads() {
 
       {/* Lead Detail Panel */}
       {selectedLead && <LeadDetailPanel lead={selectedLead} onClose={() => setSelectedLead(null)} />}
+
+      {/* New Lead Modal */}
+      {newLeadOpen && (
+        <NewLeadModal
+          onClose={() => setNewLeadOpen(false)}
+          onCreate={created => {
+            setSelectedLeadId(created.id);
+            setNewLeadOpen(false);
+            toast.success(`Lead "${created.businessName}" created`);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
+// New Lead Modal
+// ────────────────────────────────────────────────
+function NewLeadModal({ onClose, onCreate }: { onClose: () => void; onCreate: (lead: Lead) => void }) {
+  const [form, setForm] = useState({
+    businessName: '',
+    industry: '',
+    contactName: '',
+    contactEmail: '',
+    contactPhone: '',
+    type: 'MCA' as Lead['type'],
+    source: 'Website Inquiry',
+    monthlySales: '',
+    amountRequested: '',
+    assignedAgent: 'Sarah Johnson',
+    priority: 'Medium' as Lead['priority'],
+    notes: '',
+  });
+
+  const update = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSubmit = () => {
+    if (!form.businessName.trim()) {
+      toast.error('Business name is required');
+      return;
+    }
+    const created = leadActions.create(form as any);
+    onCreate(created);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-[12px] shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-gray-900">New Lead</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-md">
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+        </div>
+        <div className="px-6 py-5 grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto">
+          <FormInput label="Business Name *" value={form.businessName} onChange={v => update('businessName', v)} full />
+          <FormInput label="Industry" value={form.industry} onChange={v => update('industry', v)} />
+          <FormInput label="Contact Name" value={form.contactName} onChange={v => update('contactName', v)} />
+          <FormInput label="Contact Email" value={form.contactEmail} onChange={v => update('contactEmail', v)} />
+          <FormInput label="Contact Phone" value={form.contactPhone} onChange={v => update('contactPhone', v)} />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
+            <select
+              value={form.type}
+              onChange={e => update('type', e.target.value)}
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option>MCA</option><option>Residual</option><option>Leasing</option>
+            </select>
+          </div>
+          <FormInput label="Source" value={form.source} onChange={v => update('source', v)} />
+          <FormInput label="Monthly Sales" value={form.monthlySales} onChange={v => update('monthlySales', v)} placeholder="$50,000" />
+          <FormInput label="Amount Requested" value={form.amountRequested} onChange={v => update('amountRequested', v)} placeholder="$100,000" />
+          <FormInput label="Assigned Agent" value={form.assignedAgent} onChange={v => update('assignedAgent', v)} />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Priority</label>
+            <select
+              value={form.priority}
+              onChange={e => update('priority', e.target.value)}
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option>High</option><option>Medium</option><option>Low</option>
+            </select>
+          </div>
+          <div className="col-span-2">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+            <textarea
+              value={form.notes}
+              onChange={e => update('notes', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50">Cancel</button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" /> Create Lead
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FormInput({
+  label,
+  value,
+  onChange,
+  full,
+  placeholder,
+}: { label: string; value: string; onChange: (v: string) => void; full?: boolean; placeholder?: string }) {
+  return (
+    <div className={full ? 'col-span-2' : ''}>
+      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+      <input
+        value={value}
+        placeholder={placeholder}
+        onChange={e => onChange(e.target.value)}
+        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
     </div>
   );
 }

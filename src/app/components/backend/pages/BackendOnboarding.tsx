@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ClipboardList,
   Clock,
   AlertTriangle,
-  CheckCircle2,
   TrendingUp,
   Eye,
   Bell,
@@ -14,32 +14,12 @@ import {
   Loader2,
   User,
   Smartphone,
+  ArrowRight,
 } from 'lucide-react';
+import { useOnboarding, onboardingActions, type OnboardingApp, type SLAStatus, type OnbStep } from '../crmStore';
 
-// ── Types ──
-type StepName = 'Application Submitted' | 'Bank Verification' | 'Identity Verification' | 'Underwriting' | 'Docs & E-Sign' | 'Funded';
-type SLAStatus = 'On Track' | 'At Risk' | 'Breached';
-
-interface StepProgress {
-  step: StepName;
-  completedAt: string | null; // null = not completed
-  slaTarget: string;
-}
-
-interface OnboardingApp {
-  id: string;
-  merchantName: string;
-  agent: string;
-  currentStep: StepName;
-  currentStepIndex: number;
-  timeInStep: string;
-  timeInStepHours: number;
-  slaTarget: string;
-  slaStatus: SLAStatus;
-  submittedDate: string;
-  blocker: string;
-  steps: StepProgress[];
-}
+// ── Local aliases (kept to minimize diff) ──
+type StepName = OnbStep;
 
 const STEPS: StepName[] = [
   'Application Submitted',
@@ -69,8 +49,11 @@ const pipelineData: { step: StepName; count: number; avgTime: string; sla: SLASt
   { step: 'Funded', count: 12, avgTime: '—', sla: 'On Track' },
 ];
 
-// ── Sample data ──
-const applications: OnboardingApp[] = [
+// Team members available for reassignment
+const AGENTS = ['Marcus Johnson', 'Priya Patel', 'Jamal Foster', 'Devon Richards', 'Sarah Kim', 'Alex Rivera'];
+
+// Legacy seed kept here as reference only (store now owns the source of truth).
+const _legacySeed: OnboardingApp[] = [
   {
     id: 'ONB-001',
     merchantName: 'Sunrise Bakery LLC',
@@ -199,10 +182,10 @@ const applications: OnboardingApp[] = [
   },
 ];
 
-// ── Stats ──
-const activeApps = applications.filter(a => a.currentStep !== 'Funded').length;
+// silence unused warning
+void _legacySeed;
+
 const avgTimeToFunded = 6.3; // days
-const slaBreaches = applications.filter(a => a.slaStatus === 'Breached').length;
 const completionRate = 78;
 
 function slaDot(status: SLAStatus) {
@@ -245,7 +228,56 @@ const pipelineStepColors: Record<StepName, string> = {
 // Main Component
 // ════════════════════════════════
 export function BackendOnboarding() {
-  const [selectedApp, setSelectedApp] = useState<OnboardingApp | null>(null);
+  const applications = useOnboarding();
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [agentFilter, setAgentFilter] = useState<string>('All');
+  const [slaFilter, setSlaFilter] = useState<string>('All');
+
+  const selectedApp = applications.find(a => a.id === selectedAppId) || null;
+
+  const filteredApps = useMemo(() => {
+    return applications.filter(a => {
+      if (agentFilter !== 'All' && a.agent !== agentFilter) return false;
+      if (slaFilter !== 'All' && a.slaStatus !== slaFilter) return false;
+      return true;
+    });
+  }, [applications, agentFilter, slaFilter]);
+
+  const activeApps = applications.filter(a => a.currentStep !== 'Funded').length;
+  const slaBreaches = applications.filter(a => a.slaStatus === 'Breached').length;
+
+  // Derive pipeline data from live state
+  const livePipelineData = useMemo(() => {
+    const steps: StepName[] = ['Application Submitted', 'Bank Verification', 'Identity Verification', 'Underwriting', 'Docs & E-Sign', 'Funded'];
+    return steps.map(step => {
+      const inStep = applications.filter(a => a.currentStep === step);
+      const avgHours = inStep.length > 0 ? inStep.reduce((s, a) => s + a.timeInStepHours, 0) / inStep.length : 0;
+      const worstSla: SLAStatus = inStep.some(a => a.slaStatus === 'Breached')
+        ? 'Breached'
+        : inStep.some(a => a.slaStatus === 'At Risk')
+        ? 'At Risk'
+        : 'On Track';
+      const avgTime =
+        step === 'Funded'
+          ? '—'
+          : avgHours === 0
+          ? '—'
+          : avgHours >= 24
+          ? `${(avgHours / 24).toFixed(1)} days`
+          : `${avgHours.toFixed(1)} hrs`;
+      return { step, count: inStep.length, avgTime, sla: worstSla };
+    });
+  }, [applications]);
+
+  const handleNudge = (id: string, name: string) => {
+    onboardingActions.nudge(id);
+    toast.success(`Nudge sent to ${name}`, { description: 'Automated reminder email + SMS queued.' });
+  };
+
+  const handleAdvance = (id: string, name: string) => {
+    onboardingActions.advance(id);
+    toast.success(`${name} advanced`, { description: 'Moved to the next onboarding step.' });
+  };
 
   return (
     <div className="px-6 py-6 space-y-6">
@@ -261,7 +293,7 @@ export function BackendOnboarding() {
           icon={ClipboardList}
           label="Active Applications"
           value={String(activeApps)}
-          sub={`${applications.length} total submitted`}
+          sub={`${applications.length} total in pipeline`}
           variant="indigo"
         />
         <SummaryCard
@@ -291,7 +323,7 @@ export function BackendOnboarding() {
       <div className="bg-white rounded-[8px] border border-gray-200 p-5">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">Pipeline Overview</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {pipelineData.map((p, i) => (
+          {livePipelineData.map((p, i) => (
             <div key={p.step} className={`relative rounded-[8px] border p-4 ${pipelineStepColors[p.step]}`}>
               {/* Connector arrow (hidden on first) */}
               {i > 0 && (
@@ -308,6 +340,31 @@ export function BackendOnboarding() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <select
+          value={agentFilter}
+          onChange={e => setAgentFilter(e.target.value)}
+          className="px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white"
+        >
+          <option value="All">All agents</option>
+          {AGENTS.map(a => <option key={a} value={a}>{a}</option>)}
+        </select>
+        <select
+          value={slaFilter}
+          onChange={e => setSlaFilter(e.target.value)}
+          className="px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white"
+        >
+          <option value="All">All SLA statuses</option>
+          <option value="On Track">On Track</option>
+          <option value="At Risk">At Risk</option>
+          <option value="Breached">Breached</option>
+        </select>
+        <span className="text-xs text-gray-500 ml-auto">
+          Showing {filteredApps.length} of {applications.length}
+        </span>
       </div>
 
       {/* Table */}
@@ -327,12 +384,12 @@ export function BackendOnboarding() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {applications.map(app => {
+              {filteredApps.map(app => {
                 const breached = app.slaStatus === 'Breached';
                 return (
                   <tr
                     key={app.id}
-                    onClick={() => setSelectedApp(app)}
+                    onClick={() => setSelectedAppId(app.id)}
                     className={`transition-colors cursor-pointer ${
                       breached
                         ? 'border-l-[3px] border-l-red-500 bg-red-50/30 hover:bg-red-50/50'
@@ -363,18 +420,33 @@ export function BackendOnboarding() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
                         <button
-                          onClick={() => setSelectedApp(app)}
+                          onClick={() => setSelectedAppId(app.id)}
                           className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors"
                           title="View"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          className="p-1.5 hover:bg-amber-50 rounded-md text-gray-400 hover:text-amber-600 transition-colors"
-                          title="Nudge"
+                          onClick={() => handleNudge(app.id, app.merchantName)}
+                          className="p-1.5 hover:bg-amber-50 rounded-md text-gray-400 hover:text-amber-600 transition-colors relative"
+                          title="Nudge merchant"
                         >
                           <Bell className="w-4 h-4" />
+                          {(app.nudges || 0) > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-amber-500 text-white text-[10px] rounded-full flex items-center justify-center">
+                              {app.nudges}
+                            </span>
+                          )}
                         </button>
+                        {app.currentStep !== 'Funded' && (
+                          <button
+                            onClick={() => handleAdvance(app.id, app.merchantName)}
+                            className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-600 transition-colors"
+                            title="Advance to next step"
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -387,7 +459,7 @@ export function BackendOnboarding() {
 
       {/* Slide-out Detail Panel */}
       {selectedApp && (
-        <SlideOutPanel app={selectedApp} onClose={() => setSelectedApp(null)} />
+        <SlideOutPanel app={selectedApp} onClose={() => setSelectedAppId(null)} />
       )}
     </div>
   );
@@ -424,9 +496,32 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
 
 // ── Slide-out Panel ──
 function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => void }) {
-  const completedCount = app.steps.filter(s => s.completedAt !== null).length;
-  // If currentStepIndex > 0 and current step isn't completed, applicant is on currentStepIndex
   const applicantStepNum = app.currentStepIndex + 1;
+  const [reassignOpen, setReassignOpen] = useState(false);
+
+  const sendReminder = () => {
+    onboardingActions.nudge(app.id);
+    toast.success(`Reminder sent to ${app.merchantName}`, {
+      description: 'Email + SMS reminder dispatched to the merchant contact.',
+    });
+  };
+
+  const reassign = (agent: string) => {
+    if (agent === app.agent) {
+      setReassignOpen(false);
+      return;
+    }
+    onboardingActions.reassign(app.id, agent);
+    setReassignOpen(false);
+    toast.success(`Reassigned to ${agent}`, {
+      description: `${app.merchantName} moved from ${app.agent}.`,
+    });
+  };
+
+  const advanceStep = () => {
+    onboardingActions.advance(app.id);
+    toast.success(`${app.merchantName} advanced`, { description: 'Moved to the next onboarding step.' });
+  };
 
   return (
     <>
@@ -601,14 +696,61 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
             </div>
           </div>
 
+          {/* Nudge history */}
+          {(app.nudges || 0) > 0 && (
+            <div className="rounded-[8px] border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+              <div className="flex items-center gap-2">
+                <Bell className="w-3.5 h-3.5" />
+                <span className="font-medium">{app.nudges} nudge{app.nudges === 1 ? '' : 's'} sent</span>
+                {app.lastNudge && <span className="text-amber-600">· last: {app.lastNudge}</span>}
+              </div>
+            </div>
+          )}
+
           {/* Quick actions */}
-          <div className="flex items-center gap-2">
-            <button className="flex-1 px-4 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-[6px] hover:bg-indigo-700 transition-colors">
-              Send Reminder
-            </button>
-            <button className="flex-1 px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-[6px] hover:bg-gray-50 transition-colors">
-              Reassign Agent
-            </button>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={sendReminder}
+                className="flex-1 px-4 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-[6px] hover:bg-indigo-700 transition-colors"
+              >
+                Send Reminder
+              </button>
+              <button
+                onClick={() => setReassignOpen(v => !v)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-[6px] hover:bg-gray-50 transition-colors"
+              >
+                Reassign Agent
+              </button>
+            </div>
+            {reassignOpen && (
+              <div className="rounded-[6px] border border-gray-200 bg-white p-2 space-y-1">
+                <p className="text-xs text-gray-500 px-2 py-1">Select a new agent</p>
+                {AGENTS.map(agent => (
+                  <button
+                    key={agent}
+                    onClick={() => reassign(agent)}
+                    className={`w-full text-left px-3 py-2 text-sm rounded-[4px] transition-colors ${
+                      agent === app.agent
+                        ? 'bg-indigo-50 text-indigo-700 font-medium'
+                        : 'hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    {agent}
+                    {agent === app.agent && <span className="text-xs text-indigo-500 ml-2">(current)</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+            {app.currentStep !== 'Funded' && (
+              <button
+                onClick={advanceStep}
+                className="w-full px-4 py-2.5 text-sm font-medium border border-emerald-200 bg-emerald-50 text-emerald-700 rounded-[6px] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <ArrowRight className="w-4 h-4" />
+                Advance to Next Step
+              </button>
+            )}
           </div>
         </div>
       </div>
