@@ -159,7 +159,7 @@ export function BackendResiduals() {
           </div>
           <button
             onClick={() => { setShowUpload(true); setStep('idle'); setFiles([]); }}
-            className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Upload Report
@@ -171,7 +171,7 @@ export function BackendResiduals() {
           <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <FileSpreadsheet className="w-4 h-4 text-[#4318FF]" />
+                <FileSpreadsheet className="w-4 h-4 text-brand" />
                 {step === 'mapping' ? 'Column Mapping' : step === 'processing' ? 'Processing Report...' : step === 'done' ? 'Report Processed' : 'Upload Residual Report'}
               </h2>
               <button onClick={resetUpload} className="p-1 hover:bg-gray-100 rounded transition-colors">
@@ -189,7 +189,7 @@ export function BackendResiduals() {
                     onDrop={handleDrop}
                     onClick={() => inputRef.current?.click()}
                     className={`border-2 border-dashed rounded-[8px] p-8 text-center cursor-pointer transition-colors ${
-                      dragOver ? 'border-[#4318FF] bg-[#4318FF]/5' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                      dragOver ? 'border-brand bg-brand/5' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
                     }`}
                   >
                     <input
@@ -201,9 +201,9 @@ export function BackendResiduals() {
                     />
                     <div className="flex flex-col items-center gap-3">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
-                        dragOver ? 'bg-[#4318FF]/10' : 'bg-gray-100'
+                        dragOver ? 'bg-brand/10' : 'bg-gray-100'
                       }`}>
-                        <Upload className={`w-5 h-5 ${dragOver ? 'text-[#4318FF]' : 'text-gray-400'}`} />
+                        <Upload className={`w-5 h-5 ${dragOver ? 'text-brand' : 'text-gray-400'}`} />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700">Drag & drop residual report here</p>
@@ -226,7 +226,7 @@ export function BackendResiduals() {
                       ))}
                       <button
                         onClick={startMapping}
-                        className="mt-3 px-5 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2"
+                        className="mt-3 px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
                       >
                         <ArrowUpDown className="w-4 h-4" />
                         Detect & Map Columns
@@ -263,7 +263,7 @@ export function BackendResiduals() {
                               <select
                                 value={m.mappedTo}
                                 onChange={e => updateMapping(i, e.target.value)}
-                                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                               >
                                 {systemFields.map(f => (
                                   <option key={f} value={f}>{f}</option>
@@ -289,7 +289,7 @@ export function BackendResiduals() {
                   <div className="flex items-center gap-3 mt-4">
                     <button
                       onClick={processReport}
-                      className="px-5 py-2.5 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2"
+                      className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Process Report
@@ -307,7 +307,7 @@ export function BackendResiduals() {
               {/* Step: Processing */}
               {step === 'processing' && (
                 <div className="flex flex-col items-center py-10 gap-4">
-                  <Loader2 className="w-8 h-8 text-[#4318FF] animate-spin" />
+                  <Loader2 className="w-8 h-8 text-brand animate-spin" />
                   <div className="text-center">
                     <p className="text-sm font-medium text-gray-900">Processing residual report...</p>
                     <p className="text-xs text-gray-400 mt-1">Matching merchants, calculating agent splits, and verifying totals.</p>
@@ -333,7 +333,7 @@ export function BackendResiduals() {
         {showProcessedData && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <SummaryCard label="Report Period" value="March 2026" icon={<CalendarDays className="w-4 h-4 text-[#4318FF]" />} />
+              <SummaryCard label="Report Period" value="March 2026" icon={<CalendarDays className="w-4 h-4 text-brand" />} />
               <SummaryCard label="Total Volume" value={fmtWhole(totals.volume)} icon={<BarChart3 className="w-4 h-4 text-emerald-600" />} />
               <SummaryCard label="Total Net Revenue" value={fmt(totals.net)} icon={<DollarSign className="w-4 h-4 text-blue-600" />} />
               <SummaryCard label="Total Agent Payouts" value={fmt(totals.agentPay)} icon={<Users className="w-4 h-4 text-amber-600" />} />
@@ -345,7 +345,7 @@ export function BackendResiduals() {
               <select
                 value={agentFilter}
                 onChange={e => setAgentFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               >
                 <option value="All">All Agents</option>
                 {agents.map(a => <option key={a} value={a}>{a}</option>)}
@@ -353,7 +353,7 @@ export function BackendResiduals() {
               <select
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               >
                 <option value="March 2026">March 2026</option>
                 <option value="February 2026">February 2026</option>
@@ -388,7 +388,7 @@ export function BackendResiduals() {
                         <td className="pl-5 py-3">
                           <button
                             onClick={() => navigate(`/residuals/${r.merchantId}`)}
-                            className="text-sm font-medium text-[#4318FF] hover:underline underline-offset-2"
+                            className="text-sm font-medium text-brand hover:underline underline-offset-2"
                           >
                             {r.merchantName}
                           </button>
@@ -454,7 +454,7 @@ export function BackendResiduals() {
                       </span>
                     </td>
                     <td className="px-3 py-3 pr-5 text-right">
-                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4318FF] hover:underline underline-offset-2">
+                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
                         <Download className="w-3.5 h-3.5" />
                         Download
                       </button>
@@ -517,7 +517,7 @@ export function AgentResiduals() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <SummaryCard label="My Merchants" value={agentMerchants.length.toString()} icon={<Building2 className="w-4 h-4 text-[#4318FF]" />} />
+          <SummaryCard label="My Merchants" value={agentMerchants.length.toString()} icon={<Building2 className="w-4 h-4 text-brand" />} />
           <SummaryCard label="My Volume" value={fmtWhole(myVolume)} icon={<BarChart3 className="w-4 h-4 text-emerald-600" />} />
           <SummaryCard label="My Commission" value={fmt(myTotal)} icon={<DollarSign className="w-4 h-4 text-amber-600" />} />
           <div className="bg-white rounded-[8px] border border-gray-200 p-3.5">
@@ -596,7 +596,7 @@ export function AgentResiduals() {
                     <td className="px-3 py-3 text-sm text-gray-900 text-right tabular-nums">{fmtWhole(s.volume)}</td>
                     <td className="px-3 py-3 text-sm text-emerald-700 text-right font-medium tabular-nums">{fmt(s.commission)}</td>
                     <td className="px-3 py-3 pr-5 text-right">
-                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4318FF] hover:underline underline-offset-2">
+                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
                         <Download className="w-3.5 h-3.5" />
                         PDF
                       </button>

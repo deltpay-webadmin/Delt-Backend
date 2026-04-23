@@ -179,7 +179,7 @@ export function BackendCapital() {
                 Synced Apr 14
               </span>
             </div>
-            <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Deal
             </button>
           </div>
@@ -202,7 +202,7 @@ export function BackendCapital() {
                 onClick={() => setActiveTab(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] ${
                   activeTab === t.key
-                    ? 'text-[#4318FF] border-[#4318FF]'
+                    ? 'text-brand border-brand'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
@@ -218,7 +218,7 @@ export function BackendCapital() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Self-Funded Block */}
             <div className="lg:col-span-2 bg-white rounded-[8px] border border-gray-200 p-5 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#4318FF] to-[#6B5BFF]" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand to-brand-light" />
               <div className="flex items-center gap-2 mb-4">
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-indigo-50 text-indigo-600">Self-Funded</span>
                 <span className="text-xs text-gray-400">{M.selfCount} deals - Family office capital @ 2%/mo</span>
@@ -303,7 +303,7 @@ export function BackendCapital() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search merchant or ID..."
-                className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               />
             </div>
           </div>
@@ -365,7 +365,7 @@ export function BackendCapital() {
                           <div className="text-sm font-semibold text-gray-900 tabular-nums">{fmtK(m.fundedAmt)}</div>
                           <div className="text-[11px] text-gray-400">{fmtDate(m.funded)}</div>
                         </td>
-                        <td className="py-3 text-sm font-semibold text-[#4318FF] tabular-nums">{m.factor.toFixed(2)}x</td>
+                        <td className="py-3 text-sm font-semibold text-brand tabular-nums">{m.factor.toFixed(2)}x</td>
                         <td className="py-3 pr-4">
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-sm text-gray-700 tabular-nums">{fmtK(m.collected)}</span>
@@ -442,7 +442,7 @@ export function BackendCapital() {
                             <div className="mt-4 pt-3 border-t border-gray-200 flex justify-end">
                               <button
                                 onClick={(e) => { e.stopPropagation(); navigate(`/deals/${m.id}`); }}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#4318FF] hover:bg-[#4318FF]/5 rounded-[6px] transition-colors"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/5 rounded-[6px] transition-colors"
                               >
                                 Open Full Detail <ChevronRight className="w-3.5 h-3.5" />
                               </button>
@@ -467,7 +467,7 @@ export function BackendCapital() {
             <p className="text-xs text-gray-400">
               {filtered.length}/{DEALS.length} deals - ACH.com - QBO - DataMerch - FiCoSo - Fundomate
             </p>
-            <p className="text-xs text-gray-400"><span className="text-[#4318FF] font-bold">delt</span>pay.com</p>
+            <p className="text-xs text-gray-400"><span className="text-brand font-bold">delt</span>pay.com</p>
           </div>
         </>}
 
@@ -511,13 +511,13 @@ export function BackendCapital() {
                     <td className="py-3">
                       <div className="flex items-center gap-1">{stages.map((s, i) => (
                         <div key={i} className="flex items-center gap-0.5">
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-[#4318FF] text-white ring-2 ring-[#4318FF]/20' : 'bg-gray-100 text-gray-400'}`} title={s.name}>{s.done ? '✓' : s.icon}</div>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-brand text-white ring-2 ring-brand/20' : 'bg-gray-100 text-gray-400'}`} title={s.name}>{s.done ? '✓' : s.icon}</div>
                           {i < stages.length - 1 && <div className={`w-3 h-0.5 ${s.done ? 'bg-emerald-300' : 'bg-gray-200'}`} />}
                         </div>
                       ))}</div>
                     </td>
                     <td className="py-3">
-                      <button onClick={(e) => { e.stopPropagation(); setCollectionModal(m.id); }} className="px-2.5 py-1.5 bg-[#4318FF] text-white text-[10px] font-semibold rounded-[6px] hover:bg-[#3311DD] transition-colors">{nextStage.name} →</button>
+                      <button onClick={(e) => { e.stopPropagation(); setCollectionModal(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button>
                     </td>
                   </tr>);
                 })}{DEALS.filter(m => m.status === 'slow' || m.status === 'default').length === 0 && (
@@ -581,7 +581,7 @@ export function BackendCapital() {
             {/* Cross-Product Risk Correlation */}
             <div className="bg-white rounded-[8px] border border-gray-200">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#4318FF]" />
+                <Activity className="w-4 h-4 text-brand" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Cross-Product Risk Correlation</h3><p className="text-xs text-gray-500 mt-0.5">Processing health alongside MCA repayment — early warning signals</p></div>
               </div>
               <div className="overflow-x-auto">
@@ -710,7 +710,7 @@ export function BackendCapital() {
             {/* Merchant Fraud Risk Matrix */}
             <div className="bg-white rounded-[8px] border border-gray-200">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#4318FF]" />
+                <Shield className="w-4 h-4 text-brand" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Merchant Fraud Risk Matrix</h3><p className="text-xs text-gray-500 mt-0.5">Per-merchant fraud indicator scoring</p></div>
               </div>
               <div className="overflow-x-auto">
@@ -855,7 +855,7 @@ export function BackendCapital() {
             {/* FiCoSo UCC Filing Status */}
             <div className="bg-white rounded-[8px] border border-gray-200">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#4318FF]" /><div><h3 className="text-sm font-semibold text-gray-900">FiCoSo UCC Filing Status</h3><p className="text-xs text-gray-500 mt-0.5">UCC-1 lien positions and expiration tracking</p></div></div>
+                <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-brand" /><div><h3 className="text-sm font-semibold text-gray-900">FiCoSo UCC Filing Status</h3><p className="text-xs text-gray-500 mt-0.5">UCC-1 lien positions and expiration tracking</p></div></div>
                 <span className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />FiCoSo synced Apr 14</span>
               </div>
               <div className="overflow-x-auto">
@@ -906,11 +906,11 @@ export function BackendCapital() {
                   {stages.map((s, i) => (
                     <div key={i} className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-[#4318FF] text-white ring-2 ring-[#4318FF]/20' : 'bg-gray-100 text-gray-400'}`}>{s.done ? '✓' : i + 1}</div>
-                        {i < stages.length - 1 && <div className={`w-0.5 h-12 ${s.done ? 'bg-emerald-300' : s.active ? 'bg-[#4318FF]/30' : 'bg-gray-200'}`} />}
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-brand text-white ring-2 ring-brand/20' : 'bg-gray-100 text-gray-400'}`}>{s.done ? '✓' : i + 1}</div>
+                        {i < stages.length - 1 && <div className={`w-0.5 h-12 ${s.done ? 'bg-emerald-300' : s.active ? 'bg-brand/30' : 'bg-gray-200'}`} />}
                       </div>
                       <div className={`flex-1 pb-5 ${!s.done && !s.active ? 'opacity-50' : ''}`}>
-                        <div className="flex items-center justify-between"><p className="text-sm font-semibold text-gray-900">{s.name}</p><span className={`text-[10px] font-bold px-2 py-0.5 rounded ${s.done ? 'bg-emerald-50 text-emerald-700' : s.active ? 'bg-[#4318FF]/10 text-[#4318FF]' : 'bg-gray-100 text-gray-400'}`}>{s.done ? 'Completed' : s.active ? 'In Progress' : 'Pending'}</span></div>
+                        <div className="flex items-center justify-between"><p className="text-sm font-semibold text-gray-900">{s.name}</p><span className={`text-[10px] font-bold px-2 py-0.5 rounded ${s.done ? 'bg-emerald-50 text-emerald-700' : s.active ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-400'}`}>{s.done ? 'Completed' : s.active ? 'In Progress' : 'Pending'}</span></div>
                         <p className="text-xs text-gray-500 mt-1">{s.desc}</p>
                         <p className="text-[10px] text-gray-400 mt-0.5">Day {s.daysIn}+ &bull; {s.ts}</p>
                       </div>
@@ -918,7 +918,7 @@ export function BackendCapital() {
                   ))}
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors">Advance to Next Stage</button>
+                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
                   <button onClick={() => setCollectionModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
                 </div>
               </div>
@@ -950,7 +950,7 @@ export function BackendCapital() {
               {/* By Merchant */}
               <ConcentrationCard
                 title="Self-Funded Concentration"
-                icon={<Building2 className="w-4 h-4 text-[#4318FF]" />}
+                icon={<Building2 className="w-4 h-4 text-brand" />}
                 data={M.byMerchant}
                 total={M.activeDeployed}
                 colors={['#4318FF', '#06B6D4', '#22C55E', '#F59E0B', '#A855F7', '#EF4444', '#F472B6', '#818CF8']}
@@ -986,7 +986,7 @@ export function BackendCapital() {
                       const dr = v.count > 0 ? v.defaults / v.count : 0;
                       return (
                         <tr key={mo} className="border-b border-gray-50 hover:bg-gray-50/50">
-                          <td className="px-3 py-2.5 text-sm font-semibold text-[#4318FF]">
+                          <td className="px-3 py-2.5 text-sm font-semibold text-brand">
                             {new Date(mo + '-01T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                           </td>
                           <td className="px-3 py-2.5 text-sm tabular-nums text-gray-700">{v.selfCount}</td>
@@ -1038,7 +1038,7 @@ function Th({ children, className = '' }: { children: React.ReactNode; className
 
 function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent: string }) {
   const accentMap: Record<string, string> = {
-    indigo: 'border-t-[#4318FF]', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
+    indigo: 'border-t-brand', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
     red: 'border-t-red-500', blue: 'border-t-blue-500', gray: 'border-t-gray-300',
     orange: 'border-t-orange-500', violet: 'border-t-violet-500',
   };

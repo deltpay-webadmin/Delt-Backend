@@ -124,7 +124,7 @@ export function DealDetail() {
   const uccDaysLeft = daysBetween(today, deal.uccExpires);
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] pb-16">
+    <div className="min-h-full bg-canvas pb-16">
       {/* ═══ Header ═══ */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-[1440px] mx-auto px-6 py-5">
@@ -167,7 +167,7 @@ export function DealDetail() {
               <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <button className="px-3.5 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-medium hover:bg-[#3311DD] inline-flex items-center gap-2 transition-colors">
+              <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
                 <ExternalLink className="w-4 h-4" /> View Merchant
               </button>
             </div>
@@ -181,7 +181,7 @@ export function DealDetail() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2.5 text-sm font-medium rounded-t-[6px] transition-colors border-b-2 ${
                   activeTab === tab
-                    ? 'text-[#4318FF] border-[#4318FF] bg-[#F8FAFC]'
+                    ? 'text-brand border-brand bg-canvas'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
@@ -636,7 +636,7 @@ function Card({ title, children, icon, right }: { title: string; children: React
 
 function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent: string }) {
   const accentMap: Record<string, string> = {
-    indigo: 'border-t-[#4318FF]', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
+    indigo: 'border-t-brand', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
     red: 'border-t-red-500', blue: 'border-t-blue-500', gray: 'border-t-gray-300',
     orange: 'border-t-orange-500', violet: 'border-t-violet-500',
   };

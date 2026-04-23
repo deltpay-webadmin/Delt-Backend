@@ -80,19 +80,19 @@ function UploadModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 space-y-4">
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Document Type</label>
-            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20">
+            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
               {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant</label>
-            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20" />
+            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
           <div
             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
             onDrop={() => setDragOver(false)}
-            className={`border-2 border-dashed rounded-[8px] p-8 text-center transition-colors ${dragOver ? 'border-[#4318FF] bg-[#4318FF]/5' : 'border-gray-300 bg-gray-50'}`}>
+            className={`border-2 border-dashed rounded-[8px] p-8 text-center transition-colors ${dragOver ? 'border-brand bg-brand/5' : 'border-gray-300 bg-gray-50'}`}>
             <Upload className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="text-xs text-gray-500 mb-1">Drag & drop files here, or click to browse</p>
             <p className="text-[10px] text-gray-400">PDF, DOCX, PNG, JPG up to 25 MB</p>
@@ -104,7 +104,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">Upload</button>
+          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Upload</button>
         </div>
       </div>
     </div>
@@ -145,7 +145,7 @@ export function BackendDocuments() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -157,7 +157,7 @@ export function BackendDocuments() {
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Upload className="w-3.5 h-3.5" /> Upload
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <PenTool className="w-3.5 h-3.5" /> New E-Sign Request
           </button>
         </div>
@@ -166,7 +166,7 @@ export function BackendDocuments() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Documents', value: DOCUMENTS.length, color: 'border-t-[#4318FF]', icon: FolderOpen },
+          { label: 'Total Documents', value: DOCUMENTS.length, color: 'border-t-brand', icon: FolderOpen },
           { label: 'Signed & Complete', value: signedCount, color: 'border-t-emerald-500', icon: FileCheck },
           { label: 'Awaiting Action', value: pendingCount, color: 'border-t-amber-500', icon: FileClock },
           { label: 'Drafts', value: draftCount, color: 'border-t-gray-400', icon: File },
@@ -189,13 +189,13 @@ export function BackendDocuments() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..."
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
         </div>
         <div className="flex items-center gap-1 flex-wrap">
           {(['all', 'signed', 'pending_signature', 'sent', 'draft', 'expired'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
-                statusFilter === s ? (s === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
               }`}>{s === 'all' ? `All (${DOCUMENTS.length})` : STATUS_CONFIG[s].label}</button>
           ))}
         </div>
@@ -226,7 +226,7 @@ export function BackendDocuments() {
                 <div className="flex items-center gap-2 mb-0.5">
                   <FileText className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                   <span className="text-[10px] font-mono text-gray-400">{doc.id}</span>
-                  {doc.dealId && <span className="text-[9px] font-mono text-[#4318FF] bg-indigo-50 px-1.5 py-0.5 rounded">{doc.dealId}</span>}
+                  {doc.dealId && <span className="text-[9px] font-mono text-brand bg-indigo-50 px-1.5 py-0.5 rounded">{doc.dealId}</span>}
                   {doc.envelopeId && <span className="text-[9px] font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">{doc.envelopeId}</span>}
                 </div>
                 <h4 className="text-xs font-semibold text-gray-900 truncate">{doc.name}</h4>

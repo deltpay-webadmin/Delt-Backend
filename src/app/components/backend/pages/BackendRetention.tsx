@@ -287,15 +287,15 @@ export function BackendRetention() {
       {/* Outreach Engagement Insight */}
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-[8px] border border-indigo-200 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#4318FF]/10 flex items-center justify-center shrink-0">
-            <Megaphone className="w-4.5 h-4.5 text-[#4318FF]" />
+          <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+            <Megaphone className="w-4.5 h-4.5 text-brand" />
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">Outreach engagement correlates with +3.5 pt health score improvement</p>
             <p className="text-xs text-gray-500 mt-0.5">6 of 8 engaged merchants show rising health scores — 2 disengaged merchants are declining. <span className="font-medium text-gray-700">Merchants who open &amp; respond to outreach churn 42% less.</span></p>
           </div>
         </div>
-        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
+        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
       </div>
 
       {/* Table */}
