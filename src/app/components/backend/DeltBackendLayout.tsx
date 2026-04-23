@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { NavigationContext } from './NavigationContext';
+import { SyncIndicator } from './SyncIndicator';
 import { BackendDashboard } from './pages/BackendDashboard';
 import { BackendLeads } from './pages/BackendLeads';
 import { BackendMerchants } from './pages/BackendMerchants';
@@ -655,6 +656,11 @@ export function DeltBackendLayout() {
 
               {/* Right actions */}
               <div className="flex items-center gap-1 ml-auto">
+                {/* Sync status */}
+                <div className="mr-1">
+                  <SyncIndicator />
+                </div>
+
                 {/* Role Toggle */}
                 <button
                   onClick={toggleRole}

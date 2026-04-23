@@ -1,21 +1,30 @@
 /**
  * ────────────────────────────────────────────────────────────
- * Delt CRM — shared in-memory store
+ * Delt CRM — Supabase-backed store
  * ────────────────────────────────────────────────────────────
- * A lightweight, dependency-free pub/sub store that lets the Leads,
- * Onboarding, Underwriting and Referrals screens share state.
+ * Persistent store backed by Supabase Postgres. Preserves the
+ * pub/sub + React hook surface of the previous in-memory version
+ * so page components don't need to change.
  *
- * It intentionally mirrors the structure of the sample data already used
- * in each page so existing components can keep consuming the same shape.
+ * Behavior:
+ *   • On first hook subscription, `hydrate()` fetches all tables
+ *     from Supabase and opens a realtime channel so multi-user
+ *     updates stream in live.
+ *   • Every action applies an optimistic local update, then writes
+ *     to Supabase. On failure, state is rolled back and a toast fires.
+ *   • If `supabase` is null (env vars missing), the store falls back
+ *     to the original in-memory behavior so the app still runs.
  *
- * Every call to `update*` fires listeners synchronously so React views
- * using the provided hooks re-render the next tick.
+ * DB column names use snake_case; TS types stay camelCase. The
+ * `fromDb*` / `toDb*` helpers do the conversion.
  */
 
 import { useSyncExternalStore, useCallback } from 'react';
+import { toast } from 'sonner@2.0.3';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 // ══════════════════════════════════════════════════════════════
-// Types (kept loose/compatible with existing page-level types)
+// Types (unchanged — pages depend on this exact shape)
 // ══════════════════════════════════════════════════════════════
 
 export type LeadStage =
@@ -207,410 +216,67 @@ export interface CrmState {
 }
 
 // ══════════════════════════════════════════════════════════════
-// Seed data (mirrors what each page previously hard-coded)
+// Fallback seed data — used only when Supabase is NOT configured.
+// Keeps the app functional in preview / contributor environments.
 // ══════════════════════════════════════════════════════════════
 
-const seedLeads: Lead[] = [
-  {
-    id: 'lead-001',
-    businessName: 'Green Valley Auto Repair',
-    industry: 'Automotive',
-    contactName: 'Robert Martinez',
-    contactEmail: 'robert@greenvalleyauto.com',
-    contactPhone: '(555) 123-4567',
-    type: 'MCA',
-    source: 'Website Inquiry',
-    monthlySales: '$45,000',
-    amountRequested: '$75,000',
-    score: 82,
-    status: 'In Progress',
-    priority: 'High',
-    lastActivity: '2 hours ago',
-    assignedAgent: 'Sarah Johnson',
-    stage: 'Qualified',
-    timeline: [
-      { title: 'Follow-up call completed', description: 'Discussed terms and pricing structure', user: 'Sarah Johnson', timestamp: '2 hours ago' },
-      { title: 'Bank statements received', description: '6 months of statements uploaded', user: 'System', timestamp: '1 day ago' },
-      { title: 'Initial email sent', description: 'Introduced Delt Pay services', user: 'Sarah Johnson', timestamp: '3 days ago' },
-    ],
-    notes: 'Strong financials. Owner is motivated and ready to move forward. Prefers daily payment option. Consider offering 1.15 factor rate.',
-    referredBy: 'Metro Diner Group',
-    tasks: [
-      { id: 't1', title: 'Follow up call scheduled', due: 'Tomorrow at 2:00 PM', done: false },
-      { id: 't2', title: 'Request bank statements', due: 'Completed yesterday', done: true },
-      { id: 't3', title: 'Send proposal to client', due: 'Due in 3 days', done: false },
-    ],
-  },
-  {
-    id: 'lead-002',
-    businessName: 'Urban Wellness Spa',
-    industry: 'Health & Wellness',
-    contactName: 'Jennifer Lee',
-    contactEmail: 'jlee@urbanwellness.com',
-    contactPhone: '(555) 234-5678',
-    type: 'Leasing',
-    source: 'Referral Partner',
-    monthlySales: '$62,000',
-    amountRequested: '$120,000',
-    score: 91,
-    status: 'In Progress',
-    priority: 'High',
-    lastActivity: '4 hours ago',
-    assignedAgent: 'Michael Chen',
-    stage: 'Underwriting',
-    blocker: 'Missing tax return — requested from merchant twice, no response',
-    stepDetails: [
-      { stage: 'Application Submitted', completedAt: 'Apr 1, 9:00 AM' },
-      { stage: 'Bank Verification', completedAt: 'Apr 1, 4:30 PM' },
-      { stage: 'Identity Verification', completedAt: 'Apr 2, 10:20 AM' },
-      { stage: 'Underwriting', completedAt: null },
-      { stage: 'Docs & E-Sign', completedAt: null },
-      { stage: 'Funded', completedAt: null },
-    ],
-    timeline: [
-      { title: 'Tax return requested (2nd)', description: 'Emailed and SMS reminder sent', user: 'Michael Chen', timestamp: '1 day ago' },
-      { title: 'ID verified', description: 'Identity verification passed', user: 'System', timestamp: 'Apr 2' },
-      { title: 'Discovery call', description: 'Discussed equipment needs and financing', user: 'Michael Chen', timestamp: '2 days ago' },
-    ],
-    notes: 'Excellent credit profile. Looking to lease new spa equipment worth $120K. Stuck waiting on tax docs.',
-    referredBy: 'Coastal Seafood Inc',
-  },
-  {
-    id: 'lead-003',
-    businessName: 'Lakeside Bistro',
-    industry: 'Food & Beverage',
-    contactName: 'David Thompson',
-    contactEmail: 'david@lakesidebistro.com',
-    contactPhone: '(555) 345-6789',
-    type: 'MCA',
-    source: 'Cold Outreach',
-    monthlySales: '$28,000',
-    amountRequested: '$50,000',
-    score: 58,
-    status: 'New',
-    priority: 'Medium',
-    lastActivity: '1 day ago',
-    assignedAgent: 'Sarah Johnson',
-    stage: 'New',
-    timeline: [
-      { title: 'Lead created', description: 'Added to pipeline from cold outreach', user: 'Sarah Johnson', timestamp: '1 day ago' },
-    ],
-    notes: 'Initial contact made. Waiting for callback to schedule discovery call.',
-  },
-  {
-    id: 'lead-004',
-    businessName: 'TechStart Solutions',
-    industry: 'Technology',
-    contactName: 'Amanda Rodriguez',
-    contactEmail: 'arodriguez@techstart.io',
-    contactPhone: '(555) 456-7890',
-    type: 'Residual',
-    source: 'LinkedIn',
-    monthlySales: '$180,000',
-    amountRequested: '$250,000',
-    score: 95,
-    status: 'Won',
-    priority: 'High',
-    lastActivity: '3 days ago',
-    assignedAgent: 'James Miller',
-    stage: 'Funded',
-    stepDetails: [
-      { stage: 'Application Submitted', completedAt: 'Mar 20, 11:00 AM' },
-      { stage: 'Bank Verification', completedAt: 'Mar 20, 5:45 PM' },
-      { stage: 'Identity Verification', completedAt: 'Mar 21, 9:30 AM' },
-      { stage: 'Underwriting', completedAt: 'Mar 22, 2:00 PM' },
-      { stage: 'Docs & E-Sign', completedAt: 'Mar 24, 10:15 AM' },
-      { stage: 'Funded', completedAt: 'Mar 25, 9:00 AM' },
-    ],
-    timeline: [
-      { title: 'Deal funded', description: 'Funds disbursed — $250K', user: 'System', timestamp: 'Mar 25' },
-      { title: 'Docs signed', description: 'E-sign completed by merchant', user: 'System', timestamp: 'Mar 24' },
-    ],
-    notes: 'Excellent deal closed. Strong residual opportunity with their payment volume.',
-  },
-  {
-    id: 'lead-005',
-    businessName: 'Coastal Construction LLC',
-    industry: 'Construction',
-    contactName: 'Mark Stevens',
-    contactEmail: 'mstevens@coastalconstruction.com',
-    contactPhone: '(555) 567-8901',
-    type: 'MCA',
-    source: 'Trade Show',
-    monthlySales: '$95,000',
-    amountRequested: '$150,000',
-    score: 72,
-    status: 'In Progress',
-    priority: 'Medium',
-    lastActivity: '6 hours ago',
-    assignedAgent: 'Michael Chen',
-    stage: 'Bank Verification',
-    blocker: 'Awaiting Plaid link — merchant has not connected bank account',
-    stepDetails: [
-      { stage: 'Application Submitted', completedAt: 'Apr 8, 10:30 AM' },
-      { stage: 'Bank Verification', completedAt: null },
-      { stage: 'Identity Verification', completedAt: null },
-      { stage: 'Underwriting', completedAt: null },
-      { stage: 'Docs & E-Sign', completedAt: null },
-      { stage: 'Funded', completedAt: null },
-    ],
-    timeline: [
-      { title: 'Plaid link SMS sent', description: 'Reminded merchant to connect bank', user: 'Michael Chen', timestamp: '6 hours ago' },
-      { title: 'Met at trade show', description: 'Collected business card and initial interest', user: 'Michael Chen', timestamp: '4 days ago' },
-    ],
-    notes: 'Seasonal business. Needs capital for equipment purchase. Awaiting bank connection.',
-  },
-  {
-    id: 'lead-006',
-    businessName: 'Metro Pet Care',
-    industry: 'Pet Services',
-    contactName: 'Lisa Parker',
-    contactEmail: 'lisa@metropetcare.com',
-    contactPhone: '(555) 678-9012',
-    type: 'MCA',
-    source: 'Referral Partner',
-    monthlySales: '$38,000',
-    amountRequested: '$60,000',
-    score: 45,
-    status: 'Lost',
-    priority: 'Low',
-    lastActivity: '2 weeks ago',
-    assignedAgent: 'Sarah Johnson',
-    stage: 'Qualified',
-    timeline: [
-      { title: 'Lead marked lost', description: 'Credit score too low for approval', user: 'Sarah Johnson', timestamp: '2 weeks ago' },
-      { title: 'Qualification call', description: 'Identified credit issues', user: 'Sarah Johnson', timestamp: '3 weeks ago' },
-    ],
-    notes: 'Credit score below 620. Recommended to reapply in 6 months after improving credit.',
-  },
-  {
-    id: 'lead-007',
-    businessName: 'Pinnacle Dental Group',
-    industry: 'Healthcare',
-    contactName: 'Dr. Sarah Mills',
-    contactEmail: 'smills@pinnacledental.com',
-    contactPhone: '(555) 789-0123',
-    type: 'MCA',
-    source: 'Website Inquiry',
-    monthlySales: '$110,000',
-    amountRequested: '$200,000',
-    score: 88,
-    status: 'In Progress',
-    priority: 'High',
-    lastActivity: '1 day ago',
-    assignedAgent: 'James Miller',
-    stage: 'Docs & E-Sign',
-    blocker: 'E-sign link sent — awaiting merchant signature on funding agreement',
-    stepDetails: [
-      { stage: 'Application Submitted', completedAt: 'Apr 3, 2:10 PM' },
-      { stage: 'Bank Verification', completedAt: 'Apr 3, 6:30 PM' },
-      { stage: 'Identity Verification', completedAt: 'Apr 4, 8:45 AM' },
-      { stage: 'Underwriting', completedAt: 'Apr 6, 10:00 AM' },
-      { stage: 'Docs & E-Sign', completedAt: null },
-      { stage: 'Funded', completedAt: null },
-    ],
-    timeline: [
-      { title: 'E-sign link emailed', description: 'Funding agreement sent for signature', user: 'System', timestamp: '1 day ago' },
-      { title: 'Underwriting approved', description: '$200K approved at 1.25 factor', user: 'System', timestamp: 'Apr 6' },
-    ],
-    notes: 'Strong dental practice. Underwriting approved quickly. Awaiting final signature.',
-  },
-  {
-    id: 'lead-008',
-    businessName: 'Summit Freight Services',
-    industry: 'Logistics',
-    contactName: 'Carlos Reyes',
-    contactEmail: 'creyes@summitfreight.com',
-    contactPhone: '(555) 890-1234',
-    type: 'MCA',
-    source: 'Cold Outreach',
-    monthlySales: '$72,000',
-    amountRequested: '$100,000',
-    score: 67,
-    status: 'In Progress',
-    priority: 'Medium',
-    lastActivity: '12 hours ago',
-    assignedAgent: 'Sarah Johnson',
-    stage: 'Identity Verification',
-    blocker: 'ID photo blurry — re-upload requested via SMS',
-    stepDetails: [
-      { stage: 'Application Submitted', completedAt: 'Apr 6, 11:00 AM' },
-      { stage: 'Bank Verification', completedAt: 'Apr 6, 5:15 PM' },
-      { stage: 'Identity Verification', completedAt: null },
-      { stage: 'Underwriting', completedAt: null },
-      { stage: 'Docs & E-Sign', completedAt: null },
-      { stage: 'Funded', completedAt: null },
-    ],
-    timeline: [
-      { title: 'SMS sent for ID re-upload', description: 'Photo too blurry for verification', user: 'System', timestamp: '12 hours ago' },
-      { title: 'Bank verified via Plaid', description: 'Bank account connected successfully', user: 'System', timestamp: 'Apr 6' },
-    ],
-    notes: 'Freight company with steady revenue. Stuck on ID verification — blurry photo.',
-  },
-];
-
-const seedOnboarding: OnboardingApp[] = [
-  {
-    id: 'ONB-001',
-    merchantName: 'Sunrise Bakery LLC',
-    agent: 'Marcus Johnson',
-    currentStep: 'Bank Verification',
-    currentStepIndex: 1,
-    timeInStep: '22 hrs',
-    timeInStepHours: 22,
-    slaTarget: '24 hrs',
-    slaStatus: 'At Risk',
-    submittedDate: 'Apr 7, 2026',
-    blocker: 'Awaiting Plaid link — merchant has not connected bank account',
-    steps: [
-      { step: 'Application Submitted', completedAt: 'Apr 7, 10:30 AM', slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: null, slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-    nudges: 0,
-  },
-  {
-    id: 'ONB-002',
-    merchantName: 'Peak Construction Co',
-    agent: 'Priya Patel',
-    currentStep: 'Underwriting',
-    currentStepIndex: 3,
-    timeInStep: '3.2 days',
-    timeInStepHours: 76.8,
-    slaTarget: '48 hrs',
-    slaStatus: 'Breached',
-    submittedDate: 'Apr 2, 2026',
-    blocker: 'Missing tax return — requested from merchant twice, no response',
-    steps: [
-      { step: 'Application Submitted', completedAt: 'Apr 2, 9:15 AM', slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: 'Apr 2, 3:40 PM', slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: 'Apr 3, 11:20 AM', slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: null, slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-    nudges: 1,
-  },
-  {
-    id: 'ONB-003',
-    merchantName: 'Coastal Seafood Inc',
-    agent: 'Jamal Foster',
-    currentStep: 'Docs & E-Sign',
-    currentStepIndex: 4,
-    timeInStep: '1.5 days',
-    timeInStepHours: 36,
-    slaTarget: '72 hrs',
-    slaStatus: 'On Track',
-    submittedDate: 'Apr 4, 2026',
-    blocker: 'E-sign link sent — awaiting merchant signature on funding agreement',
-    steps: [
-      { step: 'Application Submitted', completedAt: 'Apr 4, 2:10 PM', slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: 'Apr 4, 6:30 PM', slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: 'Apr 5, 8:45 AM', slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: 'Apr 6, 10:00 AM', slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-  },
-  {
-    id: 'ONB-004',
-    merchantName: 'Metro Diner Group',
-    agent: 'Marcus Johnson',
-    currentStep: 'Identity Verification',
-    currentStepIndex: 2,
-    timeInStep: '26 hrs',
-    timeInStepHours: 26,
-    slaTarget: '24 hrs',
-    slaStatus: 'Breached',
-    submittedDate: 'Apr 6, 2026',
-    blocker: 'ID photo blurry — re-upload requested via SMS',
-    steps: [
-      { step: 'Application Submitted', completedAt: 'Apr 6, 11:00 AM', slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: 'Apr 6, 5:15 PM', slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: null, slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-  },
-  {
-    id: 'ONB-005',
-    merchantName: 'Bright Auto Sales',
-    agent: 'Devon Richards',
-    currentStep: 'Application Submitted',
-    currentStepIndex: 0,
-    timeInStep: '4 hrs',
-    timeInStepHours: 4,
-    slaTarget: '—',
-    slaStatus: 'On Track',
-    submittedDate: 'Apr 9, 2026',
-    blocker: 'Application under initial review — all fields complete',
-    steps: [
-      { step: 'Application Submitted', completedAt: null, slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: null, slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-  },
-  {
-    id: 'ONB-006',
-    merchantName: 'Lakeside Catering',
-    agent: 'Sarah Kim',
-    currentStep: 'Bank Verification',
-    currentStepIndex: 1,
-    timeInStep: '12 hrs',
-    timeInStepHours: 12,
-    slaTarget: '24 hrs',
-    slaStatus: 'On Track',
-    submittedDate: 'Apr 8, 2026',
-    blocker: 'Plaid connected — awaiting 3-day transaction pull to complete',
-    steps: [
-      { step: 'Application Submitted', completedAt: 'Apr 8, 9:00 AM', slaTarget: '—' },
-      { step: 'Bank Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Identity Verification', completedAt: null, slaTarget: '24 hrs' },
-      { step: 'Underwriting', completedAt: null, slaTarget: '48 hrs' },
-      { step: 'Docs & E-Sign', completedAt: null, slaTarget: '72 hrs' },
-      { step: 'Funded', completedAt: null, slaTarget: '24 hrs' },
-    ],
-  },
-];
-
-const seedUnderwriting: UWApplication[] = [
-  { id: 'app-001', applicationId: 'UW-2026-0147', businessName: 'TechForward Solutions', dba: 'TechForward', industry: 'IT Services', state: 'NY', productType: 'MCA', requestedAmount: 200000, monthlyRevenue: 85000, avgDailyBalance: 14200, monthsInBusiness: 48, creditScore: 712, existingPositions: 0, submissionDate: 'Apr 17, 2026', reviewer: 'Sarah Mitchell', reviewerInitials: 'SM', riskScore: 88, stage: 'Received', daysInStage: 0, slaThreshold: 2, source: 'Direct — Website', missingDocs: ['Last 3 months bank statements', 'Voided check'] },
-  { id: 'app-002', applicationId: 'UW-2026-0148', businessName: 'Miami Spice Kitchen', dba: 'Miami Spice', industry: 'Restaurant', state: 'FL', productType: 'MCA', requestedAmount: 75000, monthlyRevenue: 42000, avgDailyBalance: 6800, monthsInBusiness: 36, creditScore: 645, existingPositions: 1, submissionDate: 'Apr 17, 2026', reviewer: 'David Kim', reviewerInitials: 'DK', riskScore: 71, stage: 'Received', daysInStage: 0, slaThreshold: 2, source: 'Agent — Marcus Johnson' },
-  { id: 'app-003', applicationId: 'UW-2026-0143', businessName: 'Sunrise Cafe & Bakery', industry: 'Restaurant / Bakery', state: 'NY', productType: 'MCA', requestedAmount: 125000, monthlyRevenue: 37500, avgDailyBalance: 5100, monthsInBusiness: 24, creditScore: 668, existingPositions: 0, submissionDate: 'Apr 15, 2026', reviewer: 'David Kim', reviewerInitials: 'DK', riskScore: 78, stage: 'Doc Collection', daysInStage: 2, slaThreshold: 3, source: 'ISO — Apex Funding', missingDocs: ['Tax returns (2024)', 'Landlord letter'] },
-  { id: 'app-004', applicationId: 'UW-2026-0141', businessName: 'Coastal Construction LLC', industry: 'Construction', state: 'VA', productType: 'Term Loan', requestedAmount: 180000, monthlyRevenue: 95000, avgDailyBalance: 18200, monthsInBusiness: 72, creditScore: 701, existingPositions: 1, submissionDate: 'Apr 14, 2026', reviewer: 'Michael Torres', reviewerInitials: 'MT', riskScore: 68, stage: 'Bank Review', daysInStage: 3, slaThreshold: 3, disclosureState: 'VA HB 1027', notes: 'Large deposits irregular — need to verify contract payments', source: 'Direct — Website' },
-  { id: 'app-005', applicationId: 'UW-2026-0145', businessName: 'Urban Wellness Spa', industry: 'Health & Wellness', state: 'FL', productType: 'MCA', requestedAmount: 150000, monthlyRevenue: 62000, avgDailyBalance: 9400, monthsInBusiness: 42, creditScore: 724, existingPositions: 0, submissionDate: 'Apr 13, 2026', reviewer: 'Michael Torres', reviewerInitials: 'MT', riskScore: 91, stage: 'Credit Analysis', daysInStage: 4, slaThreshold: 5, factorRate: 1.35, proposedPayback: 202500, dailyPayment: 675, holdbackPct: 15, source: 'Referral Partner' },
-  { id: 'app-006', applicationId: 'UW-2026-0138', businessName: 'Green Valley Auto Repair', industry: 'Automotive', state: 'CA', productType: 'Revenue Based', requestedAmount: 75000, monthlyRevenue: 45000, avgDailyBalance: 7200, monthsInBusiness: 60, creditScore: 690, existingPositions: 2, submissionDate: 'Apr 12, 2026', reviewer: 'Sarah Mitchell', reviewerInitials: 'SM', riskScore: 62, stage: 'Credit Analysis', daysInStage: 5, slaThreshold: 5, disclosureState: 'CA SB 1235', factorRate: 1.42, proposedPayback: 106500, dailyPayment: 425, holdbackPct: 18, notes: '2 existing positions — stacking risk. Verify payoff on 1st position.', source: 'Direct — Website' },
-  { id: 'app-007', applicationId: 'UW-2026-0139', businessName: 'Brooklyn Vinyl Records', industry: 'Retail', state: 'NY', productType: 'MCA', requestedAmount: 50000, monthlyRevenue: 28000, avgDailyBalance: 4100, monthsInBusiness: 18, creditScore: 632, existingPositions: 0, submissionDate: 'Apr 11, 2026', reviewer: 'David Kim', reviewerInitials: 'DK', riskScore: 74, stage: 'Committee', daysInStage: 2, slaThreshold: 2, factorRate: 1.38, proposedPayback: 69000, dailyPayment: 276, holdbackPct: 15, notes: 'Low TIB (18mo). Revenue trend positive. Recommend approval with conservative terms.', source: 'Direct — Website' },
-  { id: 'app-008', applicationId: 'UW-2026-0136', businessName: 'Havana Bites Cafe', industry: 'Restaurant', state: 'FL', productType: 'MCA', requestedAmount: 45000, monthlyRevenue: 34000, avgDailyBalance: 5800, monthsInBusiness: 30, creditScore: 658, existingPositions: 0, submissionDate: 'Apr 10, 2026', reviewer: 'Michael Torres', reviewerInitials: 'MT', riskScore: 85, stage: 'Approved', daysInStage: 1, slaThreshold: 7, factorRate: 1.32, proposedPayback: 59400, dailyPayment: 198, holdbackPct: 12, source: 'Direct — Website' },
-  { id: 'app-009', applicationId: 'UW-2026-0135', businessName: 'SoBe Cycle & Fitness', industry: 'Fitness', state: 'FL', productType: 'MCA', requestedAmount: 100000, monthlyRevenue: 56000, avgDailyBalance: 8900, monthsInBusiness: 54, creditScore: 738, existingPositions: 0, submissionDate: 'Apr 9, 2026', reviewer: 'Sarah Mitchell', reviewerInitials: 'SM', riskScore: 93, stage: 'Approved', daysInStage: 2, slaThreshold: 7, factorRate: 1.28, proposedPayback: 128000, dailyPayment: 427, holdbackPct: 12, source: 'Direct — Website' },
-  { id: 'app-010', applicationId: 'UW-2026-0129', businessName: 'Metro Pet Care', industry: 'Pet Services', state: 'NJ', productType: 'MCA', requestedAmount: 60000, monthlyRevenue: 38000, avgDailyBalance: 2100, monthsInBusiness: 12, creditScore: 548, existingPositions: 3, submissionDate: 'Apr 5, 2026', reviewer: 'David Kim', reviewerInitials: 'DK', riskScore: 32, stage: 'Declined', daysInStage: 5, slaThreshold: 5, notes: 'Low credit, 3 existing positions, low ADB relative to request. High stacking risk.', source: 'Direct — Website' },
-  { id: 'app-011', applicationId: 'UW-2026-0127', businessName: 'Doral Fresh Market', industry: 'Grocery', state: 'FL', productType: 'MCA', requestedAmount: 40000, monthlyRevenue: 31000, avgDailyBalance: 2800, monthsInBusiness: 14, creditScore: 582, existingPositions: 2, submissionDate: 'Apr 3, 2026', reviewer: 'Michael Torres', reviewerInitials: 'MT', riskScore: 38, stage: 'Declined', daysInStage: 8, slaThreshold: 5, notes: 'Negative cash flow trend. Multiple NSFs on bank statements. Adverse action sent.', source: 'Direct — Website' },
-];
-
-const seedReferrals: Referral[] = [
-  { id: 'REF-001', referringMerchant: 'Metro Diner Group', referredBusiness: 'Valley Pizza Co', referralCode: 'METRO-2024A', date: 'Mar 28, 2026', status: 'Converted', rewardStatus: 'Paid', rewardAmount: '$100' },
-  { id: 'REF-002', referringMerchant: 'Coastal Seafood Inc', referredBusiness: 'Harbor Fish Market', referralCode: 'COAST-7X91', date: 'Apr 2, 2026', status: 'Contacted', rewardStatus: 'Pending', rewardAmount: '$100' },
-  { id: 'REF-003', referringMerchant: 'Bright Auto Sales', referredBusiness: 'Sunrise Auto Body', referralCode: 'BRIGHT-KQ33', date: 'Apr 5, 2026', status: 'Pending', rewardStatus: 'Pending', rewardAmount: '$100' },
-  { id: 'REF-004', referringMerchant: 'Lakeside Catering', referredBusiness: 'Greenfield Events LLC', referralCode: 'LAKE-PP82', date: 'Feb 15, 2026', status: 'Expired', rewardStatus: 'N/A', rewardAmount: '—' },
-];
+const fallbackSeed: CrmState = {
+  leads: [
+    {
+      id: 'lead-001',
+      businessName: 'Green Valley Auto Repair',
+      industry: 'Automotive',
+      contactName: 'Robert Martinez',
+      contactEmail: 'robert@greenvalleyauto.com',
+      contactPhone: '(555) 123-4567',
+      type: 'MCA',
+      source: 'Website Inquiry',
+      monthlySales: '$45,000',
+      amountRequested: '$75,000',
+      score: 82,
+      status: 'In Progress',
+      priority: 'High',
+      lastActivity: '2 hours ago',
+      assignedAgent: 'Sarah Johnson',
+      stage: 'Qualified',
+      timeline: [
+        { title: 'Follow-up call completed', description: 'Discussed terms and pricing structure', user: 'Sarah Johnson', timestamp: '2 hours ago' },
+      ],
+      notes: 'Strong financials. Owner is motivated and ready to move forward.',
+      referredBy: 'Metro Diner Group',
+      tasks: [
+        { id: 't1', title: 'Follow up call scheduled', due: 'Tomorrow at 2:00 PM', done: false },
+      ],
+    },
+  ],
+  onboarding: [],
+  underwriting: [],
+  referrals: [],
+  program: { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
+};
 
 // ══════════════════════════════════════════════════════════════
-// Store
+// Store (pub/sub)
 // ══════════════════════════════════════════════════════════════
+
+interface SyncState {
+  isLoading: boolean;
+  isOnline: boolean;
+  lastError: string | null;
+}
 
 let state: CrmState = {
-  leads: seedLeads,
-  onboarding: seedOnboarding,
-  underwriting: seedUnderwriting,
-  referrals: seedReferrals,
+  leads: [],
+  onboarding: [],
+  underwriting: [],
+  referrals: [],
   program: { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
+};
+
+let sync: SyncState = {
+  isLoading: isSupabaseConfigured,
+  isOnline: isSupabaseConfigured,
+  lastError: null,
 };
 
 const listeners = new Set<() => void>();
@@ -620,8 +286,14 @@ function set(next: Partial<CrmState>) {
   listeners.forEach(l => l());
 }
 
+function setSync(next: Partial<SyncState>) {
+  sync = { ...sync, ...next };
+  listeners.forEach(l => l());
+}
+
 function subscribe(cb: () => void) {
   listeners.add(cb);
+  maybeHydrate();
   return () => listeners.delete(cb);
 }
 
@@ -629,7 +301,398 @@ function getSnapshot() {
   return state;
 }
 
-// ── Hooks ──
+function getSyncSnapshot() {
+  return sync;
+}
+
+// ══════════════════════════════════════════════════════════════
+// DB ↔ TS mappers
+// ══════════════════════════════════════════════════════════════
+
+function fromDbLead(r: any): Lead {
+  return {
+    id: r.id,
+    businessName: r.business_name,
+    industry: r.industry,
+    contactName: r.contact_name ?? '',
+    contactEmail: r.contact_email ?? '',
+    contactPhone: r.contact_phone ?? '',
+    type: r.type,
+    source: r.source ?? '',
+    monthlySales: r.monthly_sales ?? '',
+    amountRequested: r.amount_requested ?? '',
+    score: r.score ?? 50,
+    status: r.status,
+    priority: r.priority,
+    lastActivity: r.last_activity ?? '',
+    assignedAgent: r.assigned_agent ?? '',
+    stage: r.stage,
+    timeline: r.timeline ?? [],
+    notes: r.notes ?? '',
+    extraNotes: r.extra_notes ?? [],
+    tasks: r.tasks ?? [],
+    blocker: r.blocker ?? undefined,
+    stepDetails: r.step_details ?? undefined,
+    referredBy: r.referred_by ?? undefined,
+    bundle: r.bundle ?? null,
+  };
+}
+
+function toDbLead(l: Partial<Lead>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (l.id !== undefined) out.id = l.id;
+  if (l.businessName !== undefined) out.business_name = l.businessName;
+  if (l.industry !== undefined) out.industry = l.industry;
+  if (l.contactName !== undefined) out.contact_name = l.contactName;
+  if (l.contactEmail !== undefined) out.contact_email = l.contactEmail;
+  if (l.contactPhone !== undefined) out.contact_phone = l.contactPhone;
+  if (l.type !== undefined) out.type = l.type;
+  if (l.source !== undefined) out.source = l.source;
+  if (l.monthlySales !== undefined) out.monthly_sales = l.monthlySales;
+  if (l.amountRequested !== undefined) out.amount_requested = l.amountRequested;
+  if (l.score !== undefined) out.score = l.score;
+  if (l.status !== undefined) out.status = l.status;
+  if (l.priority !== undefined) out.priority = l.priority;
+  if (l.lastActivity !== undefined) out.last_activity = l.lastActivity;
+  if (l.assignedAgent !== undefined) out.assigned_agent = l.assignedAgent;
+  if (l.stage !== undefined) out.stage = l.stage;
+  if (l.timeline !== undefined) out.timeline = l.timeline;
+  if (l.notes !== undefined) out.notes = l.notes;
+  if (l.extraNotes !== undefined) out.extra_notes = l.extraNotes;
+  if (l.tasks !== undefined) out.tasks = l.tasks;
+  if (l.blocker !== undefined) out.blocker = l.blocker;
+  if (l.stepDetails !== undefined) out.step_details = l.stepDetails;
+  if (l.referredBy !== undefined) out.referred_by = l.referredBy;
+  if (l.bundle !== undefined) out.bundle = l.bundle;
+  return out;
+}
+
+function fromDbOnb(r: any): OnboardingApp {
+  return {
+    id: r.id,
+    merchantName: r.merchant_name,
+    agent: r.agent,
+    currentStep: r.current_step,
+    currentStepIndex: r.current_step_index ?? 0,
+    timeInStep: r.time_in_step ?? '',
+    timeInStepHours: Number(r.time_in_step_hours ?? 0),
+    slaTarget: r.sla_target ?? '',
+    slaStatus: r.sla_status ?? 'On Track',
+    submittedDate: r.submitted_date ?? '',
+    blocker: r.blocker ?? '',
+    steps: r.steps ?? [],
+    nudges: r.nudges ?? 0,
+    lastNudge: r.last_nudge ?? undefined,
+  };
+}
+
+function toDbOnb(o: Partial<OnboardingApp>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (o.id !== undefined) out.id = o.id;
+  if (o.merchantName !== undefined) out.merchant_name = o.merchantName;
+  if (o.agent !== undefined) out.agent = o.agent;
+  if (o.currentStep !== undefined) out.current_step = o.currentStep;
+  if (o.currentStepIndex !== undefined) out.current_step_index = o.currentStepIndex;
+  if (o.timeInStep !== undefined) out.time_in_step = o.timeInStep;
+  if (o.timeInStepHours !== undefined) out.time_in_step_hours = o.timeInStepHours;
+  if (o.slaTarget !== undefined) out.sla_target = o.slaTarget;
+  if (o.slaStatus !== undefined) out.sla_status = o.slaStatus;
+  if (o.submittedDate !== undefined) out.submitted_date = o.submittedDate;
+  if (o.blocker !== undefined) out.blocker = o.blocker;
+  if (o.steps !== undefined) out.steps = o.steps;
+  if (o.nudges !== undefined) out.nudges = o.nudges;
+  if (o.lastNudge !== undefined) out.last_nudge = o.lastNudge;
+  return out;
+}
+
+function fromDbUw(r: any): UWApplication {
+  return {
+    id: r.id,
+    applicationId: r.application_id,
+    businessName: r.business_name,
+    dba: r.dba ?? undefined,
+    industry: r.industry ?? '',
+    state: r.state ?? '',
+    productType: r.product_type,
+    requestedAmount: Number(r.requested_amount ?? 0),
+    monthlyRevenue: Number(r.monthly_revenue ?? 0),
+    avgDailyBalance: Number(r.avg_daily_balance ?? 0),
+    monthsInBusiness: Number(r.months_in_business ?? 0),
+    creditScore: Number(r.credit_score ?? 0),
+    existingPositions: Number(r.existing_positions ?? 0),
+    submissionDate: r.submission_date ?? '',
+    reviewer: r.reviewer ?? '',
+    reviewerInitials: r.reviewer_initials ?? '',
+    riskScore: Number(r.risk_score ?? 0),
+    stage: r.stage,
+    daysInStage: Number(r.days_in_stage ?? 0),
+    slaThreshold: Number(r.sla_threshold ?? 3),
+    factorRate: r.factor_rate != null ? Number(r.factor_rate) : undefined,
+    proposedPayback: r.proposed_payback != null ? Number(r.proposed_payback) : undefined,
+    dailyPayment: r.daily_payment != null ? Number(r.daily_payment) : undefined,
+    holdbackPct: r.holdback_pct != null ? Number(r.holdback_pct) : undefined,
+    disclosureState: r.disclosure_state ?? undefined,
+    missingDocs: r.missing_docs ?? undefined,
+    notes: r.notes ?? undefined,
+    source: r.source ?? '',
+  };
+}
+
+function toDbUw(a: Partial<UWApplication>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (a.id !== undefined) out.id = a.id;
+  if (a.applicationId !== undefined) out.application_id = a.applicationId;
+  if (a.businessName !== undefined) out.business_name = a.businessName;
+  if (a.dba !== undefined) out.dba = a.dba;
+  if (a.industry !== undefined) out.industry = a.industry;
+  if (a.state !== undefined) out.state = a.state;
+  if (a.productType !== undefined) out.product_type = a.productType;
+  if (a.requestedAmount !== undefined) out.requested_amount = a.requestedAmount;
+  if (a.monthlyRevenue !== undefined) out.monthly_revenue = a.monthlyRevenue;
+  if (a.avgDailyBalance !== undefined) out.avg_daily_balance = a.avgDailyBalance;
+  if (a.monthsInBusiness !== undefined) out.months_in_business = a.monthsInBusiness;
+  if (a.creditScore !== undefined) out.credit_score = a.creditScore;
+  if (a.existingPositions !== undefined) out.existing_positions = a.existingPositions;
+  if (a.submissionDate !== undefined) out.submission_date = a.submissionDate;
+  if (a.reviewer !== undefined) out.reviewer = a.reviewer;
+  if (a.reviewerInitials !== undefined) out.reviewer_initials = a.reviewerInitials;
+  if (a.riskScore !== undefined) out.risk_score = a.riskScore;
+  if (a.stage !== undefined) out.stage = a.stage;
+  if (a.daysInStage !== undefined) out.days_in_stage = a.daysInStage;
+  if (a.slaThreshold !== undefined) out.sla_threshold = a.slaThreshold;
+  if (a.factorRate !== undefined) out.factor_rate = a.factorRate;
+  if (a.proposedPayback !== undefined) out.proposed_payback = a.proposedPayback;
+  if (a.dailyPayment !== undefined) out.daily_payment = a.dailyPayment;
+  if (a.holdbackPct !== undefined) out.holdback_pct = a.holdbackPct;
+  if (a.disclosureState !== undefined) out.disclosure_state = a.disclosureState;
+  if (a.missingDocs !== undefined) out.missing_docs = a.missingDocs;
+  if (a.notes !== undefined) out.notes = a.notes;
+  if (a.source !== undefined) out.source = a.source;
+  return out;
+}
+
+function fromDbReferral(r: any): Referral {
+  return {
+    id: r.id,
+    referringMerchant: r.referring_merchant,
+    referredBusiness: r.referred_business,
+    referralCode: r.referral_code,
+    date: r.date ?? '',
+    status: r.status,
+    rewardStatus: r.reward_status,
+    rewardAmount: r.reward_amount ?? '',
+  };
+}
+
+function toDbReferral(r: Partial<Referral>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (r.id !== undefined) out.id = r.id;
+  if (r.referringMerchant !== undefined) out.referring_merchant = r.referringMerchant;
+  if (r.referredBusiness !== undefined) out.referred_business = r.referredBusiness;
+  if (r.referralCode !== undefined) out.referral_code = r.referralCode;
+  if (r.date !== undefined) out.date = r.date;
+  if (r.status !== undefined) out.status = r.status;
+  if (r.rewardStatus !== undefined) out.reward_status = r.rewardStatus;
+  if (r.rewardAmount !== undefined) out.reward_amount = r.rewardAmount;
+  return out;
+}
+
+function fromDbProgram(r: any): ReferralProgram {
+  return {
+    rewardAmount: r.reward_amount ?? '100',
+    freeMonths: r.free_months ?? '1',
+    planTier: r.plan_tier ?? 'Growth',
+  };
+}
+
+function toDbProgram(p: Partial<ReferralProgram>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (p.rewardAmount !== undefined) out.reward_amount = String(p.rewardAmount);
+  if (p.freeMonths !== undefined) out.free_months = String(p.freeMonths);
+  if (p.planTier !== undefined) out.plan_tier = p.planTier;
+  return out;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Hydration + realtime
+// ══════════════════════════════════════════════════════════════
+
+let hydrated = false;
+let hydrating = false;
+
+async function maybeHydrate() {
+  if (hydrated || hydrating) return;
+
+  if (!supabase) {
+    // Offline mode — load fallback seed once so screens aren't empty.
+    hydrated = true;
+    set(fallbackSeed);
+    setSync({ isLoading: false, isOnline: false });
+    return;
+  }
+
+  hydrating = true;
+  setSync({ isLoading: true, lastError: null });
+
+  try {
+    const [leadsRes, onbRes, uwRes, refRes, progRes] = await Promise.all([
+      supabase.from('leads').select('*').order('id', { ascending: true }),
+      supabase.from('onboarding_apps').select('*').order('id', { ascending: true }),
+      supabase.from('underwriting_apps').select('*').order('id', { ascending: true }),
+      supabase.from('referrals').select('*').order('id', { ascending: true }),
+      supabase.from('referral_program').select('*').eq('id', 1).maybeSingle(),
+    ]);
+
+    const firstErr =
+      leadsRes.error || onbRes.error || uwRes.error || refRes.error || progRes.error;
+    if (firstErr) throw firstErr;
+
+    set({
+      leads: (leadsRes.data || []).map(fromDbLead),
+      onboarding: (onbRes.data || []).map(fromDbOnb),
+      underwriting: (uwRes.data || []).map(fromDbUw),
+      referrals: (refRes.data || []).map(fromDbReferral),
+      program: progRes.data
+        ? fromDbProgram(progRes.data)
+        : { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
+    });
+
+    hydrated = true;
+    setSync({ isLoading: false, isOnline: true, lastError: null });
+    subscribeRealtime();
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error('[Delt CRM] Hydration failed:', err);
+    hydrated = true; // don't retry-loop — user can refresh
+    setSync({ isLoading: false, isOnline: false, lastError: err?.message || 'Failed to load' });
+    toast.error('Unable to load CRM data — showing local snapshot.');
+    // Keep whatever's already in state (likely empty) to stay functional.
+  } finally {
+    hydrating = false;
+  }
+}
+
+function subscribeRealtime() {
+  if (!supabase) return;
+  const channel = supabase
+    .channel('crm-sync')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'leads' },
+      payload => applyRealtime('leads', payload),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'onboarding_apps' },
+      payload => applyRealtime('onboarding_apps', payload),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'underwriting_apps' },
+      payload => applyRealtime('underwriting_apps', payload),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'referrals' },
+      payload => applyRealtime('referrals', payload),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'referral_program' },
+      payload => applyRealtime('referral_program', payload),
+    )
+    .subscribe();
+  // Keep reference so it isn't GC'd.
+  (globalThis as any).__deltCrmChannel = channel;
+}
+
+function applyRealtime(table: string, payload: any) {
+  const { eventType, new: newRow, old: oldRow } = payload;
+  if (table === 'leads') {
+    if (eventType === 'DELETE') {
+      set({ leads: state.leads.filter(l => l.id !== oldRow?.id) });
+    } else {
+      const mapped = fromDbLead(newRow);
+      const exists = state.leads.some(l => l.id === mapped.id);
+      set({
+        leads: exists
+          ? state.leads.map(l => (l.id === mapped.id ? mapped : l))
+          : [mapped, ...state.leads],
+      });
+    }
+  } else if (table === 'onboarding_apps') {
+    if (eventType === 'DELETE') {
+      set({ onboarding: state.onboarding.filter(o => o.id !== oldRow?.id) });
+    } else {
+      const mapped = fromDbOnb(newRow);
+      const exists = state.onboarding.some(o => o.id === mapped.id);
+      set({
+        onboarding: exists
+          ? state.onboarding.map(o => (o.id === mapped.id ? mapped : o))
+          : [...state.onboarding, mapped],
+      });
+    }
+  } else if (table === 'underwriting_apps') {
+    if (eventType === 'DELETE') {
+      set({ underwriting: state.underwriting.filter(a => a.id !== oldRow?.id) });
+    } else {
+      const mapped = fromDbUw(newRow);
+      const exists = state.underwriting.some(a => a.id === mapped.id);
+      set({
+        underwriting: exists
+          ? state.underwriting.map(a => (a.id === mapped.id ? mapped : a))
+          : [mapped, ...state.underwriting],
+      });
+    }
+  } else if (table === 'referrals') {
+    if (eventType === 'DELETE') {
+      set({ referrals: state.referrals.filter(r => r.id !== oldRow?.id) });
+    } else {
+      const mapped = fromDbReferral(newRow);
+      const exists = state.referrals.some(r => r.id === mapped.id);
+      set({
+        referrals: exists
+          ? state.referrals.map(r => (r.id === mapped.id ? mapped : r))
+          : [mapped, ...state.referrals],
+      });
+    }
+  } else if (table === 'referral_program') {
+    if (newRow) set({ program: fromDbProgram(newRow) });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Optimistic write helper
+// ══════════════════════════════════════════════════════════════
+
+async function persist<T>(
+  label: string,
+  apply: () => void,
+  rollback: () => void,
+  op: () => Promise<{ error: { message: string } | null }>,
+): Promise<void> {
+  apply();
+  if (!supabase) return; // offline mode: optimistic-only
+  try {
+    const { error } = await op();
+    if (error) {
+      rollback();
+      // eslint-disable-next-line no-console
+      console.error(`[Delt CRM] ${label} failed:`, error);
+      toast.error(`Couldn't save ${label.toLowerCase()} — reverted.`);
+    }
+  } catch (err: any) {
+    rollback();
+    // eslint-disable-next-line no-console
+    console.error(`[Delt CRM] ${label} threw:`, err);
+    toast.error(`Couldn't save ${label.toLowerCase()} — reverted.`);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Hooks
+// ══════════════════════════════════════════════════════════════
+
 export function useCrm() {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
@@ -659,8 +722,13 @@ export function useReferralProgram() {
   return useSyncExternalStore(subscribe, selector, selector);
 }
 
+/** Exposes hydration & connectivity status for UI indicators. */
+export function useCrmSync() {
+  return useSyncExternalStore(subscribe, getSyncSnapshot, getSyncSnapshot);
+}
+
 // ══════════════════════════════════════════════════════════════
-// Actions
+// Actions (signatures unchanged — pages unchanged)
 // ══════════════════════════════════════════════════════════════
 
 const nowStamp = () =>
@@ -674,7 +742,12 @@ const nowStamp = () =>
 // ── Lead actions ──
 export const leadActions = {
   create(lead: Partial<Lead>): Lead {
-    const id = `lead-${String(state.leads.length + 1).padStart(3, '0')}`;
+    // Generate an ID that's unique against current state.
+    const used = new Set(state.leads.map(l => l.id));
+    let n = state.leads.length + 1;
+    let id = `lead-${String(n).padStart(3, '0')}`;
+    while (used.has(id)) id = `lead-${String(++n).padStart(3, '0')}`;
+
     const created: Lead = {
       id,
       businessName: lead.businessName || 'New Business',
@@ -694,17 +767,36 @@ export const leadActions = {
       stage: 'New',
       timeline: [{ title: 'Lead created', description: 'Manually added via CRM', user: lead.assignedAgent || 'System', timestamp: 'just now' }],
       notes: lead.notes || '',
+      extraNotes: [],
+      tasks: [],
     };
-    set({ leads: [created, ...state.leads] });
+    const prev = state.leads;
+    persist(
+      'lead',
+      () => set({ leads: [created, ...state.leads] }),
+      () => set({ leads: prev }),
+      () => supabase!.from('leads').insert(toDbLead(created)).then(r => ({ error: r.error })),
+    );
     return created;
   },
+
   update(id: string, patch: Partial<Lead>) {
-    set({ leads: state.leads.map(l => (l.id === id ? { ...l, ...patch } : l)) });
+    const prev = state.leads;
+    const lead = state.leads.find(l => l.id === id);
+    if (!lead) return;
+    persist(
+      'lead',
+      () => set({ leads: state.leads.map(l => (l.id === id ? { ...l, ...patch } : l)) }),
+      () => set({ leads: prev }),
+      () => supabase!.from('leads').update(toDbLead(patch)).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
+
   setStatus(id: string, status: Lead['status']) {
     leadActions.update(id, { status, lastActivity: 'just now' });
     leadActions.addTimeline(id, { title: `Status set to ${status}`, description: 'Updated from pipeline', user: 'You', timestamp: 'just now' });
   },
+
   advanceStage(id: string) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
@@ -717,6 +809,7 @@ export const leadActions = {
     leadActions.update(id, patch);
     leadActions.addTimeline(id, { title: `Advanced to ${next}`, description: 'Pipeline stage promoted', user: 'You', timestamp: 'just now' });
   },
+
   submitApplication(id: string) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
@@ -736,10 +829,12 @@ export const leadActions = {
     leadActions.update(id, patch);
     leadActions.addTimeline(id, { title: 'Application submitted', description: 'Handed off to onboarding', user: 'You', timestamp: 'just now' });
   },
+
   markLost(id: string) {
     leadActions.update(id, { status: 'Lost', lastActivity: 'just now' });
     leadActions.addTimeline(id, { title: 'Lead marked lost', description: 'Closed-lost from pipeline', user: 'You', timestamp: 'just now' });
   },
+
   addNote(id: string, body: string, author = 'You') {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
@@ -747,23 +842,27 @@ export const leadActions = {
     leadActions.update(id, { extraNotes: [...(lead.extraNotes || []), note], lastActivity: 'just now' });
     leadActions.addTimeline(id, { title: 'Note added', description: body.slice(0, 80), user: author, timestamp: 'just now' });
   },
+
   toggleTask(id: string, taskId: string) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
     const tasks = (lead.tasks || []).map(t => (t.id === taskId ? { ...t, done: !t.done } : t));
     leadActions.update(id, { tasks });
   },
+
   addTask(id: string, title: string, due = 'No due date') {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
     const task: LeadTask = { id: `t-${Date.now()}`, title, due, done: false };
     leadActions.update(id, { tasks: [...(lead.tasks || []), task] });
   },
+
   addTimeline(id: string, item: TimelineItem) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
     leadActions.update(id, { timeline: [item, ...lead.timeline] });
   },
+
   assignBundle(id: string, bundle: { name: string; amount: number }) {
     const now = new Date();
     const exp = new Date(now);
@@ -778,6 +877,7 @@ export const leadActions = {
     leadActions.update(id, { bundle: b });
     leadActions.addTimeline(id, { title: `Bundle assigned: ${bundle.name}`, description: `$${bundle.amount} credit issued`, user: 'You', timestamp: 'just now' });
   },
+
   cycleBundleStatus(id: string) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead || !lead.bundle) return;
@@ -791,35 +891,70 @@ export const leadActions = {
 // ── Onboarding actions ──
 export const onboardingActions = {
   nudge(id: string) {
-    set({
-      onboarding: state.onboarding.map(o =>
-        o.id === id ? { ...o, nudges: (o.nudges || 0) + 1, lastNudge: nowStamp() } : o,
-      ),
-    });
+    const prev = state.onboarding;
+    const target = state.onboarding.find(o => o.id === id);
+    if (!target) return;
+    const patch = { nudges: (target.nudges || 0) + 1, lastNudge: nowStamp() };
+    persist(
+      'onboarding nudge',
+      () =>
+        set({
+          onboarding: state.onboarding.map(o => (o.id === id ? { ...o, ...patch } : o)),
+        }),
+      () => set({ onboarding: prev }),
+      () => supabase!.from('onboarding_apps').update(toDbOnb(patch)).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
+
   reassign(id: string, newAgent: string) {
-    set({ onboarding: state.onboarding.map(o => (o.id === id ? { ...o, agent: newAgent } : o)) });
+    const prev = state.onboarding;
+    persist(
+      'reassign',
+      () =>
+        set({
+          onboarding: state.onboarding.map(o => (o.id === id ? { ...o, agent: newAgent } : o)),
+        }),
+      () => set({ onboarding: prev }),
+      () => supabase!.from('onboarding_apps').update({ agent: newAgent }).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
+
   advance(id: string) {
-    set({
-      onboarding: state.onboarding.map(o => {
-        if (o.id !== id) return o;
-        const STEPS: OnbStep[] = ['Application Submitted', 'Bank Verification', 'Identity Verification', 'Underwriting', 'Docs & E-Sign', 'Funded'];
-        const nextIdx = Math.min(o.currentStepIndex + 1, STEPS.length - 1);
-        const nextStep = STEPS[nextIdx];
-        const steps = o.steps.map((s, i) => (i === o.currentStepIndex ? { ...s, completedAt: nowStamp() } : s));
-        return { ...o, currentStep: nextStep, currentStepIndex: nextIdx, steps, timeInStep: '0 hrs', timeInStepHours: 0, slaStatus: 'On Track' as SLAStatus };
-      }),
-    });
+    const STEPS: OnbStep[] = ['Application Submitted', 'Bank Verification', 'Identity Verification', 'Underwriting', 'Docs & E-Sign', 'Funded'];
+    const target = state.onboarding.find(o => o.id === id);
+    if (!target) return;
+    const nextIdx = Math.min(target.currentStepIndex + 1, STEPS.length - 1);
+    const nextStep = STEPS[nextIdx];
+    const steps = target.steps.map((s, i) => (i === target.currentStepIndex ? { ...s, completedAt: nowStamp() } : s));
+    const patch: Partial<OnboardingApp> = {
+      currentStep: nextStep,
+      currentStepIndex: nextIdx,
+      steps,
+      timeInStep: '0 hrs',
+      timeInStepHours: 0,
+      slaStatus: 'On Track',
+    };
+    const prev = state.onboarding;
+    persist(
+      'advance step',
+      () =>
+        set({
+          onboarding: state.onboarding.map(o => (o.id === id ? { ...o, ...patch } : o)),
+        }),
+      () => set({ onboarding: prev }),
+      () => supabase!.from('onboarding_apps').update(toDbOnb(patch)).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
 };
 
 // ── Underwriting actions ──
 export const underwritingActions = {
   create(partial: Partial<UWApplication>): UWApplication {
-    const num = state.underwriting.length + 1;
-    const id = `app-${String(num).padStart(3, '0')}`;
-    const appId = `UW-2026-${String(200 + num).padStart(4, '0')}`;
+    const used = new Set(state.underwriting.map(a => a.id));
+    let n = state.underwriting.length + 1;
+    let id = `app-${String(n).padStart(3, '0')}`;
+    while (used.has(id)) id = `app-${String(++n).padStart(3, '0')}`;
+    const appId = `UW-2026-${String(200 + n).padStart(4, '0')}`;
     const reviewer = partial.reviewer || 'Sarah Mitchell';
     const app: UWApplication = {
       id,
@@ -843,18 +978,37 @@ export const underwritingActions = {
       slaThreshold: 2,
       source: partial.source || 'Manual',
     };
-    set({ underwriting: [app, ...state.underwriting] });
+    const prev = state.underwriting;
+    persist(
+      'underwriting app',
+      () => set({ underwriting: [app, ...state.underwriting] }),
+      () => set({ underwriting: prev }),
+      () => supabase!.from('underwriting_apps').insert(toDbUw(app)).then(r => ({ error: r.error })),
+    );
     return app;
   },
+
   update(id: string, patch: Partial<UWApplication>) {
-    set({ underwriting: state.underwriting.map(a => (a.id === id ? { ...a, ...patch } : a)) });
+    const prev = state.underwriting;
+    persist(
+      'underwriting app',
+      () =>
+        set({
+          underwriting: state.underwriting.map(a => (a.id === id ? { ...a, ...patch } : a)),
+        }),
+      () => set({ underwriting: prev }),
+      () => supabase!.from('underwriting_apps').update(toDbUw(patch)).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
+
   setStage(id: string, stage: UWStage) {
     underwritingActions.update(id, { stage, daysInStage: 0 });
   },
+
   approve(id: string) {
     underwritingActions.update(id, { stage: 'Approved', daysInStage: 0 });
   },
+
   decline(id: string) {
     underwritingActions.update(id, { stage: 'Declined', daysInStage: 0 });
   },
@@ -863,21 +1017,51 @@ export const underwritingActions = {
 // ── Referral actions ──
 export const referralActions = {
   setStatus(id: string, status: Referral['status']) {
-    set({
-      referrals: state.referrals.map(r =>
-        r.id === id
-          ? { ...r, status, rewardStatus: status === 'Converted' ? (r.rewardStatus === 'N/A' ? 'Pending' : r.rewardStatus) : r.rewardStatus }
-          : r,
-      ),
-    });
+    const target = state.referrals.find(r => r.id === id);
+    if (!target) return;
+    const nextRewardStatus: Referral['rewardStatus'] =
+      status === 'Converted'
+        ? target.rewardStatus === 'N/A'
+          ? 'Pending'
+          : target.rewardStatus
+        : target.rewardStatus;
+    const prev = state.referrals;
+    persist(
+      'referral status',
+      () =>
+        set({
+          referrals: state.referrals.map(r =>
+            r.id === id ? { ...r, status, rewardStatus: nextRewardStatus } : r,
+          ),
+        }),
+      () => set({ referrals: prev }),
+      () =>
+        supabase!
+          .from('referrals')
+          .update({ status, reward_status: nextRewardStatus })
+          .eq('id', id)
+          .then(r => ({ error: r.error })),
+    );
   },
+
   payReward(id: string) {
-    set({
-      referrals: state.referrals.map(r => (r.id === id ? { ...r, rewardStatus: 'Paid' } : r)),
-    });
+    const prev = state.referrals;
+    persist(
+      'reward payout',
+      () =>
+        set({
+          referrals: state.referrals.map(r => (r.id === id ? { ...r, rewardStatus: 'Paid' } : r)),
+        }),
+      () => set({ referrals: prev }),
+      () => supabase!.from('referrals').update({ reward_status: 'Paid' }).eq('id', id).then(r => ({ error: r.error })),
+    );
   },
+
   create(partial: Partial<Referral>) {
-    const id = `REF-${String(state.referrals.length + 1).padStart(3, '0')}`;
+    const used = new Set(state.referrals.map(r => r.id));
+    let n = state.referrals.length + 1;
+    let id = `REF-${String(n).padStart(3, '0')}`;
+    while (used.has(id)) id = `REF-${String(++n).padStart(3, '0')}`;
     const ref: Referral = {
       id,
       referringMerchant: partial.referringMerchant || 'Unknown',
@@ -888,13 +1072,36 @@ export const referralActions = {
       rewardStatus: 'Pending',
       rewardAmount: `$${state.program.rewardAmount}`,
     };
-    set({ referrals: [ref, ...state.referrals] });
+    const prev = state.referrals;
+    persist(
+      'referral',
+      () => set({ referrals: [ref, ...state.referrals] }),
+      () => set({ referrals: prev }),
+      () => supabase!.from('referrals').insert(toDbReferral(ref)).then(r => ({ error: r.error })),
+    );
     return ref;
   },
 };
 
+// ── Program actions ──
 export const programActions = {
   update(patch: Partial<ReferralProgram>) {
-    set({ program: { ...state.program, ...patch } });
+    // Coerce to strings (interface stores strings; callers sometimes pass Number()).
+    const coerced: Partial<ReferralProgram> = {};
+    if (patch.rewardAmount !== undefined) coerced.rewardAmount = String(patch.rewardAmount);
+    if (patch.freeMonths !== undefined) coerced.freeMonths = String(patch.freeMonths);
+    if (patch.planTier !== undefined) coerced.planTier = patch.planTier;
+
+    const prev = state.program;
+    persist(
+      'referral program',
+      () => set({ program: { ...state.program, ...coerced } }),
+      () => set({ program: prev }),
+      () =>
+        supabase!
+          .from('referral_program')
+          .upsert({ id: 1, ...toDbProgram(coerced) })
+          .then(r => ({ error: r.error })),
+    );
   },
 };
