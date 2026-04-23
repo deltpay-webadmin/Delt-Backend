@@ -103,10 +103,10 @@ const typeCls = (t: string) => {
 // ── Stat Card ──
 function StatCard({ label, value, icon, sub, highlight }: { label: string; value: string; icon: React.ReactNode; sub?: string; highlight?: boolean }) {
   return (
-    <div className={`bg-white rounded-[8px] border p-5 ${highlight ? 'border-[#4318FF]/30 ring-1 ring-[#4318FF]/10' : 'border-gray-200'}`}>
+    <div className={`bg-white rounded-[8px] border p-5 ${highlight ? 'border-brand/30 ring-1 ring-brand/10' : 'border-gray-200'}`}>
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
-        <div className={highlight ? 'text-[#4318FF]' : 'text-gray-400'}>{icon}</div>
+        <div className={highlight ? 'text-brand' : 'text-gray-400'}>{icon}</div>
       </div>
       <p className="text-2xl font-bold text-gray-900">{value}</p>
       {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
@@ -132,7 +132,7 @@ export function BackendPayroll() {
   const ytdPayroll = 312_480;
 
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC]">
+    <div className="h-full flex flex-col bg-canvas">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-6">
         <div className="flex items-center justify-between">
@@ -140,7 +140,7 @@ export function BackendPayroll() {
             <h1 className="text-2xl font-bold text-gray-900">Payroll</h1>
             <p className="text-sm text-gray-600 mt-1">Manage employee and agent commission payouts</p>
           </div>
-          <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3614d0] transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Banknote className="w-4 h-4" /> Run Payroll
           </button>
         </div>
@@ -162,7 +162,7 @@ export function BackendPayroll() {
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
-                tab === t ? 'border-[#4318FF] text-[#4318FF]' : 'border-transparent text-gray-500 hover:text-gray-900'
+                tab === t ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-900'
               }`}
             >
               {t}
@@ -174,8 +174,8 @@ export function BackendPayroll() {
         {tab === 'upcoming' && (
           <div className="space-y-6">
             {/* Pay period info */}
-            <div className="flex items-center gap-4 px-4 py-3 bg-[#4318FF]/5 border border-[#4318FF]/15 rounded-[8px]">
-              <Calendar className="w-5 h-5 text-[#4318FF]" />
+            <div className="flex items-center gap-4 px-4 py-3 bg-brand/5 border border-brand/15 rounded-[8px]">
+              <Calendar className="w-5 h-5 text-brand" />
               <div>
                 <p className="text-sm font-medium text-gray-900">Pay Period: Apr 1–15, 2026</p>
                 <p className="text-xs text-gray-500">Scheduled for Apr 15, 2026 &middot; Semi-monthly cycle</p>
@@ -282,7 +282,7 @@ export function BackendPayroll() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Total Net Pay</p>
-                  <p className="text-lg font-bold text-[#4318FF]">{fmt(totalNet)}</p>
+                  <p className="text-lg font-bold text-brand">{fmt(totalNet)}</p>
                 </div>
               </div>
               <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-between">
@@ -290,7 +290,7 @@ export function BackendPayroll() {
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                   Review all line items before approving. Approved payroll is final.
                 </div>
-                <button className="px-5 py-2.5 bg-[#4318FF] text-white text-sm font-semibold rounded-[6px] hover:bg-[#3614d0] transition-colors flex items-center gap-2">
+                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" /> Approve & Run
                 </button>
               </div>
@@ -306,7 +306,7 @@ export function BackendPayroll() {
               <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">Payroll Calendar — April 2026</h3>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#4318FF]" /> Pay Date</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-brand" /> Pay Date</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-amber-400" /> Deadline</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-400" /> Completed</span>
                 </div>
@@ -324,10 +324,10 @@ export function BackendPayroll() {
                     const isPast = day <= 9;
                     const isToday = day === 9;
                     return (
-                      <div key={day} className={`bg-white p-2 min-h-[72px] ${isToday ? 'ring-2 ring-[#4318FF] ring-inset' : ''}`}>
-                        <span className={`text-xs font-medium ${isToday ? 'text-[#4318FF]' : 'text-gray-700'}`}>{day}</span>
+                      <div key={day} className={`bg-white p-2 min-h-[72px] ${isToday ? 'ring-2 ring-brand ring-inset' : ''}`}>
+                        <span className={`text-xs font-medium ${isToday ? 'text-brand' : 'text-gray-700'}`}>{day}</span>
                         {isPayDay && (
-                          <div className={`mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold ${isPast ? 'bg-emerald-100 text-emerald-700' : 'bg-[#4318FF]/10 text-[#4318FF]'}`}>
+                          <div className={`mt-1 px-1.5 py-0.5 rounded text-[9px] font-semibold ${isPast ? 'bg-emerald-100 text-emerald-700' : 'bg-brand/10 text-brand'}`}>
                             {isPast ? 'Paid' : 'Pay Day'}
                           </div>
                         )}
@@ -356,7 +356,7 @@ export function BackendPayroll() {
                   { date: 'May 1', label: 'Semi-Monthly Payroll', type: 'pay' },
                 ].map(item => (
                   <div key={item.date + item.label} className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-[6px]">
-                    <Calendar className={`w-4 h-4 shrink-0 ${item.type === 'pay' ? 'text-[#4318FF]' : 'text-amber-500'}`} />
+                    <Calendar className={`w-4 h-4 shrink-0 ${item.type === 'pay' ? 'text-brand' : 'text-amber-500'}`} />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{item.label}</p>
                     </div>

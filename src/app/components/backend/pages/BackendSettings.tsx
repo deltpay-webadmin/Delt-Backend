@@ -196,7 +196,7 @@ export function BackendSettings() {
                 onClick={() => setTab(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-1.5 ${
                   tab === t.key
-                    ? 'text-[#4318FF] border-[#4318FF]'
+                    ? 'text-brand border-brand'
                     : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
@@ -213,7 +213,7 @@ export function BackendSettings() {
             {GENERAL_SECTIONS.map(section => {
               const open = expandedSection === section.key;
               return (
-                <div key={section.key} className={`border rounded-[8px] overflow-hidden transition-colors ${open ? 'border-[#4318FF]' : 'border-gray-200'}`}>
+                <div key={section.key} className={`border rounded-[8px] overflow-hidden transition-colors ${open ? 'border-brand' : 'border-gray-200'}`}>
                   <button
                     onClick={() => setExpandedSection(open ? null : section.key)}
                     className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50/50 transition-colors"
@@ -241,7 +241,7 @@ export function BackendSettings() {
                                 <span className="text-sm font-mono text-gray-600">{f.value}</span>
                               </div>
                             ) : f.type === 'select' ? (
-                              <select defaultValue={f.value} className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-900 bg-white focus:outline-none focus:border-[#4318FF]">
+                              <select defaultValue={f.value} className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-900 bg-white focus:outline-none focus:border-brand">
                                 {f.options?.map(o => <option key={o}>{o}</option>)}
                               </select>
                             ) : (
@@ -249,14 +249,14 @@ export function BackendSettings() {
                                 type="text"
                                 defaultValue={f.value}
                                 readOnly={f.readonly}
-                                className={`w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 focus:outline-none focus:border-[#4318FF] ${f.readonly ? 'bg-gray-50 text-gray-500' : 'bg-white'}`}
+                                className={`w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 focus:outline-none focus:border-brand ${f.readonly ? 'bg-gray-50 text-gray-500' : 'bg-white'}`}
                               />
                             )}
                           </div>
                         </div>
                       ))}
                       <div className="flex justify-end pt-4 mt-2 border-t border-gray-100">
-                        <button className="px-5 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-semibold hover:bg-[#3311DD] transition-colors">Save Changes</button>
+                        <button className="px-5 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
                       </div>
                     </div>
                   )}
@@ -298,11 +298,11 @@ export function BackendSettings() {
                 <div className="flex gap-2 mt-1">
                   {int.status === 'connected' ? (
                     <>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-[#4318FF] bg-[#4318FF]/5 border border-[#4318FF]/15 rounded-[6px] hover:bg-[#4318FF]/10 transition-colors">Configure</button>
+                      <button className="px-3 py-1.5 text-[11px] font-medium text-brand bg-brand/5 border border-brand/15 rounded-[6px] hover:bg-brand/10 transition-colors">Configure</button>
                       <button className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Disconnect</button>
                     </>
                   ) : (
-                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-[#4318FF] rounded-[6px] hover:bg-[#3311DD] transition-colors">Connect</button>
+                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[6px] hover:bg-brand-hover transition-colors">Connect</button>
                   )}
                 </div>
               </div>
@@ -318,7 +318,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Roles</h2>
                 <p className="text-sm text-gray-400 mt-0.5">System roles define baseline access. Permissions enforced across all modules.</p>
               </div>
-              <button className="px-4 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-semibold hover:bg-[#3311DD] inline-flex items-center gap-1.5 transition-colors">
+              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Custom Role
               </button>
             </div>
@@ -326,7 +326,7 @@ export function BackendSettings() {
               {ROLES.map(role => {
                 const open = expandedRole === role.id;
                 return (
-                  <div key={role.id} className={`border rounded-[8px] overflow-hidden transition-colors ${open ? 'border-[#4318FF]' : 'border-gray-200'}`}>
+                  <div key={role.id} className={`border rounded-[8px] overflow-hidden transition-colors ${open ? 'border-brand' : 'border-gray-200'}`}>
                     <button
                       onClick={() => setExpandedRole(open ? null : role.id)}
                       className="w-full flex items-center justify-between px-5 py-4 bg-white text-left"
@@ -342,7 +342,7 @@ export function BackendSettings() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-mono text-gray-500">{role.userCount} user{role.userCount !== 1 ? 's' : ''}</span>
-                        {role.isSystem && <span className="text-[10px] font-semibold text-[#4318FF] bg-[#4318FF]/8 px-2 py-0.5 rounded">System</span>}
+                        {role.isSystem && <span className="text-[10px] font-semibold text-brand bg-brand/8 px-2 py-0.5 rounded">System</span>}
                         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
                       </div>
                     </button>
@@ -399,7 +399,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Users & Access</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{USERS.length} users across {ROLES.length} roles</p>
               </div>
-              <button className="px-4 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-semibold hover:bg-[#3311DD] inline-flex items-center gap-1.5 transition-colors">
+              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Invite User
               </button>
             </div>
@@ -462,7 +462,7 @@ export function BackendSettings() {
                                 {user.role === 'agent' && (
                                   <div>
                                     <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200">Agent Configuration</h4>
-                                    <DRow l="Commission Split" v={`${user.split}%`} c="text-[#4318FF]" bold />
+                                    <DRow l="Commission Split" v={`${user.split}%`} c="text-brand" bold />
                                     <DRow l="Portfolio Cap" v={`${user.portfolioCap} merchants`} />
                                     <DRow l="Monthly Volume" v={user.monthlyVolume ? `$${user.monthlyVolume.toLocaleString()}` : '—'} />
                                     <DRow l="Territories" v={user.territories.join(', ')} />
@@ -501,7 +501,7 @@ export function BackendSettings() {
                 <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
                   <span className="text-xs font-mono text-gray-400 min-w-[140px] shrink-0">{log.time}</span>
                   <p className="flex-1 text-sm text-gray-700"><span className="font-semibold">{log.user}</span> {log.action}</p>
-                  <span className="text-[11px] font-medium text-[#4318FF] bg-[#4318FF]/5 px-2.5 py-0.5 rounded shrink-0">{log.module}</span>
+                  <span className="text-[11px] font-medium text-brand bg-brand/5 px-2.5 py-0.5 rounded shrink-0">{log.module}</span>
                 </div>
               ))}
             </div>
@@ -518,7 +518,7 @@ function Toggle({ value }: { value: boolean }) {
   return (
     <button
       onClick={() => setOn(!on)}
-      className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-[#4318FF]' : 'bg-gray-200'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-brand' : 'bg-gray-200'}`}
     >
       <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all ${on ? 'left-[23px]' : 'left-[3px]'}`} />
     </button>

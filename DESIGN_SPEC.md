@@ -1,8 +1,8 @@
 # Delt Backend — Design Spec
 
-Source of truth for the reference project's visual system. Every value is cited to a file path (and line where useful) so it can be re-verified.
+Source of truth for the project's visual system. Every value is cited to a file path (and line where useful) so it can be re-verified.
 
-The repo is a Figma Make export using **Tailwind v4** + Vite + React. There is **no `tailwind.config.*` file** — Tailwind v4 uses a CSS-first `@theme` block. All design tokens live in `src/styles/default_theme.css` (duplicated in `src/styles/globals.css`).
+The repo is a Figma Make export using **Tailwind v4** + Vite + React. There is **no `tailwind.config.*` file** — Tailwind v4 uses a CSS-first `@theme` block. All design tokens live in `src/styles/default_theme.css` (single source of truth); `src/styles/globals.css` owns only the base layer and default element typography.
 
 ---
 
@@ -15,9 +15,9 @@ The repo is a Figma Make export using **Tailwind v4** + Vite + React. There is *
 | PostCSS | `postcss.config.mjs` — empty (`export default {}`); Tailwind v4 does not need PostCSS |
 | Style entry | `src/main.tsx:4` → `src/styles/index.css` |
 | Stylesheet chain | `src/styles/index.css:1-5` — imports `tailwindcss source(none)`, globs `../../**/*.{js,ts,jsx,tsx}`, then `tw-animate-css`, then `default_theme.css`, then `globals.css` |
-| `@theme` block | `src/styles/default_theme.css:81-120` and duplicated in `src/styles/globals.css:83-122` |
+| `@theme` block | `src/styles/default_theme.css` (single source of truth) |
 
-No `tailwind.config.{js,ts,mjs}` exists. Tokens are defined as CSS custom properties under `:root` / `.dark` and exposed to Tailwind via `@theme inline { --color-*: var(--*); ... }`.
+No `tailwind.config.{js,ts,mjs}` exists. Tokens are defined as CSS custom properties under `:root` / `.dark` in `default_theme.css` and exposed to Tailwind via `@theme inline { --color-*: var(--*); ... }` in the same file. `globals.css` owns only `@custom-variant dark`, the DM Sans `@import`, the base layer, and default element typography.
 
 ---
 
@@ -30,17 +30,21 @@ No `tailwind.config.{js,ts,mjs}` exists. Tokens are defined as CSS custom proper
   ```css
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
   ```
-- Applied at the app shell via arbitrary class `font-['DM_Sans']` — `src/app/components/backend/DeltBackendLayout.tsx:442`.
+- Exposed to Tailwind as `--font-sans` in `default_theme.css` (inside `@theme inline`): `'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`.
+- Applied at the app shell via the `font-sans` utility — `src/app/components/backend/DeltBackendLayout.tsx:442`. Preview `<pre>` blocks in `BackendOutreach.tsx` also use `font-sans` to opt out of the browser monospace default.
 - The print/PDF export uses an OS-level fallback stack only: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` — `src/app/components/ExportDealReport.tsx:19`.
 
 ### Weight tokens
 
-Defined in `src/styles/default_theme.css:25-26` and `src/styles/globals.css:27-28`:
+Defined in `src/styles/default_theme.css` (light and dark blocks kept in sync):
 
 | Token | Value |
 |---|---|
 | `--font-weight-normal` | `400` |
 | `--font-weight-medium` | `500` |
+| `--font-weight-semibold` | `600` |
+| `--font-weight-bold` | `700` |
+| `--font-weight-extrabold` | `800` |
 
 ### Weights actually used in markup
 
@@ -138,7 +142,7 @@ Arbitrary radii used in the backend UI: `rounded-[2px]`, `rounded-[4px]`, `round
 
 ## 5. Color tokens
 
-All tokens are CSS custom properties on `:root` / `.dark`, mirrored onto Tailwind via `@theme inline`. Source of truth: `src/styles/default_theme.css:3-42` (light) and `:44-79` (dark), duplicated verbatim in `src/styles/globals.css`.
+All tokens are CSS custom properties on `:root` / `.dark`, mirrored onto Tailwind via `@theme inline`. Single source of truth: `src/styles/default_theme.css`.
 
 ### Light theme (`:root`)
 
@@ -178,6 +182,13 @@ All tokens are CSS custom properties on `:root` / `.dark`, mirrored onto Tailwin
 | `--sidebar-accent-foreground` | `oklch(0.205 0 0)` |
 | `--sidebar-border` | `oklch(0.922 0 0)` |
 | `--sidebar-ring` | `oklch(0.708 0 0)` |
+| `--brand` | `#4318FF` |
+| `--brand-hover` | `#3311DD` |
+| `--brand-light` | `#7B61FF` |
+| `--canvas` | `#F8FAFC` |
+| `--canvas-muted` | `#FAFBFD` |
+| `--info` | `#0284C7` |
+| `--info-hover` | `#0369A1` |
 
 ### Dark theme (`.dark`)
 
@@ -217,12 +228,19 @@ Deltas vs. light (see `default_theme.css:44-79` for the full list):
 | `--sidebar-accent-foreground` | `oklch(0.985 0 0)` |
 | `--sidebar-border` | `oklch(0.269 0 0)` |
 | `--sidebar-ring` | `oklch(0.439 0 0)` |
+| `--brand` | `#4318FF` (constant across themes) |
+| `--brand-hover` | `#3311DD` (constant across themes) |
+| `--brand-light` | `#7B61FF` (constant across themes) |
+| `--canvas` | `oklch(0.145 0 0)` |
+| `--canvas-muted` | `oklch(0.19 0 0)` |
+| `--info` | `#0284C7` (constant) |
+| `--info-hover` | `#0369A1` (constant) |
 
 ### `@theme inline` → Tailwind utilities
 
-`default_theme.css:81-120` maps every token above into a Tailwind color / radius slot:
+The `@theme inline` block in `default_theme.css` maps every token above into a Tailwind color / radius / font slot:
 
-- `bg-background`, `text-foreground`
+- Semantic surface / text: `bg-background`, `text-foreground`
 - `bg-card`, `text-card-foreground`
 - `bg-popover`, `text-popover-foreground`
 - `bg-primary`, `text-primary-foreground`
@@ -234,23 +252,36 @@ Deltas vs. light (see `default_theme.css:44-79` for the full list):
 - `ring-ring`
 - `text-chart-1 … chart-5`
 - `bg-sidebar`, `text-sidebar-foreground`, `bg-sidebar-primary`, `text-sidebar-primary-foreground`, `bg-sidebar-accent`, `text-sidebar-accent-foreground`, `border-sidebar-border`, `ring-sidebar-ring`
+- **Delt product tokens:** `bg-brand`, `text-brand`, `border-brand`, `ring-brand`, `from-brand`, `to-brand`, plus alpha modifiers (`bg-brand/10`, `bg-brand/[0.06]`, etc.); `bg-brand-hover`, `text-brand-hover`; `bg-brand-light`, `to-brand-light`; `bg-canvas`, `bg-canvas-muted`; `bg-info`, `text-info`, `bg-info-hover`.
 - Radii: `rounded-sm` (6 px), `rounded-md` (8 px), `rounded-lg` (10 px), `rounded-xl` (14 px)
+- Font: `font-sans` → DM Sans stack
 
-### Brand / product colors used as arbitrary classes (not tokens)
+### Brand / product token usage
 
-These are referenced directly with bracket syntax across the backend pages rather than through tokens:
+The `[#4318FF]` / `[#3311DD]` / `[#7B61FF]` / `[#F8FAFC]` / `[#FAFBFD]` / `[#0284C7]` / `[#0369A1]` / `[#3614d0]` / `[#6B5BFF]` arbitrary classes that previously littered the backend have been migrated to these tokens in the patterns below.
 
-| Color | Hex | Role / example |
+| Old arbitrary class | Token class |
+|---|---|
+| `bg-[#4318FF]`, `text-[#4318FF]`, `border-[#4318FF]`, `ring-[#4318FF]`, `from-[#4318FF]` | `bg-brand`, `text-brand`, `border-brand`, `ring-brand`, `from-brand` |
+| `bg-[#4318FF]/10`, `bg-[#4318FF]/[0.06]`, etc. | `bg-brand/10`, `bg-brand/[0.06]`, etc. |
+| `bg-[#3311DD]`, `bg-[#3614d0]`, `hover:bg-[#3311DD]`, `hover:bg-[#3614d0]` | `bg-brand-hover`, `hover:bg-brand-hover` (the two near-identical deep shades were unified) |
+| `to-[#6B5BFF]`, `to-[#7B61FF]` | `to-brand-light` (unified) |
+| `bg-[#F8FAFC]` | `bg-canvas` |
+| `bg-[#FAFBFD]` | `bg-canvas-muted` |
+| `bg-[#0284C7]`, `text-[#0284C7]` | `bg-info`, `text-info` |
+| `bg-[#0369A1]`, `hover:bg-[#0369A1]` | `bg-info-hover`, `hover:bg-info-hover` |
+
+### Other colors (left as literal hex or Tailwind defaults)
+
+Status families and other palettes that are still referenced as arbitrary classes or inline styles — not worth tokenizing given sparse, scattered use:
+
+| Family | Representative hexes | Role |
 |---|---|---|
-| **Delt Purple** (brand) | `#4318FF` | Logo, active nav, CTAs (`DeltBackendLayout.tsx:452, 468, 580, 634`) |
-| Delt Purple (hover / deep) | `#3311DD`, `#3614d0` | Hover states |
-| Delt Purple (soft) | `#6B5BFF`, `#7B61FF` | Gradients |
-| **Canvas background** | `#F8FAFC` (slate-50) | App shell bg (`DeltBackendLayout.tsx:442`) |
-| Success green | `#10B981`, `#059669`, `#22C55E` / `#22c55e`, `#0E9F6E`, `#0FAF62`, `#6BAF3D`, `#2D5016` | Status chips, KPI deltas |
+| Success green | `#10B981`, `#059669`, `#22C55E`, `#0E9F6E`, `#0FAF62`, `#6BAF3D`, `#2D5016` | Status chips, KPI deltas |
 | Warning amber | `#D97706`, `#E3A008`, `#E8850C`, `#B45309`, `#644712` | Alerts, totals |
 | Danger red | `#DC2E3A`, `#E11D48`, `#EF4444`, `#B91C1C` | Destructive, errors |
-| Info blue | `#0284C7`, `#0369A1`, `#06B6D4`, `#4A90D9` | Links, info chips |
-| Indigo accents | `#6366F1` / `#6366f1`, `#818CF8` | Secondary brand |
+| Extra info | `#06B6D4`, `#4A90D9` | Occasional info chips |
+| Indigo accents | `#6366F1`, `#818CF8` | Secondary brand |
 | Purple accents | `#A855F7`, `#6B21A8` | Tag variants |
 | Slate text / borders | `#334155`, `#94A3B8`, `#E2E8F0`, `#E5E7EB` | Body / borders |
 | Payment brand swatches | `#006fcf`, `#1A1F36`, `#041e42`, `#1a1f71`, `#1E3A5F` | Card brand badges |
@@ -301,7 +332,7 @@ Shell usage:
 ## 8. Miscellaneous globals
 
 - `src/styles/globals.css:1` — `@custom-variant dark (&:is(.dark *));` (dark mode variant)
-- `src/styles/globals.css:125-127` — global reset `* { @apply border-border outline-ring/50; }`
-- `src/styles/globals.css:129-133` — `body { @apply bg-background text-foreground; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }`
+- `src/styles/globals.css` — `@apply border-border outline-ring/50;` global reset on `*`
+- `src/styles/globals.css` — `body { @apply bg-background text-foreground; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }`
 - `src/styles/index.css:3` — animation library `tw-animate-css`
 - PDF/print export uses its own font stack (`ExportDealReport.tsx:19`) and is not part of the UI shell.

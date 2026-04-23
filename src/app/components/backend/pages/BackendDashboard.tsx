@@ -45,7 +45,7 @@ const TOP_MERCHANTS = [
 
 const TEAM_SNAP = [
   { name: 'Sarah Johnson', vol: '$131.9K', merchants: 3, color: 'bg-emerald-500' },
-  { name: 'Michael Chen', vol: '$187.2K', merchants: 3, color: 'bg-[#4318FF]' },
+  { name: 'Michael Chen', vol: '$187.2K', merchants: 3, color: 'bg-brand' },
   { name: 'James Miller', vol: '$165.7K', merchants: 2, color: 'bg-amber-500' },
   { name: 'Lyndon', vol: '$0', merchants: 0, color: 'bg-gray-400' },
 ];
@@ -94,7 +94,7 @@ export function BackendDashboard() {
               <span className="text-gray-500 font-medium">{fmtK(MERCHANTS_DATA.totalVolume)} processed this period</span>
             </p>
           </div>
-          <button className="px-4 py-2 bg-[#4318FF] text-white rounded-[6px] text-sm font-semibold hover:bg-[#3311DD] inline-flex items-center gap-2 transition-colors">
+          <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
             <RefreshCw className="w-4 h-4" /> Refresh Data
           </button>
         </div>
@@ -132,7 +132,7 @@ export function BackendDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <BigKPI label="Net Revenue" value={`$${RESIDUALS.netRevenue.toLocaleString()}`} sub={RESIDUALS.period} color="text-emerald-600" />
                 <BigKPI label="Total Volume" value={fmtK(RESIDUALS.totalVolume)} sub={`${MERCHANTS_DATA.total} merchants`} />
-                <BigKPI label="Delt Retained" value={`$${RESIDUALS.deltRetained.toLocaleString()}`} sub="After agent splits" color="text-[#4318FF]" />
+                <BigKPI label="Delt Retained" value={`$${RESIDUALS.deltRetained.toLocaleString()}`} sub="After agent splits" color="text-brand" />
                 <BigKPI label="Agent Payouts" value={`$${RESIDUALS.agentPayouts.toLocaleString()}`} sub={`${TEAM.agents} agents`} color="text-amber-500" />
               </div>
             </div>
@@ -152,11 +152,11 @@ export function BackendDashboard() {
                       <span className="text-[10px] font-semibold font-mono text-gray-500">${(r.net / 1000).toFixed(1)}K</span>
                       <div className="flex-1 w-full flex flex-col justify-end">
                         <div
-                          className={`w-full rounded ${isCurrent ? 'bg-[#4318FF]' : 'bg-gray-200'}`}
+                          className={`w-full rounded ${isCurrent ? 'bg-brand' : 'bg-gray-200'}`}
                           style={{ height: `${pct}%`, transition: 'height 0.5s ease', minHeight: 4 }}
                         />
                       </div>
-                      <span className={`text-[11px] ${isCurrent ? 'text-[#4318FF] font-bold' : 'text-gray-400 font-medium'}`}>{r.month}</span>
+                      <span className={`text-[11px] ${isCurrent ? 'text-brand font-bold' : 'text-gray-400 font-medium'}`}>{r.month}</span>
                     </div>
                   );
                 })}
@@ -168,9 +168,9 @@ export function BackendDashboard() {
               {/* Pipeline */}
               <div className="bg-white rounded-[8px] border border-gray-200 p-5">
                 <div className="flex items-center gap-2 mb-3.5">
-                  <Activity className="w-4 h-4 text-[#4318FF]" />
+                  <Activity className="w-4 h-4 text-brand" />
                   <span className="text-sm font-bold text-gray-900 flex-1">Pipeline</span>
-                  <button onClick={() => navigate('/leads')} className="text-[11px] text-[#4318FF] font-semibold hover:underline">View →</button>
+                  <button onClick={() => navigate('/leads')} className="text-[11px] text-brand font-semibold hover:underline">View →</button>
                 </div>
                 <div className="grid grid-cols-4 gap-1.5">
                   <MiniKPI label="Leads" value={PIPELINE.leads} />
@@ -190,9 +190,9 @@ export function BackendDashboard() {
               {/* Capital */}
               <div className="bg-white rounded-[8px] border border-gray-200 p-5">
                 <div className="flex items-center gap-2 mb-3.5">
-                  <Landmark className="w-4 h-4 text-[#4318FF]" />
+                  <Landmark className="w-4 h-4 text-brand" />
                   <span className="text-sm font-bold text-gray-900 flex-1">Capital</span>
-                  <button onClick={() => navigate('/capital')} className="text-[11px] text-[#4318FF] font-semibold hover:underline">View →</button>
+                  <button onClick={() => navigate('/capital')} className="text-[11px] text-brand font-semibold hover:underline">View →</button>
                 </div>
                 <div className="grid grid-cols-4 gap-1.5">
                   <MiniKPI label="Deployed" value={fmtK(CAPITAL.deployed)} />
@@ -205,7 +205,7 @@ export function BackendDashboard() {
                   <MiniKPI label="Default" value={`${CAPITAL.defaultRate}%`} color={CAPITAL.defaultRate > 5 ? 'text-red-500' : 'text-emerald-600'} />
                   <MiniKPI label="Active" value={CAPITAL.activeDeals} />
                   <MiniKPI label="Renewals" value={CAPITAL.renewalPipeline} />
-                  <MiniKPI label="Fundomate" value={`$${(CAPITAL.fundomateComm / 1000).toFixed(1)}K`} color="text-[#4318FF]" />
+                  <MiniKPI label="Fundomate" value={`$${(CAPITAL.fundomateComm / 1000).toFixed(1)}K`} color="text-brand" />
                 </div>
               </div>
             </div>
@@ -214,7 +214,7 @@ export function BackendDashboard() {
             <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
               <div className="flex items-baseline justify-between px-5 pt-4 pb-3">
                 <p className="text-sm font-bold text-gray-900">Top Merchants by Volume</p>
-                <button onClick={() => navigate('/merchants')} className="text-[11px] text-[#4318FF] font-semibold hover:underline">All Merchants →</button>
+                <button onClick={() => navigate('/merchants')} className="text-[11px] text-brand font-semibold hover:underline">All Merchants →</button>
               </div>
               <table className="w-full">
                 <thead>
@@ -327,7 +327,7 @@ export function BackendDashboard() {
                               onClick={(e) => e.stopPropagation()}
                               className={`px-3 py-1.5 rounded-[6px] text-[11px] font-semibold transition-colors ${
                                 ai === 0
-                                  ? 'bg-[#4318FF] text-white hover:bg-[#3311DD]'
+                                  ? 'bg-brand text-white hover:bg-brand-hover'
                                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                             >
@@ -383,7 +383,7 @@ function MiniKPI({ label, value, color, accent }: { label: string; value: string
   return (
     <div>
       <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-0.5">{label}</p>
-      <p className={`text-base font-bold font-mono tracking-tight ${accent ? 'text-[#4318FF]' : color || 'text-gray-900'}`}>{value}</p>
+      <p className={`text-base font-bold font-mono tracking-tight ${accent ? 'text-brand' : color || 'text-gray-900'}`}>{value}</p>
     </div>
   );
 }

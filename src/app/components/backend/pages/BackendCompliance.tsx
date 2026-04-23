@@ -107,7 +107,7 @@ function ControlDetail({ controlKey, state, onClose }: {
       </div>
       <div className="mt-3 pt-2 border-t border-gray-200/50 flex items-center justify-between">
         <span className="text-[10px] text-gray-400">Last completed: {state.lastCompleted}</span>
-        <button className="text-[10px] font-semibold text-[#4318FF] hover:underline flex items-center gap-1">View full history <ArrowRight className="w-3 h-3" /></button>
+        <button className="text-[10px] font-semibold text-brand hover:underline flex items-center gap-1">View full history <ArrowRight className="w-3 h-3" /></button>
       </div>
     </div>
   );
@@ -384,7 +384,7 @@ const tagCfg: Record<string, { bg: string; text: string }> = {
   compliance: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
   track: { bg: 'bg-gray-100', text: 'text-gray-600' },
   audit: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  generate: { bg: 'bg-indigo-50', text: 'text-[#4318FF]' },
+  generate: { bg: 'bg-indigo-50', text: 'text-brand' },
 };
 
 function Tag({ type }: { type: string }) {
@@ -457,7 +457,7 @@ export function BackendCompliance() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <ShieldCheck className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -476,7 +476,7 @@ export function BackendCompliance() {
             return (
               <button key={t.id} onClick={() => { setTab(t.id); setActiveControl(null); setSelectedMerchant(null); setSelectedDeal(null); }}
                 className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium rounded-t-[6px] transition-colors whitespace-nowrap ${
-                  isActive ? 'bg-[#4318FF]/5 text-[#4318FF] border-b-2 border-[#4318FF]' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-b-2 border-transparent'
+                  isActive ? 'bg-brand/5 text-brand border-b-2 border-brand' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-b-2 border-transparent'
                 }`}>
                 <Icon className="w-3.5 h-3.5" />
                 {t.label}
@@ -550,7 +550,7 @@ export function BackendCompliance() {
                 {/* Deadlines this month */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Calendar className="w-4 h-4 text-[#4318FF]" />
+                    <Calendar className="w-4 h-4 text-brand" />
                     <h3 className="text-sm font-bold text-gray-900">Deadlines this month</h3>
                   </div>
                   <div className="space-y-1">
@@ -659,13 +659,13 @@ export function BackendCompliance() {
                           </div>
                           <h3 className="text-sm font-bold text-gray-900">{deal.merchant}</h3>
                           <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-500">
-                            <span className="font-mono font-bold text-[#4318FF]">{deal.state}</span>
+                            <span className="font-mono font-bold text-brand">{deal.state}</span>
                             <span>{deal.amount} @ {deal.factorRate}x</span>
                             <span>{deal.agent}</span>
                             <span>{deal.date}</span>
                           </div>
                         </div>
-                        <button className="text-xs text-[#4318FF] font-medium hover:underline flex items-center gap-1">
+                        <button className="text-xs text-brand font-medium hover:underline flex items-center gap-1">
                           View deal <ArrowRight className="w-3 h-3" />
                         </button>
                       </div>
@@ -715,7 +715,7 @@ export function BackendCompliance() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-[10px] font-mono text-gray-400">{m.id}</span>
-                            <span className="font-mono font-bold text-[10px] text-[#4318FF]">{m.state}</span>
+                            <span className="font-mono font-bold text-[10px] text-brand">{m.state}</span>
                             <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${m.type === 'mca' ? 'bg-purple-50 text-purple-700' : m.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'}`}>{m.type === 'both' ? 'MCA + Processing' : m.type === 'mca' ? 'MCA' : 'Processing'}</span>
                           </div>
                           <h4 className="text-sm font-bold text-gray-900">{m.name}</h4>
@@ -744,14 +744,14 @@ export function BackendCompliance() {
           {/* Merchant Detail */}
           {tab === 'merchants' && selectedMerchant && activeMerchant && (
             <div>
-              <button onClick={() => { setSelectedMerchant(null); setActiveControl(null); }} className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#4318FF] mb-4 font-medium">
+              <button onClick={() => { setSelectedMerchant(null); setActiveControl(null); }} className="flex items-center gap-1 text-xs text-gray-500 hover:text-brand mb-4 font-medium">
                 <ChevronRight className="w-3 h-3 rotate-180" /> All merchants
               </button>
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] font-mono text-gray-400">{activeMerchant.id}</span>
-                    <span className="font-mono font-bold text-xs text-[#4318FF]">{activeMerchant.state}</span>
+                    <span className="font-mono font-bold text-xs text-brand">{activeMerchant.state}</span>
                     <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${activeMerchant.type === 'mca' ? 'bg-purple-50 text-purple-700' : activeMerchant.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'}`}>{activeMerchant.type === 'both' ? 'MCA + Processing' : activeMerchant.type === 'mca' ? 'MCA' : 'Processing'}</span>
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">{activeMerchant.name}</h2>
@@ -799,7 +799,7 @@ export function BackendCompliance() {
 
               {/* Evidence for this merchant */}
               <div className="mt-5">
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-2 flex items-center gap-2"><BadgeCheck className="w-3.5 h-3.5 text-[#4318FF]" /> Evidence trail</h4>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-2 flex items-center gap-2"><BadgeCheck className="w-3.5 h-3.5 text-brand" /> Evidence trail</h4>
                 <div className="space-y-1">
                   {EVIDENCE.filter(e => e.merchant === activeMerchant.name).map(e => {
                     const ctrl = CONTROLS.find(c => c.key === e.control);
@@ -833,7 +833,7 @@ export function BackendCompliance() {
                   return (
                     <button key={t.key} onClick={() => setMonitoringView(t.key)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${
-                        monitoringView === t.key ? 'bg-white text-[#4318FF] shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
+                        monitoringView === t.key ? 'bg-white text-brand shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
                       }`}>
                       <Icon className="w-3.5 h-3.5" />
                       {t.label}
@@ -846,7 +846,7 @@ export function BackendCompliance() {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     {(['all', 'critical', 'warning', 'info'] as const).map(f => (
-                      <button key={f} onClick={() => setDeadlineFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${deadlineFilter === f ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                      <button key={f} onClick={() => setDeadlineFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${deadlineFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                         {f === 'all' ? `All (${DEADLINES.length})` : `${f.charAt(0).toUpperCase() + f.slice(1)} (${DEADLINES.filter(d => d.severity === f).length})`}
                       </button>
                     ))}
@@ -947,17 +947,17 @@ export function BackendCompliance() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input value={auditSearch} onChange={e => setAuditSearch(e.target.value)}
                     placeholder="Search evidence records..."
-                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setAuditControl(null)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${!auditControl ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
+                  <button onClick={() => setAuditControl(null)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${!auditControl ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
                   {CONTROLS.map(c => (
-                    <button key={c.key} onClick={() => setAuditControl(auditControl === c.key ? null : c.key)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${auditControl === c.key ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                    <button key={c.key} onClick={() => setAuditControl(auditControl === c.key ? null : c.key)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${auditControl === c.key ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                       {c.shortLabel}
                     </button>
                   ))}
                 </div>
-                <button className="ml-auto px-3 py-1.5 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD] flex items-center gap-1.5 shrink-0">
+                <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                   <Download className="w-3 h-3" /> Export All
                 </button>
               </div>
@@ -991,14 +991,14 @@ export function BackendCompliance() {
 
               {/* Document vault */}
               <div className="mt-6">
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2"><FolderOpen className="w-3.5 h-3.5 text-[#4318FF]" /> Document Vault</h4>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2"><FolderOpen className="w-3.5 h-3.5 text-brand" /> Document Vault</h4>
                 <div className="space-y-4">
                   {DOC_CATEGORIES.map((cat, ci) => {
                     const Icon = cat.icon;
                     return (
                       <div key={ci}>
                         <div className="flex items-center gap-2 mb-1.5">
-                          <Icon className="w-3.5 h-3.5 text-[#4318FF]" />
+                          <Icon className="w-3.5 h-3.5 text-brand" />
                           <span className="text-[10px] font-bold text-gray-900 uppercase tracking-wide">{cat.cat}</span>
                           <span className="text-[9px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{cat.docs.length}</span>
                         </div>
@@ -1039,7 +1039,7 @@ export function BackendCompliance() {
                   return (
                     <button key={t.key} onClick={() => setRulesTab(t.key)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${
-                        rulesTab === t.key ? 'bg-white text-[#4318FF] shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
+                        rulesTab === t.key ? 'bg-white text-brand shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
                       }`}>
                       <Icon className="w-3.5 h-3.5" />
                       {t.label}
@@ -1053,7 +1053,7 @@ export function BackendCompliance() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     {(['all', 'enforced', 'pending'] as const).map(f => (
-                      <button key={f} onClick={() => setStateFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${stateFilter === f ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                      <button key={f} onClick={() => setStateFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${stateFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                         {f === 'all' ? `All (${STATES.length})` : f === 'enforced' ? `Enforced (${STATES.filter(s => s.status === 'enforced').length})` : `Pending (${STATES.filter(s => s.status === 'pending').length})`}
                       </button>
                     ))}
@@ -1062,17 +1062,17 @@ export function BackendCompliance() {
                     {filteredStates.map(s => {
                       const isExpanded = expandedState === s.st;
                       return (
-                        <div key={s.st} className={`rounded-[8px] border transition-all ${isExpanded ? 'border-[#4318FF]/20 shadow-sm' : 'border-gray-200'}`}>
+                        <div key={s.st} className={`rounded-[8px] border transition-all ${isExpanded ? 'border-brand/20 shadow-sm' : 'border-gray-200'}`}>
                           <div className="px-4 py-3 cursor-pointer hover:bg-gray-50/50" onClick={() => setExpandedState(isExpanded ? null : s.st)}>
                             <div className="flex items-center gap-3">
-                              <span className="text-lg font-extrabold font-mono text-[#4318FF] w-8 shrink-0">{s.st}</span>
+                              <span className="text-lg font-extrabold font-mono text-brand w-8 shrink-0">{s.st}</span>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="text-sm font-bold text-gray-900">{s.name}</span>
                                   <span className={`px-1.5 py-0.5 text-[9px] font-semibold rounded ${s.status === 'enforced' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{s.status}</span>
                                   {s.aprReq && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-red-50 text-red-700">APR req</span>}
                                   {s.regReq && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-cyan-50 text-cyan-700">registration</span>}
-                                  {s.contractMod && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-indigo-50 text-[#4318FF]">addendum</span>}
+                                  {s.contractMod && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-indigo-50 text-brand">addendum</span>}
                                 </div>
                                 <div className="flex gap-4 mt-1 text-[11px] text-gray-500">
                                   <span><span className="text-gray-400">Law:</span> {s.law}</span>
@@ -1087,7 +1087,7 @@ export function BackendCompliance() {
                             <div className="px-4 pb-4 border-t border-gray-100 pt-4 ml-11 space-y-4">
                               {s.contractMod && (
                                 <div className="bg-indigo-50 rounded-[6px] p-3 border border-indigo-100">
-                                  <p className="text-[10px] font-mono font-bold text-[#4318FF] mb-1">CONTRACT MODIFICATION REQUIRED</p>
+                                  <p className="text-[10px] font-mono font-bold text-brand mb-1">CONTRACT MODIFICATION REQUIRED</p>
                                   <p className="text-xs text-gray-700 leading-relaxed">{s.contractNote}</p>
                                 </div>
                               )}
@@ -1129,7 +1129,7 @@ export function BackendCompliance() {
                     <div key={si}>
                       <div className="mb-3">
                         <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                          {si === 0 && <Lock className="w-4 h-4 text-[#4318FF]" />}
+                          {si === 0 && <Lock className="w-4 h-4 text-brand" />}
                           {si === 1 && <CreditCard className="w-4 h-4 text-blue-600" />}
                           {si === 2 && <CreditCard className="w-4 h-4 text-orange-600" />}
                           {si === 3 && <ShieldAlert className="w-4 h-4 text-red-600" />}
@@ -1223,13 +1223,13 @@ export function BackendCompliance() {
                     const Icon = r.icon;
                     return (
                       <div key={ri}>
-                        <h4 className="text-xs font-bold text-[#4318FF] uppercase tracking-wide mb-2 flex items-center gap-2"><Icon className="w-3.5 h-3.5" />{r.topic}</h4>
+                        <h4 className="text-xs font-bold text-brand uppercase tracking-wide mb-2 flex items-center gap-2"><Icon className="w-3.5 h-3.5" />{r.topic}</h4>
                         <div className="space-y-1 ml-6">
                           {r.sources.map((s, si) => (
                             <div key={si} className="flex items-start gap-2 px-3 py-2 bg-white rounded-[6px] border border-gray-100 hover:border-gray-200 transition-colors group">
                               <span className="text-[10px] text-gray-300 font-mono mt-0.5 shrink-0">{String(si + 1).padStart(2, '0')}</span>
                               <span className="text-xs text-gray-700 leading-relaxed flex-1">{s}</span>
-                              <ExternalLink className="w-3 h-3 text-gray-300 mt-0.5 shrink-0 group-hover:text-[#4318FF] transition-colors" />
+                              <ExternalLink className="w-3 h-3 text-gray-300 mt-0.5 shrink-0 group-hover:text-brand transition-colors" />
                             </div>
                           ))}
                         </div>

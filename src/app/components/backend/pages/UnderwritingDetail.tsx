@@ -207,7 +207,7 @@ export function UnderwritingDetail() {
   const strokeDashoffset = circumference - (riskScore / 100) * circumference;
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] pb-24">
+    <div className="min-h-full bg-canvas pb-24">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="px-6 py-6">

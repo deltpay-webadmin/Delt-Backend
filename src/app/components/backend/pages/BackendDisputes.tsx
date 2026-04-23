@@ -243,7 +243,7 @@ const stageConfig: Record<DisputeStage, { label: string; color: string; bg: stri
   evidence: { label: 'Evidence Collection', color: 'text-amber-700', bg: 'bg-amber-50' },
   draft: { label: 'Draft Response', color: 'text-orange-700', bg: 'bg-orange-50' },
   review: { label: 'Review', color: 'text-purple-700', bg: 'bg-purple-50' },
-  submitted: { label: 'Submitted', color: 'text-[#4318FF]', bg: 'bg-indigo-50' },
+  submitted: { label: 'Submitted', color: 'text-brand', bg: 'bg-indigo-50' },
   awaiting: { label: 'Awaiting Decision', color: 'text-gray-700', bg: 'bg-gray-100' },
   won: { label: 'Won', color: 'text-emerald-700', bg: 'bg-emerald-50' },
   lost: { label: 'Lost', color: 'text-red-700', bg: 'bg-red-50' },
@@ -356,7 +356,7 @@ export function BackendDisputes() {
                 Live
               </span>
             </div>
-            <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> Log Dispute
             </button>
           </div>
@@ -368,7 +368,7 @@ export function BackendDisputes() {
             { label: 'Critical (< 3 days)', count: activeDisputes.filter(d => d.daysLeft <= 3).length, amount: activeDisputes.filter(d => d.daysLeft <= 3).reduce((s, d) => s + d.amount, 0), color: 'red', accent: 'border-t-red-500' },
             { label: 'Urgent (3-7 days)', count: activeDisputes.filter(d => d.daysLeft > 3 && d.daysLeft <= 7).length, amount: activeDisputes.filter(d => d.daysLeft > 3 && d.daysLeft <= 7).reduce((s, d) => s + d.amount, 0), color: 'amber', accent: 'border-t-amber-500' },
             { label: 'Normal (> 7 days)', count: activeDisputes.filter(d => d.daysLeft > 7).length, amount: activeDisputes.filter(d => d.daysLeft > 7).reduce((s, d) => s + d.amount, 0), color: 'emerald', accent: 'border-t-emerald-500' },
-            { label: 'Win Rate (Resolved)', count: analytics.resolved, amount: analytics.recoveredAmount, color: 'indigo', accent: 'border-t-[#4318FF]', isRate: true },
+            { label: 'Win Rate (Resolved)', count: analytics.resolved, amount: analytics.recoveredAmount, color: 'indigo', accent: 'border-t-brand', isRate: true },
           ].map((s, i) => (
             <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${s.accent} p-4`}>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{s.label}</p>
@@ -390,13 +390,13 @@ export function BackendDisputes() {
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-2 ${
-                  activeTab === t.key ? 'text-[#4318FF] border-[#4318FF]' : 'text-gray-500 border-transparent hover:text-gray-700'
+                  activeTab === t.key ? 'text-brand border-brand' : 'text-gray-500 border-transparent hover:text-gray-700'
                 }`}
               >
                 {t.label}
                 {t.badge !== undefined && (
                   <span className={`text-[10px] tabular-nums px-1.5 py-px rounded-full ${
-                    activeTab === t.key ? 'bg-[#4318FF]/10 text-[#4318FF]' : 'bg-gray-100 text-gray-500'
+                    activeTab === t.key ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-500'
                   }`}>{t.badge}</span>
                 )}
               </button>
@@ -414,12 +414,12 @@ export function BackendDisputes() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search disputes, merchants, reason codes..."
-                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
               </div>
               <div className="flex items-center gap-1">
                 {['all', 'new', 'evidence', 'draft', 'review', 'submitted', 'awaiting'].map(s => (
                   <button key={s} onClick={() => setStageFilter(s)}
-                    className={`px-2.5 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${stageFilter === s ? 'bg-[#4318FF]/10 text-[#4318FF]' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    className={`px-2.5 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${stageFilter === s ? 'bg-brand/10 text-brand' : 'text-gray-500 hover:bg-gray-50'}`}>
                     {s === 'all' ? 'All Active' : stageConfig[s as DisputeStage]?.label || s}
                   </button>
                 ))}
@@ -485,11 +485,11 @@ export function BackendDisputes() {
                           <td className="pr-5 py-3">
                             <div className="flex items-center gap-1">
                               <button onClick={(e) => { e.stopPropagation(); setEvidenceModal(d.id); }}
-                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-[#4318FF] transition-colors" title="Evidence Builder">
+                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Evidence Builder">
                                 <FileText className="w-3.5 h-3.5" />
                               </button>
                               <button onClick={(e) => { e.stopPropagation(); setCostCalcId(d.id); }}
-                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-[#4318FF] transition-colors" title="Cost Calculator">
+                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Cost Calculator">
                                 <Calculator className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -513,7 +513,7 @@ export function BackendDisputes() {
                                         <div className={`flex flex-col items-center gap-1`}>
                                           <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
                                             isDone && !isCurrent ? 'bg-emerald-100 text-emerald-700' :
-                                            isCurrent ? 'bg-[#4318FF] text-white ring-2 ring-[#4318FF]/20' :
+                                            isCurrent ? 'bg-brand text-white ring-2 ring-brand/20' :
                                             isLost ? 'bg-red-100 text-red-700' :
                                             'bg-gray-100 text-gray-400'
                                           }`}>
@@ -618,7 +618,7 @@ export function BackendDisputes() {
                         return (
                           <div key={d.id} onClick={() => { setActiveTab('inbox'); setSelectedDispute(d.id); }}
                             className={`rounded-[6px] border p-2.5 cursor-pointer hover:shadow-sm transition-all ${
-                              urg === 'critical' ? 'border-red-200 bg-red-50/30' : 'border-gray-200 hover:border-[#4318FF]/30'
+                              urg === 'critical' ? 'border-red-200 bg-red-50/30' : 'border-gray-200 hover:border-brand/30'
                             }`}>
                             <div className="flex items-center justify-between mb-1">
                               <p className="text-[10px] font-bold text-gray-500">{d.id}</p>
@@ -637,7 +637,7 @@ export function BackendDisputes() {
                             {!['won', 'lost'].includes(d.stage) && d.evidenceTypes.length > 0 && (
                               <div className="mt-2">
                                 <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                  <div className="h-full bg-[#4318FF] rounded-full" style={{ width: `${(d.evidenceCollected.length / d.evidenceTypes.length) * 100}%` }} />
+                                  <div className="h-full bg-brand rounded-full" style={{ width: `${(d.evidenceCollected.length / d.evidenceTypes.length) * 100}%` }} />
                                 </div>
                                 <p className="text-[8px] text-gray-400 mt-0.5">{d.evidenceCollected.length}/{d.evidenceTypes.length} evidence</p>
                               </div>
@@ -721,7 +721,7 @@ export function BackendDisputes() {
           <div className="space-y-4">
             <div className="bg-white rounded-[8px] border border-gray-200">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#4318FF]" />
+                <Shield className="w-4 h-4 text-brand" />
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">Reason Code Classification Engine</h3>
                   <p className="text-xs text-gray-500 mt-0.5">Auto-tagged codes with required evidence and representment strategy (CPFPP exam framework)</p>
@@ -735,7 +735,7 @@ export function BackendDisputes() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="flex flex-col items-center">
-                            <span className="text-lg font-bold text-[#4318FF]">{code}</span>
+                            <span className="text-lg font-bold text-brand">{code}</span>
                             <span className="text-[9px] text-gray-400 font-medium">{info.network}</span>
                           </div>
                           <div>
@@ -797,7 +797,7 @@ export function BackendDisputes() {
               {/* Win Rate by Reason Code */}
               <div className="bg-white rounded-[8px] border border-gray-200">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#4318FF]" />
+                  <BarChart3 className="w-4 h-4 text-brand" />
                   <h3 className="text-sm font-semibold text-gray-900">Win Rate by Reason Code</h3>
                 </div>
                 <div className="px-5 py-4 space-y-3">
@@ -976,7 +976,7 @@ export function BackendDisputes() {
                           <td className="py-2.5"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text}`}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span></td>
                           <td className="pr-5 py-2.5">
                             {a.status === 'pending' ? (
-                              <button className="px-3 py-1.5 bg-[#4318FF] text-white text-[10px] font-semibold rounded-[6px] hover:bg-[#3311DD] transition-colors">
+                              <button className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">
                                 Issue Refund
                               </button>
                             ) : <span className="text-xs text-gray-400">-</span>}
@@ -1377,8 +1377,8 @@ export function BackendDisputes() {
                         <span className="text-lg font-bold tabular-nums text-emerald-800">+{portfolioROI.toFixed(0)}%</span>
                       </div>
                     </div>
-                    <div className="bg-[#4318FF]/5 rounded-[6px] border border-[#4318FF]/20 p-3 mt-2">
-                      <p className="text-xs text-[#4318FF] font-semibold mb-1">Bottom Line</p>
+                    <div className="bg-brand/5 rounded-[6px] border border-brand/20 p-3 mt-2">
+                      <p className="text-xs text-brand font-semibold mb-1">Bottom Line</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         For every <strong className="text-gray-900">$1</strong> spent on representment labor, you recover an expected <strong className="text-emerald-700">${(totalExpectedRecovery / totalRepresentmentCost).toFixed(2)}</strong> in transaction revenue.
                         Not fighting disputes costs <strong className="text-red-700">{fmt(totalInaction)}</strong> across the portfolio — {((totalInaction / totalRepresentmentCost)).toFixed(1)}× more than the cost of fighting them.
@@ -1396,7 +1396,7 @@ export function BackendDisputes() {
           <p className="text-xs text-gray-400">
             {DISPUTES.length} total disputes — North - Verifi CDRN - Ethoca - {analytics.active} active
           </p>
-          <p className="text-xs text-gray-400"><span className="text-[#4318FF] font-bold">delt</span>pay.com</p>
+          <p className="text-xs text-gray-400"><span className="text-brand font-bold">delt</span>pay.com</p>
         </div>
       </div>
 
@@ -1470,13 +1470,13 @@ export function BackendDisputes() {
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between sticky bottom-0 bg-white">
                 <div className="flex items-center gap-2">
                   <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#4318FF] rounded-full" style={{ width: `${(dispute.evidenceCollected.length / dispute.evidenceTypes.length) * 100}%` }} />
+                    <div className="h-full bg-brand rounded-full" style={{ width: `${(dispute.evidenceCollected.length / dispute.evidenceTypes.length) * 100}%` }} />
                   </div>
                   <span className="text-xs text-gray-500">{dispute.evidenceCollected.length}/{dispute.evidenceTypes.length} collected</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-                  <button className="px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] flex items-center gap-2">
+                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-2">
                     <Send className="w-3.5 h-3.5" /> Submit for Review
                   </button>
                 </div>
@@ -1549,7 +1549,7 @@ export function BackendDisputes() {
               </div>
 
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3">
-                <button className="flex-1 px-4 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors">Fight This Dispute</button>
+                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
                 <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Close</button>
               </div>
             </div>
@@ -1574,7 +1574,7 @@ function Th({ children, className = '' }: { children: React.ReactNode; className
 
 function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent: string }) {
   const accentMap: Record<string, string> = {
-    indigo: 'border-t-[#4318FF]', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
+    indigo: 'border-t-brand', emerald: 'border-t-emerald-500', amber: 'border-t-amber-500',
     red: 'border-t-red-500', blue: 'border-t-blue-500',
   };
   return (

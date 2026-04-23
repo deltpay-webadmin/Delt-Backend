@@ -140,18 +140,18 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 w-16 shrink-0">To:</span>
             <input value={to} onChange={e => setTo(e.target.value)} placeholder={channel === 'email' ? 'email@merchant.com' : 'Phone number'}
-              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           {channel === 'email' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-16 shrink-0">Subject:</span>
               <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject line..."
-                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
           )}
           <textarea value={body} onChange={e => setBody(e.target.value)} rows={channel === 'email' ? 10 : 4}
             placeholder={channel === 'email' ? 'Write your email...' : 'Write your message...'}
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF] resize-none" />
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
         </div>
         <div className="flex items-center justify-between px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-            <button onClick={onClose} className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+            <button onClick={onClose} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Send className="w-3.5 h-3.5" /> Send
             </button>
           </div>
@@ -210,7 +210,7 @@ export function BackendInbox() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <Inbox className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -219,7 +219,7 @@ export function BackendInbox() {
           </div>
         </div>
         <button onClick={() => setShowCompose(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> Compose
         </button>
       </div>
@@ -233,20 +233,20 @@ export function BackendInbox() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations..."
-                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1 flex-wrap">
               {(['all', 'unread', 'starred'] as const).map(s => (
                 <button key={s} onClick={() => setStatusFilter(s)}
                   className={`px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${
-                    statusFilter === s ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                    statusFilter === s ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? `All (${threads.length})` : s === 'unread' ? `Unread (${unreadCount})` : `Starred (${starredCount})`}</button>
               ))}
               <div className="border-l border-gray-200 pl-1 ml-1 flex gap-1">
                 {(['all', 'email', 'sms', 'call'] as const).map(c => {
                   if (c === 'all') return (
                     <button key={c} onClick={() => setChannelFilter('all')}
-                      className={`px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${channelFilter === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
+                      className={`px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${channelFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
                   );
                   const cfg = CHANNEL_CONFIG[c];
                   const Icon = cfg.icon;
@@ -270,7 +270,7 @@ export function BackendInbox() {
               return (
                 <div key={thread.id} onClick={() => openThread(thread.id)}
                   className={`px-3 py-3 border-b border-gray-100 cursor-pointer transition-colors ${
-                    isActive ? 'bg-[#4318FF]/5 border-l-2 border-l-[#4318FF]' : isUnread ? 'bg-blue-50/30 hover:bg-gray-50' : 'hover:bg-gray-50'
+                    isActive ? 'bg-brand/5 border-l-2 border-l-brand' : isUnread ? 'bg-blue-50/30 hover:bg-gray-50' : 'hover:bg-gray-50'
                   }`}>
                   <div className="flex items-start gap-2.5">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${cfg.bg}`}>
@@ -286,14 +286,14 @@ export function BackendInbox() {
                       </div>
                       <div className="flex items-center gap-1.5 mb-1">
                         <span className="text-[10px] text-gray-500">{thread.contact}</span>
-                        {thread.dealId && <span className="text-[8px] font-mono text-[#4318FF] bg-indigo-50 px-1 py-0.5 rounded">{thread.dealId}</span>}
+                        {thread.dealId && <span className="text-[8px] font-mono text-brand bg-indigo-50 px-1 py-0.5 rounded">{thread.dealId}</span>}
                       </div>
                       <p className={`text-[11px] truncate ${isUnread ? 'text-gray-700' : 'text-gray-400'}`}>{thread.lastMessage}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[9px] text-gray-400">{thread.agent}</span>
                         <span className="text-[9px] text-gray-300">&middot;</span>
                         <span className="text-[9px] text-gray-400">{thread.messageCount} messages</span>
-                        {isUnread && <span className="w-1.5 h-1.5 rounded-full bg-[#4318FF] shrink-0" />}
+                        {isUnread && <span className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />}
                       </div>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export function BackendInbox() {
                 <div className="flex items-center gap-2 mb-0.5">
                   <h3 className="text-sm font-bold text-gray-900">{activeThread.merchant}</h3>
                   <span className="text-[10px] font-mono text-gray-400">{activeThread.merchantId}</span>
-                  {activeThread.dealId && <span className="text-[9px] font-mono text-[#4318FF] bg-indigo-50 px-1.5 py-0.5 rounded">{activeThread.dealId}</span>}
+                  {activeThread.dealId && <span className="text-[9px] font-mono text-brand bg-indigo-50 px-1.5 py-0.5 rounded">{activeThread.dealId}</span>}
                 </div>
                 <div className="flex items-center gap-3 text-[11px] text-gray-500">
                   <span className="flex items-center gap-1"><User className="w-3 h-3" />{activeThread.contact}</span>
@@ -347,8 +347,8 @@ export function BackendInbox() {
                       {/* Message header */}
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isOutbound ? 'bg-[#4318FF]/10' : 'bg-gray-100'}`}>
-                            {isOutbound ? <Send className="w-3 h-3 text-[#4318FF]" /> : <MsgIcon className={`w-3 h-3 ${msgCfg.color}`} />}
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isOutbound ? 'bg-brand/10' : 'bg-gray-100'}`}>
+                            {isOutbound ? <Send className="w-3 h-3 text-brand" /> : <MsgIcon className={`w-3 h-3 ${msgCfg.color}`} />}
                           </div>
                           <span className="text-xs font-semibold text-gray-900">{msg.from}</span>
                           <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border ${msgCfg.bg} ${msgCfg.color}`}>
@@ -384,21 +384,21 @@ export function BackendInbox() {
                 <div className="flex-1 relative">
                   <input value={replyText} onChange={e => setReplyText(e.target.value)}
                     placeholder={`Reply to ${activeThread.contact}...`}
-                    className="w-full pl-4 pr-20 py-2.5 bg-white border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]"
+                    className="w-full pl-4 pr-20 py-2.5 bg-white border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                     onKeyDown={e => { if (e.key === 'Enter') setReplyText(''); }} />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button className="p-1 hover:bg-gray-100 rounded"><Paperclip className="w-3.5 h-3.5 text-gray-400" /></button>
                     <button onClick={() => setReplyText('')}
-                      className={`p-1.5 rounded-[4px] transition-all ${replyText.trim() ? 'bg-[#4318FF] hover:bg-[#3311DD]' : 'bg-gray-200'}`}>
+                      className={`p-1.5 rounded-[4px] transition-all ${replyText.trim() ? 'bg-brand hover:bg-brand-hover' : 'bg-gray-200'}`}>
                       <Send className="w-3 h-3 text-white" />
                     </button>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 mt-2">
-                <button className="text-[10px] text-gray-500 hover:text-[#4318FF] flex items-center gap-1"><Phone className="w-3 h-3" /> Log call</button>
-                <button className="text-[10px] text-gray-500 hover:text-[#4318FF] flex items-center gap-1"><Edit3 className="w-3 h-3" /> Add note</button>
-                <button className="text-[10px] text-gray-500 hover:text-[#4318FF] flex items-center gap-1"><Calendar className="w-3 h-3" /> Schedule follow-up</button>
+                <button className="text-[10px] text-gray-500 hover:text-brand flex items-center gap-1"><Phone className="w-3 h-3" /> Log call</button>
+                <button className="text-[10px] text-gray-500 hover:text-brand flex items-center gap-1"><Edit3 className="w-3 h-3" /> Add note</button>
+                <button className="text-[10px] text-gray-500 hover:text-brand flex items-center gap-1"><Calendar className="w-3 h-3" /> Schedule follow-up</button>
               </div>
             </div>
           </div>

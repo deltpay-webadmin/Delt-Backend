@@ -605,7 +605,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
                                   </div>
-                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-[#4318FF] text-white text-sm font-medium rounded-[6px] hover:bg-[#3311DD] transition-colors">
+                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">
                                     Save
                                   </button>
                                 </div>

@@ -126,7 +126,7 @@ export function BackendPayments() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#4318FF] to-[#7B61FF] flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
             <Wallet className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -138,7 +138,7 @@ export function BackendPayments() {
           <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-[#4318FF] text-white text-xs font-medium rounded-[6px] hover:bg-[#3311DD]">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
           </button>
         </div>
@@ -149,7 +149,7 @@ export function BackendPayments() {
         {[
           { label: "Today's Collections", value: `$${todayCollected.toLocaleString()}`, sub: `${PAYMENTS.filter(p => p.date === '2026-04-17' && p.status === 'success' && p.type === 'collection').length} successful`, color: 'border-t-emerald-500', icon: DollarSign },
           { label: 'Failed Today', value: todayFailed, sub: `${todayFailed} NSF returns`, color: 'border-t-red-500', icon: XCircle },
-          { label: 'Outstanding Balance', value: `$${(totalOutstanding / 1000).toFixed(0)}K`, sub: `${COLLECTIONS.length} active accounts`, color: 'border-t-[#4318FF]', icon: Banknote },
+          { label: 'Outstanding Balance', value: `$${(totalOutstanding / 1000).toFixed(0)}K`, sub: `${COLLECTIONS.length} active accounts`, color: 'border-t-brand', icon: Banknote },
           { label: 'Avg % Collected', value: `${avgCollectionRate.toFixed(1)}%`, sub: 'across active deals', color: 'border-t-blue-500', icon: TrendingUp },
         ].map((kpi, i) => {
           const Icon = kpi.icon;
@@ -183,13 +183,13 @@ export function BackendPayments() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search transactions..."
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1">
               {(['all', 'success', 'failed', 'pending', 'returned', 'scheduled'] as const).map(s => (
                 <button key={s} onClick={() => setStatusFilter(s)}
                   className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
-                    statusFilter === s ? (s === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : `${PAYMENT_STATUS_CONFIG[s].bg} ${PAYMENT_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                    statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${PAYMENT_STATUS_CONFIG[s].bg} ${PAYMENT_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? 'All' : PAYMENT_STATUS_CONFIG[s].label}</button>
               ))}
             </div>
@@ -218,11 +218,11 @@ export function BackendPayments() {
                     <p className="text-[10px] text-gray-400">{pmt.description}</p>
                     {pmt.failReason && <p className="text-[10px] text-red-600 mt-0.5">{pmt.failReason}{pmt.retryDate ? ` — Retry: ${pmt.retryDate}` : ''}</p>}
                   </div>
-                  <span className={`w-20 shrink-0 text-[10px] font-medium ${pmt.type === 'funding' ? 'text-[#4318FF]' : pmt.type === 'refund' ? 'text-amber-600' : pmt.type === 'fee' ? 'text-gray-500' : 'text-gray-600'}`}>
+                  <span className={`w-20 shrink-0 text-[10px] font-medium ${pmt.type === 'funding' ? 'text-brand' : pmt.type === 'refund' ? 'text-amber-600' : pmt.type === 'fee' ? 'text-gray-500' : 'text-gray-600'}`}>
                     {pmt.type.charAt(0).toUpperCase() + pmt.type.slice(1)}
                   </span>
                   <span className="w-16 shrink-0 text-[10px] text-gray-500 uppercase">{pmt.method}</span>
-                  <span className={`w-24 shrink-0 text-xs font-semibold text-right ${pmt.type === 'funding' ? 'text-[#4318FF]' : pmt.status === 'failed' ? 'text-red-600' : 'text-gray-900'}`}>
+                  <span className={`w-24 shrink-0 text-xs font-semibold text-right ${pmt.type === 'funding' ? 'text-brand' : pmt.status === 'failed' ? 'text-red-600' : 'text-gray-900'}`}>
                     {pmt.type === 'funding' ? '-' : ''}${pmt.amount.toLocaleString()}
                   </span>
                   <span className="w-20 shrink-0 text-[10px] font-mono text-gray-500">{pmt.date.replace('2026-', '')}</span>
@@ -246,13 +246,13 @@ export function BackendPayments() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search accounts..."
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-[#4318FF]/20 focus:border-[#4318FF]" />
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1">
               {(['all', 'current', 'slow_pay', 'default', 'workout', 'paid_off'] as const).map(s => (
                 <button key={s} onClick={() => setCollectionStatusFilter(s)}
                   className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
-                    collectionStatusFilter === s ? (s === 'all' ? 'bg-[#4318FF]/5 text-[#4318FF] border-[#4318FF]/20' : `${COLLECTION_STATUS_CONFIG[s].bg} ${COLLECTION_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                    collectionStatusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${COLLECTION_STATUS_CONFIG[s].bg} ${COLLECTION_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? 'All' : COLLECTION_STATUS_CONFIG[s].label}</button>
               ))}
             </div>
@@ -278,7 +278,7 @@ export function BackendPayments() {
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-semibold text-gray-900">{acct.merchant}</h4>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-mono text-[#4318FF]">{acct.dealId}</span>
+                      <span className="text-[10px] font-mono text-brand">{acct.dealId}</span>
                       <span className="text-[10px] text-gray-400">{acct.agent}</span>
                     </div>
                   </div>
