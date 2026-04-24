@@ -15,7 +15,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, ChevronLeft, Loader2, X } from 'lucide-react';
+import { Check, ChevronLeft, Loader2, Upload, X, Plus, Trash2, FileText } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -568,6 +568,229 @@ export function ReviewCard({
         {title}
       </div>
       <div>{children}</div>
+    </div>
+  );
+}
+
+// ─── Additional primitives for KYB flows ────────────────────────
+
+export function Checkbox({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`w-full text-left px-3.5 py-3 rounded-[8px] border flex items-start gap-3 transition-colors ${
+        checked
+          ? 'border-brand bg-brand/[0.04]'
+          : 'border-gray-200 bg-white hover:border-gray-300'
+      }`}
+    >
+      <div
+        className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+          checked ? 'bg-brand border-brand' : 'border-gray-300'
+        }`}
+      >
+        {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] font-medium text-gray-900">{label}</div>
+        {description && (
+          <div className="text-[12px] text-gray-500 mt-0.5">{description}</div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+export function Slider({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 100,
+  suffix = '%',
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  suffix?: string;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <FieldLabel>{label}</FieldLabel>
+        <span className="text-[12px] font-semibold text-gray-900 tabular-nums">
+          {value}
+          {suffix}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        className="w-full accent-brand cursor-pointer"
+      />
+    </div>
+  );
+}
+
+export interface UploadedFile {
+  id: string;
+  name: string;
+  size: number;
+}
+
+export function FileDrop({
+  label,
+  accept = '.pdf,.jpg,.jpeg,.png',
+  files,
+  onAdd,
+  onRemove,
+  optional,
+  hint,
+}: {
+  label: string;
+  accept?: string;
+  files: UploadedFile[];
+  onAdd: (f: UploadedFile) => void;
+  onRemove: (id: string) => void;
+  optional?: boolean;
+  hint?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const handlePick = (fileList: FileList | null) => {
+    if (!fileList) return;
+    Array.from(fileList).forEach(f => {
+      onAdd({
+        id: `file-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: f.name,
+        size: f.size,
+      });
+    });
+    if (inputRef.current) inputRef.current.value = '';
+  };
+  return (
+    <div>
+      <FieldLabel optional={optional}>{label}</FieldLabel>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => {
+          e.preventDefault();
+          handlePick(e.dataTransfer.files);
+        }}
+        className="w-full border-2 border-dashed border-gray-200 hover:border-brand/40 hover:bg-brand/[0.02] rounded-[8px] px-4 py-5 flex flex-col items-center justify-center gap-1.5 transition-colors"
+      >
+        <Upload className="w-5 h-5 text-gray-400" />
+        <span className="text-[13px] font-medium text-gray-700">Click or drag files here</span>
+        <span className="text-[11px] text-gray-500">{hint || 'PDF, JPG, PNG up to 10MB'}</span>
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept={accept}
+        className="hidden"
+        onChange={e => handlePick(e.target.files)}
+      />
+      {files.length > 0 && (
+        <div className="mt-2 space-y-1.5">
+          {files.map(f => (
+            <div
+              key={f.id}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-[6px]"
+            >
+              <FileText className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span className="text-[12px] text-gray-700 truncate flex-1">{f.name}</span>
+              <span className="text-[11px] text-gray-400 tabular-nums shrink-0">
+                {(f.size / 1024).toFixed(0)} KB
+              </span>
+              <button
+                type="button"
+                onClick={() => onRemove(f.id)}
+                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                aria-label="Remove file"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Stripe-style repeating section with Add / Remove. */
+export function RepeaterSection({
+  title,
+  items,
+  renderItem,
+  onAdd,
+  onRemove,
+  addLabel = 'Add another',
+  emptyHint,
+}: {
+  title?: string;
+  items: { id: string }[];
+  renderItem: (item: { id: string }, index: number) => React.ReactNode;
+  onAdd: () => void;
+  onRemove: (id: string) => void;
+  addLabel?: string;
+  emptyHint?: string;
+}) {
+  return (
+    <div className="space-y-3">
+      {title && <FieldLabel>{title}</FieldLabel>}
+      {items.length === 0 && emptyHint && (
+        <div className="text-[12px] text-gray-500 bg-gray-50 border border-gray-100 rounded-[6px] px-3 py-2.5">
+          {emptyHint}
+        </div>
+      )}
+      {items.map((item, i) => (
+        <div
+          key={item.id}
+          className="rounded-[10px] border border-gray-200 px-4 py-3 relative bg-white"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              #{i + 1}
+            </span>
+            <button
+              type="button"
+              onClick={() => onRemove(item.id)}
+              className="text-[12px] text-gray-400 hover:text-red-600 transition-colors inline-flex items-center gap-1"
+            >
+              <Trash2 className="w-3 h-3" />
+              Remove
+            </button>
+          </div>
+          {renderItem(item, i)}
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={onAdd}
+        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] font-medium text-brand bg-brand/[0.04] hover:bg-brand/[0.08] border border-dashed border-brand/30 rounded-[8px] transition-colors"
+      >
+        <Plus className="w-3.5 h-3.5" />
+        {addLabel}
+      </button>
     </div>
   );
 }
