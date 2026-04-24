@@ -1020,6 +1020,11 @@ export function BackendCapital() {
           </div>
         )}
       </div>
+
+      <NewDealFlow
+        open={newDealOpen}
+        onClose={() => setNewDealOpen(false)}
+      />
     </div>
   );
 }

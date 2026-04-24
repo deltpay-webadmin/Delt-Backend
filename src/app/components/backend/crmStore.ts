@@ -189,6 +189,62 @@ export interface UWApplication {
   source: string;
 }
 
+// ── Merchants ──
+export type MerchantStatus = 'Active' | 'Inactive' | 'Pending';
+export type PlanTier = 'Free' | 'Growth' | 'Custom';
+
+export interface MerchantProducts {
+  processing: boolean;
+  capital: boolean;
+  website: boolean;
+  lens: boolean;
+}
+
+export interface Merchant {
+  id: string;
+  name: string;
+  industry: string;
+  status: MerchantStatus;
+  monthlyVolume: number;
+  mcaBalance: number;
+  capitalDeployed: number;
+  healthScore: number;
+  agent: string;
+  products: MerchantProducts;
+  plan: PlanTier;
+  monthlyFee: number;
+  // Optional contact/business info captured during onboarding.
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  state?: string;
+  ein?: string;
+  website?: string;
+  notes?: string;
+}
+
+// ── Deals ──
+export type DealStatus = 'Current' | 'Delinquent' | 'Default' | 'Paid Off' | 'Workout';
+export type DealType = 'MCA' | 'Lease' | 'Residual';
+
+export interface Deal {
+  id: string;
+  status: DealStatus;
+  delinquencyLabel?: string;
+  type: DealType;
+  borrower: string;
+  loanAmount: number;
+  repaymentAmount: number;
+  collected: number;
+  outstanding: number;
+  rate: number;
+  dailyPayment: number;
+  fundedDate: string;
+  dueDate: string;
+  agent: string;
+  notes?: string;
+}
+
 // ── Referrals ──
 export interface Referral {
   id: string;
@@ -213,6 +269,9 @@ export interface CrmState {
   underwriting: UWApplication[];
   referrals: Referral[];
   program: ReferralProgram;
+  /** Client-side only — merchants & deals aren't persisted to Supabase yet. */
+  merchants: Merchant[];
+  deals: Deal[];
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -271,6 +330,8 @@ let state: CrmState = {
   underwriting: [],
   referrals: [],
   program: { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
+  merchants: [],
+  deals: [],
 };
 
 let sync: SyncState = {
@@ -712,6 +773,16 @@ export function useUnderwriting() {
   return useSyncExternalStore(subscribe, selector, selector);
 }
 
+export function useMerchants() {
+  const selector = useCallback(() => state.merchants, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useDeals() {
+  const selector = useCallback(() => state.deals, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
 export function useReferrals() {
   const selector = useCallback(() => state.referrals, []);
   return useSyncExternalStore(subscribe, selector, selector);
@@ -1103,5 +1174,91 @@ export const programActions = {
           .upsert({ id: 1, ...toDbProgram(coerced) })
           .then(r => ({ error: r.error })),
     );
+  },
+};
+
+// ── Merchant actions (client-side only — not yet backed by Supabase) ──
+export const merchantActions = {
+  create(partial: Partial<Merchant>): Merchant {
+    const used = new Set(state.merchants.map(m => m.id));
+    let n = state.merchants.length + 1;
+    let id = `merchant-${String(n).padStart(3, '0')}`;
+    while (used.has(id)) id = `merchant-${String(++n).padStart(3, '0')}`;
+    const merchant: Merchant = {
+      id,
+      name: partial.name || 'New Merchant',
+      industry: partial.industry || 'General',
+      status: (partial.status as MerchantStatus) || 'Pending',
+      monthlyVolume: partial.monthlyVolume ?? 0,
+      mcaBalance: partial.mcaBalance ?? 0,
+      capitalDeployed: partial.capitalDeployed ?? 0,
+      healthScore: partial.healthScore ?? 75,
+      agent: partial.agent || 'Unassigned',
+      products: partial.products || { processing: true, capital: false, website: false, lens: false },
+      plan: (partial.plan as PlanTier) || 'Free',
+      monthlyFee: partial.monthlyFee ?? 0,
+      contactName: partial.contactName,
+      contactEmail: partial.contactEmail,
+      contactPhone: partial.contactPhone,
+      state: partial.state,
+      ein: partial.ein,
+      website: partial.website,
+      notes: partial.notes,
+    };
+    set({ merchants: [merchant, ...state.merchants] });
+    return merchant;
+  },
+
+  update(id: string, patch: Partial<Merchant>) {
+    set({ merchants: state.merchants.map(m => (m.id === id ? { ...m, ...patch } : m)) });
+  },
+
+  remove(id: string) {
+    set({ merchants: state.merchants.filter(m => m.id !== id) });
+  },
+};
+
+// ── Deal actions (client-side only — not yet backed by Supabase) ──
+export const dealActions = {
+  create(partial: Partial<Deal>): Deal {
+    const used = new Set(state.deals.map(d => d.id));
+    let n = state.deals.length + 1;
+    const next = () => `D-${String(2000 + n).padStart(4, '0')}`;
+    while (used.has(next())) n++;
+    const id = partial.id || next();
+    const loan = partial.loanAmount ?? 0;
+    const rate = partial.rate ?? 1.35;
+    const repayment = partial.repaymentAmount ?? Math.round(loan * rate);
+    const today = new Date();
+    const due = new Date(today);
+    due.setMonth(due.getMonth() + 9);
+    const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+    const deal: Deal = {
+      id,
+      status: (partial.status as DealStatus) || 'Current',
+      delinquencyLabel: partial.delinquencyLabel,
+      type: (partial.type as DealType) || 'MCA',
+      borrower: partial.borrower || 'New Borrower',
+      loanAmount: loan,
+      repaymentAmount: repayment,
+      collected: partial.collected ?? 0,
+      outstanding: partial.outstanding ?? repayment,
+      rate,
+      dailyPayment: partial.dailyPayment ?? Math.round(repayment / 150),
+      fundedDate: partial.fundedDate || fmtDate(today),
+      dueDate: partial.dueDate || fmtDate(due),
+      agent: partial.agent || 'Unassigned',
+      notes: partial.notes,
+    };
+    set({ deals: [deal, ...state.deals] });
+    return deal;
+  },
+
+  update(id: string, patch: Partial<Deal>) {
+    set({ deals: state.deals.map(d => (d.id === id ? { ...d, ...patch } : d)) });
+  },
+
+  remove(id: string) {
+    set({ deals: state.deals.filter(d => d.id !== id) });
   },
 };

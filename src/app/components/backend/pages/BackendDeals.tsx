@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useDeals, type Deal as StoreDeal } from '../crmStore';
+import { NewDealFlow } from '../flows/NewDealFlow';
 import {
   Plus,
   Search,
@@ -197,20 +199,28 @@ export function BackendDeals() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [newDealOpen, setNewDealOpen] = useState(false);
   const { navigate } = useAppNavigate();
+  const storeDeals = useDeals();
 
-  const filtered = deals.filter((d) => {
+  // Merge newly-created deals with the static sample portfolio.
+  const allDeals: Deal[] = useMemo(
+    () => [...(storeDeals as StoreDeal[]) as Deal[], ...deals],
+    [storeDeals]
+  );
+
+  const filtered = allDeals.filter((d) => {
     if (statusFilter !== 'All' && d.status !== statusFilter) return false;
     if (typeFilter !== 'All' && d.type !== typeFilter) return false;
     if (searchQuery && !d.borrower.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
 
-  const totalFunded = deals.reduce((s, d) => s + d.loanAmount, 0);
-  const totalDeployed = deals.filter((d) => d.status !== 'Paid Off').reduce((s, d) => s + d.loanAmount, 0);
-  const grossProfit = deals.reduce((s, d) => s + (d.collected - d.loanAmount * (d.collected / d.repaymentAmount)), 0);
-  const outstandingBalance = deals.reduce((s, d) => s + d.outstanding, 0);
-  const defaultRate = ((deals.filter((d) => d.status === 'Default').length / deals.length) * 100).toFixed(1);
+  const totalFunded = allDeals.reduce((s, d) => s + d.loanAmount, 0);
+  const totalDeployed = allDeals.filter((d) => d.status !== 'Paid Off').reduce((s, d) => s + d.loanAmount, 0);
+  const grossProfit = allDeals.reduce((s, d) => s + (d.collected - d.loanAmount * (d.collected / (d.repaymentAmount || 1))), 0);
+  const outstandingBalance = allDeals.reduce((s, d) => s + d.outstanding, 0);
+  const defaultRate = allDeals.length > 0 ? ((allDeals.filter((d) => d.status === 'Default').length / allDeals.length) * 100).toFixed(1) : '0.0';
 
   return (
     <div className="space-y-6">
@@ -225,7 +235,10 @@ export function BackendDeals() {
             <Download className="w-4 h-4" />
             Export Portfolio
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-[6px] text-sm hover:bg-indigo-700 transition-colors">
+          <button
+            onClick={() => setNewDealOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-[6px] text-sm hover:bg-indigo-700 transition-colors"
+          >
             <Plus className="w-4 h-4" />
             New Deal
           </button>
@@ -325,10 +338,15 @@ export function BackendDeals() {
           </table>
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
-          <span>Showing {filtered.length} of {deals.length} deals</span>
+          <span>Showing {filtered.length} of {allDeals.length} deals</span>
           <span className="text-gray-400">Page 1 of 1</span>
         </div>
       </div>
+
+      <NewDealFlow
+        open={newDealOpen}
+        onClose={() => setNewDealOpen(false)}
+      />
     </div>
   );
 }

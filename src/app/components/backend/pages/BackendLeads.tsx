@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner@2.0.3';
+import { NewLeadFlow } from '../flows/NewLeadFlow';
 import {
   Plus,
   Search,
@@ -1214,17 +1215,15 @@ export function BackendLeads() {
       {/* Lead Detail Panel */}
       {selectedLead && <LeadDetailPanel lead={selectedLead} onClose={() => setSelectedLead(null)} />}
 
-      {/* New Lead Modal */}
-      {newLeadOpen && (
-        <NewLeadModal
-          onClose={() => setNewLeadOpen(false)}
-          onCreate={created => {
-            setSelectedLeadId(created.id);
-            setNewLeadOpen(false);
-            toast.success(`Lead "${created.businessName}" created`);
-          }}
-        />
-      )}
+      {/* New Lead Flow (Stripe-style slide-over) */}
+      <NewLeadFlow
+        open={newLeadOpen}
+        onClose={() => setNewLeadOpen(false)}
+        onCreated={created => {
+          setSelectedLeadId(created.id);
+          toast.success(`Lead "${created.businessName}" created`);
+        }}
+      />
     </div>
   );
 }

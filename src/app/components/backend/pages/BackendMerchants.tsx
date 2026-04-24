@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAppNavigate } from '../NavigationContext';
+import { useMerchants, type Merchant as StoreMerchant } from '../crmStore';
+import { NewMerchantFlow } from '../flows/NewMerchantFlow';
 import {
   Plus, Search, Building2, Store, DollarSign, CreditCard, Heart,
   Banknote, Globe, Brain, ChevronDown,
@@ -100,6 +102,15 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
 // ══════════════════════════════════════
 export function BackendMerchants() {
   const { navigate } = useAppNavigate();
+  const storeMerchants = useMerchants();
+  const [newMerchantOpen, setNewMerchantOpen] = useState(false);
+
+  // Combine newly-created merchants (from the CRM store) with the static sample roster.
+  // Store merchants are displayed first so newly-created ones are visible immediately.
+  const allMerchants: Merchant[] = useMemo(
+    () => [...(storeMerchants as StoreMerchant[]) as Merchant[], ...merchants],
+    [storeMerchants]
+  );
 
   const [search, setSearch] = useState('');
   const [productFilters, setProductFilters] = useState<Set<string>>(new Set());
@@ -117,7 +128,7 @@ export function BackendMerchants() {
   };
 
   const filtered = useMemo(() => {
-    return merchants.filter(m => {
+    return allMerchants.filter(m => {
       if (search) {
         const q = search.toLowerCase();
         if (!m.name.toLowerCase().includes(q) && !m.industry.toLowerCase().includes(q) && !m.agent.toLowerCase().includes(q)) return false;
@@ -132,19 +143,19 @@ export function BackendMerchants() {
       if (productFilters.has('Lens AI') && !m.products.lens) return false;
       return true;
     });
-  }, [search, statusFilter, planFilter, industryFilter, agentFilter, productFilters]);
+  }, [allMerchants, search, statusFilter, planFilter, industryFilter, agentFilter, productFilters]);
 
   // ── Aggregates ──
-  const total = merchants.length;
-  const totalVolume = merchants.reduce((s, m) => s + m.monthlyVolume, 0);
-  const totalSubRevenue = merchants.reduce((s, m) => s + m.monthlyFee, 0);
-  const totalCapitalDeployed = merchants.reduce((s, m) => s + m.capitalDeployed, 0);
-  const totalOutstanding = merchants.reduce((s, m) => s + m.mcaBalance, 0);
-  const avgHealth = Math.round(merchants.reduce((s, m) => s + m.healthScore, 0) / total);
+  const total = allMerchants.length;
+  const totalVolume = allMerchants.reduce((s, m) => s + m.monthlyVolume, 0);
+  const totalSubRevenue = allMerchants.reduce((s, m) => s + m.monthlyFee, 0);
+  const totalCapitalDeployed = allMerchants.reduce((s, m) => s + m.capitalDeployed, 0);
+  const totalOutstanding = allMerchants.reduce((s, m) => s + m.mcaBalance, 0);
+  const avgHealth = total > 0 ? Math.round(allMerchants.reduce((s, m) => s + m.healthScore, 0) / total) : 0;
 
   // Plan distribution
   const planCounts = { Free: 0, Growth: 0, Custom: 0 };
-  merchants.forEach(m => planCounts[m.plan]++);
+  allMerchants.forEach(m => planCounts[m.plan]++);
 
   const statusColor = (s: MerchantStatus) =>
     s === 'Active' ? 'bg-emerald-50 text-emerald-700' :
@@ -169,7 +180,10 @@ export function BackendMerchants() {
           <h1 className="text-2xl font-bold text-gray-900">All Merchants</h1>
           <p className="text-sm text-gray-500 mt-0.5">{total} merchants across all products and plans</p>
         </div>
-        <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+        <button
+          onClick={() => setNewMerchantOpen(true)}
+          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" />
           Add Merchant
         </button>
@@ -343,11 +357,17 @@ export function BackendMerchants() {
           ))}
         </div>
         <div className="h-2.5 rounded-full overflow-hidden flex bg-gray-100">
-          <div className="bg-gray-400 transition-all" style={{ width: `${(planCounts.Free / total) * 100}%` }} />
-          <div className="bg-blue-500 transition-all" style={{ width: `${(planCounts.Growth / total) * 100}%` }} />
-          <div className="bg-purple-500 transition-all" style={{ width: `${(planCounts.Custom / total) * 100}%` }} />
+          <div className="bg-gray-400 transition-all" style={{ width: `${total ? (planCounts.Free / total) * 100 : 0}%` }} />
+          <div className="bg-blue-500 transition-all" style={{ width: `${total ? (planCounts.Growth / total) * 100 : 0}%` }} />
+          <div className="bg-purple-500 transition-all" style={{ width: `${total ? (planCounts.Custom / total) * 100 : 0}%` }} />
         </div>
       </div>
+
+      {/* New merchant flow */}
+      <NewMerchantFlow
+        open={newMerchantOpen}
+        onClose={() => setNewMerchantOpen(false)}
+      />
     </div>
   );
 }

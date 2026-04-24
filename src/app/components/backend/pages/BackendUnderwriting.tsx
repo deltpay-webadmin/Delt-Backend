@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
 import { useUnderwriting, underwritingActions, type UWStage, type ProductType, type UWApplication as Application } from '../crmStore';
+import { NewApplicationFlow } from '../flows/NewApplicationFlow';
 
 const STAGES: UWStage[] = ['Received', 'Doc Collection', 'Bank Review', 'Credit Analysis', 'Committee', 'Approved', 'Declined'];
 
@@ -490,12 +491,13 @@ export function BackendUnderwriting() {
         </div>
       )}
 
-      {newAppOpen && (
-        <NewApplicationModal onClose={() => setNewAppOpen(false)} onCreated={app => {
-          setNewAppOpen(false);
+      <NewApplicationFlow
+        open={newAppOpen}
+        onClose={() => setNewAppOpen(false)}
+        onCreated={app => {
           toast.success(`Application ${app.applicationId} created`, { description: app.businessName });
-        }} />
-      )}
+        }}
+      />
 
       {/* Legend */}
       <div className="flex items-center justify-between text-[10px] text-gray-400">
