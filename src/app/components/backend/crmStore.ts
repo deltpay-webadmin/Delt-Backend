@@ -85,6 +85,125 @@ export interface LeadBundle {
   status: 'Not Assigned' | 'Credit Issued' | 'Order Placed' | 'Shipped' | 'Delivered';
 }
 
+// ── KYB intake (Stripe-style lead onboarding) ──
+// Full Know-Your-Business payload captured during lead creation.
+// Kept optional on Lead so legacy leads remain valid; persisted as a
+// single `kyb` jsonb column in Supabase.
+export type BusinessStructure =
+  | 'Sole Proprietorship'
+  | 'LLC'
+  | 'Partnership'
+  | 'C Corporation'
+  | 'S Corporation'
+  | 'Non-Profit'
+  | 'Other';
+
+export interface BusinessProfile {
+  legalName: string;
+  dba: string;
+  structure: BusinessStructure;
+  taxIdType: 'EIN' | 'SSN';
+  taxIdLast4: string;
+  stateOfIncorporation: string;
+  yearFounded: string;
+  website: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  mcc: string; // Merchant Category Code
+  industry: string;
+  productDescription: string;
+}
+
+export interface Representative {
+  firstName: string;
+  lastName: string;
+  title: string;
+  email: string;
+  phone: string;
+  dobMasked: string; // MM/DD/YYYY — never store full SSN client-side
+  ssnLast4: string;
+  ownershipPct: number;
+  isOwner: boolean;
+  isController: boolean;
+  addressLine1: string;
+  city: string;
+  state: string;
+  postalCode: string;
+}
+
+export interface BeneficialOwner {
+  id: string;
+  firstName: string;
+  lastName: string;
+  title: string;
+  email: string;
+  ownershipPct: number;
+  ssnLast4: string;
+}
+
+export interface ProcessingProfile {
+  monthlyVolume: string;
+  avgTicket: string;
+  highTicket: string;
+  cardPresentPct: number; // 0-100
+  currentProcessor: string;
+  currentEffectiveRate: string;
+  acceptsAmex: boolean;
+  hasChargebacks: boolean;
+  chargebackRatePct: string;
+  seasonalBusiness: boolean;
+}
+
+export interface BankOnFile {
+  bankName: string;
+  accountHolder: string;
+  routingLast4: string;
+  accountLast4: string;
+  accountType: 'Checking' | 'Savings';
+  verificationMethod: 'Plaid' | 'Voided Check' | 'Bank Letter' | 'Manual';
+}
+
+export interface UploadedDoc {
+  id: string;
+  kind:
+    | 'Processing Statement'
+    | 'Bank Statement'
+    | 'Voided Check'
+    | 'Drivers License'
+    | 'EIN Letter'
+    | 'Other';
+  filename: string;
+  size: number;
+  uploadedAt: string;
+}
+
+export interface FundingRequest {
+  requested: boolean;
+  amount: string;
+  useOfFunds: string;
+  timeInBusinessMonths: string;
+}
+
+export interface KybIntake {
+  business: BusinessProfile;
+  representative: Representative;
+  owners: BeneficialOwner[];
+  processing: ProcessingProfile;
+  funding: FundingRequest;
+  bank: BankOnFile;
+  documents: UploadedDoc[];
+  attestation: {
+    certifiedAccurate: boolean;
+    authorizedToSign: boolean;
+    signedAt: string;
+    signedByName: string;
+  };
+}
+
 export interface Lead {
   id: string;
   businessName: string;
@@ -92,7 +211,7 @@ export interface Lead {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  type: 'MCA' | 'Residual' | 'Leasing';
+  type: 'MCA' | 'Residual' | 'Processing' | 'Leasing';
   source: string;
   monthlySales: string;
   amountRequested: string;
@@ -110,6 +229,8 @@ export interface Lead {
   stepDetails?: LeadStepDetail[];
   referredBy?: string;
   bundle?: LeadBundle | null;
+  /** Full Stripe-style KYB intake captured during lead creation. */
+  kyb?: KybIntake;
 }
 
 // ── Onboarding ──
@@ -396,6 +517,7 @@ function fromDbLead(r: any): Lead {
     stepDetails: r.step_details ?? undefined,
     referredBy: r.referred_by ?? undefined,
     bundle: r.bundle ?? null,
+    kyb: r.kyb ?? undefined,
   };
 }
 
@@ -425,6 +547,7 @@ function toDbLead(l: Partial<Lead>): Record<string, any> {
   if (l.stepDetails !== undefined) out.step_details = l.stepDetails;
   if (l.referredBy !== undefined) out.referred_by = l.referredBy;
   if (l.bundle !== undefined) out.bundle = l.bundle;
+  if (l.kyb !== undefined) out.kyb = l.kyb;
   return out;
 }
 
