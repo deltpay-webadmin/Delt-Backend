@@ -17,7 +17,7 @@
  */
 
 import React, { useMemo, useState } from 'react';
-import { Briefcase, CreditCard, HandCoins, Store } from 'lucide-react';
+import { Briefcase, CreditCard, HandCoins, Layers, Store } from 'lucide-react';
 import {
   OnboardingFlow,
   TextField,
@@ -833,20 +833,20 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
                   {
                     value: 'Processing',
                     label: 'Processing',
-                    description: 'Card acceptance / merchant account.',
+                    description: 'Merchant services — card acceptance only.',
                     icon: <CreditCard className="w-4 h-4" />,
                   },
                   {
-                    value: 'MCA',
-                    label: 'MCA',
-                    description: 'Merchant cash advance.',
+                    value: 'Capital',
+                    label: 'Capital',
+                    description: 'Working capital — merchant cash advance.',
                     icon: <HandCoins className="w-4 h-4" />,
                   },
                   {
-                    value: 'Leasing',
-                    label: 'Leasing',
-                    description: 'Equipment / terminal lease.',
-                    icon: <Store className="w-4 h-4" />,
+                    value: 'Both',
+                    label: 'Both',
+                    description: 'Processing + Capital bundle. Best terms for the merchant.',
+                    icon: <Layers className="w-4 h-4" />,
                   },
                 ]}
               />

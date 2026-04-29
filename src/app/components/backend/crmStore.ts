@@ -302,7 +302,19 @@ export interface Lead {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  type: 'MCA' | 'Residual' | 'Processing' | 'Leasing';
+  // Product picker shown on the lead intake. Aligns with how Delt sells:
+  //   Processing  — merchant services / card acceptance only
+  //   Capital     — merchant cash advance / capital only
+  //   Both        — bundled processing + capital (best margin segment)
+  // Legacy values 'MCA' | 'Residual' | 'Leasing' are kept for backwards compat
+  // with rows already in the pipeline; new leads should use the three above.
+  type:
+    | 'Processing'
+    | 'Capital'
+    | 'Both'
+    | 'MCA'
+    | 'Residual'
+    | 'Leasing';
   source: string;
   monthlySales: string;
   amountRequested: string;
