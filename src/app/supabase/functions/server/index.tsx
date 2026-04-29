@@ -270,16 +270,102 @@ app.get("/make-server-e3e3d1af/leads", async (c) => {
   }
 });
 
+// ─── Lead pipeline tagging (mirrors crmStore deriveLeadTag + LEAD_PLAYBOOK) ──
+// Edge functions cannot import from src/app/components, so the routing logic
+// is duplicated here. Keep in sync with src/app/components/backend/crmStore.ts.
+// 4 segments derived from 2 qualifying questions on /get-funded.
+const DELT_RATE = 0.026;       // Delt effective rate used for savings calc
+const DELT_PER_TXN = 0.10;     // Delt per-transaction fee used for savings calc
+const CAP_OFFER_FLOOR = 5_000;
+const CAP_OFFER_CEILING = 300_000;
+
+function deriveLeadTagServer(acceptsCards?: string | null, openToSwitch?: string | null): string | null {
+  if (!acceptsCards) return null;
+  if (acceptsCards === 'already-delt') return 'Existing-Customer-Upsell';
+  if (acceptsCards === 'no') return 'MS+CAP-NewMerchant';
+  if (acceptsCards === 'yes') {
+    if (openToSwitch === 'no') return 'CAP-Only';
+    if (openToSwitch === 'yes' || openToSwitch === 'maybe') return 'MS+CAP-Switcher';
+  }
+  return null;
+}
+
+const LEAD_PLAYBOOK_SERVER: Record<string, { priority: string; queue: string; initialStage: string; assignedAgent: string }> = {
+  'MS+CAP-Switcher':         { priority: 'High',   queue: 'Bundle Sales',           initialStage: 'Qualified', assignedAgent: 'Bundle Sales' },
+  'CAP-Only':                { priority: 'Medium', queue: 'Capital Desk',           initialStage: 'Qualified', assignedAgent: 'Capital Desk' },
+  'MS+CAP-NewMerchant':      { priority: 'Medium', queue: 'New Merchant Onboarding',initialStage: 'New',       assignedAgent: 'New Merchant Onboarding' },
+  'Existing-Customer-Upsell':{ priority: 'High',   queue: 'Customer Success',       initialStage: 'Qualified', assignedAgent: 'Customer Success' },
+};
+
+function computePreApproval(monthlyVolume?: number) {
+  const v = Number(monthlyVolume) || 0;
+  if (v <= 0) return { low: 0, high: 0 };
+  return {
+    low:  Math.max(CAP_OFFER_FLOOR, Math.min(v * 0.5, CAP_OFFER_CEILING)),
+    high: Math.min(v * 1.5, CAP_OFFER_CEILING),
+  };
+}
+
+function computeEstimatedSavings(monthlyVolume?: number, avgTicket?: number, currentRate?: number, currentPerTxn?: number) {
+  const v = Number(monthlyVolume) || 0;
+  const t = Number(avgTicket) || 0;
+  const cr = Number(currentRate) || 0;
+  const cpt = Number(currentPerTxn) || 0;
+  if (v <= 0 || t <= 0) return 0;
+  const txns = v / t;
+  const currentCost = v * (cr / 100) + txns * cpt;
+  const deltCost    = v * DELT_RATE     + txns * DELT_PER_TXN;
+  return Math.max(0, Math.round(currentCost - deltCost));
+}
+
 // Create a new lead
 app.post("/make-server-e3e3d1af/leads", async (c) => {
   try {
     const lead = await c.req.json();
     const leadId = lead.id || `lead_${Date.now()}`;
-    
-    const leadWithId = { ...lead, id: leadId };
+
+    // Derive tag + routing server-side. Always trust server logic over
+    // client-supplied leadTag so the pipeline can't be poisoned.
+    const acceptsCards   = lead.acceptsCards   ?? null;
+    const openToSwitch   = lead.openToSwitch   ?? null;
+    const leadTag        = deriveLeadTagServer(acceptsCards, openToSwitch);
+    const playbook       = leadTag ? LEAD_PLAYBOOK_SERVER[leadTag] : null;
+
+    const monthlyVolumeEstimate = lead.monthlyVolumeEstimate != null ? Number(lead.monthlyVolumeEstimate) : undefined;
+    const avgTicket             = lead.avgTicket            != null ? Number(lead.avgTicket)            : undefined;
+    const currentRate           = lead.currentRate          != null ? Number(lead.currentRate)          : undefined;
+    const currentPerTxn         = lead.currentPerTxn        != null ? Number(lead.currentPerTxn)        : undefined;
+
+    const { low: preApprovalLow, high: preApprovalHigh } = computePreApproval(monthlyVolumeEstimate);
+    const estimatedSavingsMonthly = computeEstimatedSavings(monthlyVolumeEstimate, avgTicket, currentRate, currentPerTxn);
+
+    const leadWithId = {
+      ...lead,
+      id: leadId,
+      leadTag,
+      acceptsCards,
+      openToSwitch,
+      monthlyVolumeEstimate,
+      avgTicket,
+      currentRate,
+      currentPerTxn,
+      estimatedSavingsMonthly,
+      preApprovalLow,
+      preApprovalHigh,
+      // Server-set routing — overrides client values when we have a tag.
+      ...(playbook ? {
+        priority:      lead.priority      || playbook.priority,
+        status:        lead.status        || 'New',
+        stage:         lead.stage         || playbook.initialStage,
+        assignedAgent: lead.assignedAgent || playbook.assignedAgent,
+        queue:         playbook.queue,
+      } : {}),
+      createdAt: lead.createdAt || new Date().toISOString(),
+    };
+
     await kv.set(`lead:${leadId}`, leadWithId);
-    
-    console.log('[Server] Created lead with ID:', leadId);
+
+    console.log('[Server] Created lead', leadId, 'tag=', leadTag, 'queue=', playbook?.queue);
     return c.json({ success: true, id: leadId, lead: leadWithId });
   } catch (error) {
     console.error("Error creating lead:", error);

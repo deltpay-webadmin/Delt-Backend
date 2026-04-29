@@ -204,6 +204,97 @@ export interface KybIntake {
   };
 }
 
+// ── Lead pipeline segmentation (drives routing + sales playbook) ──
+//
+// Segment is derived from the two qualifying questions on the public
+// /get-funded gate:
+//   Q1 acceptsCards: 'yes' | 'no' | 'already-delt'
+//   Q2 openToSwitch: 'yes' | 'maybe' | 'no'   (only when Q1 = 'yes')
+//
+// Tag mapping:
+//   yes + (yes|maybe)        -> 'MS+CAP-Switcher'
+//   yes +  no                -> 'CAP-Only'
+//   no                       -> 'MS+CAP-NewMerchant'
+//   already-delt             -> 'Existing-Customer-Upsell'
+export type LeadTag =
+  | 'MS+CAP-Switcher'
+  | 'CAP-Only'
+  | 'MS+CAP-NewMerchant'
+  | 'Existing-Customer-Upsell';
+
+export const LEAD_TAGS: LeadTag[] = [
+  'MS+CAP-Switcher',
+  'CAP-Only',
+  'MS+CAP-NewMerchant',
+  'Existing-Customer-Upsell',
+];
+
+export type AcceptsCards = 'yes' | 'no' | 'already-delt';
+export type OpenToSwitch = 'yes' | 'maybe' | 'no';
+
+/**
+ * Derive the CRM lead tag from the two qualifying answers.
+ * Returns null when there isn't enough signal to tag yet.
+ */
+export function deriveLeadTag(
+  acceptsCards?: AcceptsCards | string | null,
+  openToSwitch?: OpenToSwitch | string | null,
+): LeadTag | null {
+  if (!acceptsCards) return null;
+  if (acceptsCards === 'already-delt') return 'Existing-Customer-Upsell';
+  if (acceptsCards === 'no') return 'MS+CAP-NewMerchant';
+  // acceptsCards === 'yes'
+  if (openToSwitch === 'no') return 'CAP-Only';
+  if (openToSwitch === 'yes' || openToSwitch === 'maybe') return 'MS+CAP-Switcher';
+  return null;
+}
+
+/**
+ * Sales routing playbook for each tag. Used by both the public lead
+ * intake (server) and the CRM UI to suggest priority/queue.
+ *
+ *   priority    suggested initial priority on the pipeline
+ *   queue       sales queue / agent pod responsible for this segment
+ *   summary     short one-liner shown in the CRM next to the tag
+ */
+export interface LeadPlaybook {
+  priority: 'High' | 'Medium' | 'Low';
+  queue: string;
+  summary: string;
+  initialStage: LeadStage;
+}
+
+export const LEAD_PLAYBOOK: Record<LeadTag, LeadPlaybook> = {
+  'MS+CAP-Switcher': {
+    priority: 'High',
+    queue: 'Bundle Sales',
+    summary:
+      'Switching processors + Capital. Lead with savings calc and auto pre-approval. Hottest pipeline.',
+    initialStage: 'Qualified',
+  },
+  'CAP-Only': {
+    priority: 'Medium',
+    queue: 'Capital Desk',
+    summary:
+      "Capital-only. Don't push processing yet — fund the deal, plant the bundling seed for nurture.",
+    initialStage: 'Qualified',
+  },
+  'MS+CAP-NewMerchant': {
+    priority: 'Medium',
+    queue: 'New Merchant Onboarding',
+    summary:
+      'New to processing. Onboard first — Capital pre-approval activates after ~30–60 days of volume.',
+    initialStage: 'New',
+  },
+  'Existing-Customer-Upsell': {
+    priority: 'High',
+    queue: 'Customer Success',
+    summary:
+      'Existing Delt merchant. Skip qualification — route to existing-customer Capital flow with pre-filled offer.',
+    initialStage: 'Qualified',
+  },
+};
+
 export interface Lead {
   id: string;
   businessName: string;
@@ -231,6 +322,27 @@ export interface Lead {
   bundle?: LeadBundle | null;
   /** Full Stripe-style KYB intake captured during lead creation. */
   kyb?: KybIntake;
+  // ── /get-funded qualifying answers + derived tag (added 2026-04-29) ──
+  /** Derived CRM segment from the two qualifying questions. */
+  leadTag?: LeadTag | null;
+  /** Q1: does the prospect currently accept credit cards? */
+  acceptsCards?: AcceptsCards;
+  /** Q2: only when acceptsCards='yes' — open to switching to Delt? */
+  openToSwitch?: OpenToSwitch;
+  /** Pre-application volume estimate captured in the gate. */
+  monthlyVolumeEstimate?: number;
+  /** Average ticket size captured in the gate. */
+  avgTicket?: number;
+  /** Current processor rate captured in the gate (%). */
+  currentRate?: number;
+  /** Current processor per-txn fee captured in the gate ($). */
+  currentPerTxn?: number;
+  /** Server-computed monthly savings estimate vs. Delt rates. */
+  estimatedSavingsMonthly?: number;
+  /** Capital pre-approval window low (USD). */
+  preApprovalLow?: number;
+  /** Capital pre-approval window high (USD). */
+  preApprovalHigh?: number;
 }
 
 // ── Onboarding ──
@@ -518,6 +630,18 @@ function fromDbLead(r: any): Lead {
     referredBy: r.referred_by ?? undefined,
     bundle: r.bundle ?? null,
     kyb: r.kyb ?? undefined,
+    leadTag: r.lead_tag ?? null,
+    acceptsCards: r.accepts_cards ?? undefined,
+    openToSwitch: r.open_to_switch ?? undefined,
+    monthlyVolumeEstimate:
+      r.monthly_volume_estimate != null ? Number(r.monthly_volume_estimate) : undefined,
+    avgTicket: r.avg_ticket != null ? Number(r.avg_ticket) : undefined,
+    currentRate: r.current_rate != null ? Number(r.current_rate) : undefined,
+    currentPerTxn: r.current_per_txn != null ? Number(r.current_per_txn) : undefined,
+    estimatedSavingsMonthly:
+      r.estimated_savings_monthly != null ? Number(r.estimated_savings_monthly) : undefined,
+    preApprovalLow: r.pre_approval_low != null ? Number(r.pre_approval_low) : undefined,
+    preApprovalHigh: r.pre_approval_high != null ? Number(r.pre_approval_high) : undefined,
   };
 }
 
@@ -548,6 +672,18 @@ function toDbLead(l: Partial<Lead>): Record<string, any> {
   if (l.referredBy !== undefined) out.referred_by = l.referredBy;
   if (l.bundle !== undefined) out.bundle = l.bundle;
   if (l.kyb !== undefined) out.kyb = l.kyb;
+  if (l.leadTag !== undefined) out.lead_tag = l.leadTag;
+  if (l.acceptsCards !== undefined) out.accepts_cards = l.acceptsCards;
+  if (l.openToSwitch !== undefined) out.open_to_switch = l.openToSwitch;
+  if (l.monthlyVolumeEstimate !== undefined)
+    out.monthly_volume_estimate = l.monthlyVolumeEstimate;
+  if (l.avgTicket !== undefined) out.avg_ticket = l.avgTicket;
+  if (l.currentRate !== undefined) out.current_rate = l.currentRate;
+  if (l.currentPerTxn !== undefined) out.current_per_txn = l.currentPerTxn;
+  if (l.estimatedSavingsMonthly !== undefined)
+    out.estimated_savings_monthly = l.estimatedSavingsMonthly;
+  if (l.preApprovalLow !== undefined) out.pre_approval_low = l.preApprovalLow;
+  if (l.preApprovalHigh !== undefined) out.pre_approval_high = l.preApprovalHigh;
   return out;
 }
 

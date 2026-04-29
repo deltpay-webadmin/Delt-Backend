@@ -55,6 +55,35 @@ export interface Lead {
   state?: string;
   notesHistory?: LeadNote[];
   attachments?: LeadAttachment[];
+  // ── /get-funded pipeline tag (added 2026-04-29) ──
+  // Derived from the two qualifying questions on the website's /get-funded gate.
+  // Drives priority + queue assignment in the agent CRM.
+  leadTag?: 'MS+CAP-Switcher' | 'CAP-Only' | 'MS+CAP-NewMerchant' | 'Existing-Customer-Upsell' | null;
+  acceptsCards?: 'yes' | 'no' | 'already-delt';
+  openToSwitch?: 'yes' | 'maybe' | 'no';
+  monthlyVolumeEstimate?: number;
+  avgTicket?: number;
+  currentRate?: number;
+  currentPerTxn?: number;
+  estimatedSavingsMonthly?: number;
+  preApprovalLow?: number;
+  preApprovalHigh?: number;
+  queue?: string;
+}
+
+// Display helpers for the lead pipeline tag.
+export const LEAD_TAG_LABELS: Record<NonNullable<Lead['leadTag']>, string> = {
+  'MS+CAP-Switcher': 'Switcher + Capital',
+  'CAP-Only': 'Capital only',
+  'MS+CAP-NewMerchant': 'New Merchant + Capital',
+  'Existing-Customer-Upsell': 'Existing Customer Upsell',
+};
+
+export const LEAD_TAG_STYLES: Record<NonNullable<Lead['leadTag']>, string> = {
+  'MS+CAP-Switcher': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+  'CAP-Only': 'bg-amber-100 text-amber-700 border border-amber-200',
+  'MS+CAP-NewMerchant': 'bg-sky-100 text-sky-700 border border-sky-200',
+  'Existing-Customer-Upsell': 'bg-violet-100 text-violet-700 border border-violet-200',
 }
 
 export interface LeadNote {
@@ -90,6 +119,7 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [tagFilter, setTagFilter] = useState<string>('all');
   const [showNewLeadDrawer, setShowNewLeadDrawer] = useState(false);
   const [showLeadDetails, setShowLeadDetails] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -264,8 +294,9 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     const matchesType = typeFilter === 'all' || lead.leadType === typeFilter;
     const matchesPriority = priorityFilter === 'all' || lead.priority === priorityFilter;
+    const matchesTag = tagFilter === 'all' || (lead.leadTag || '') === tagFilter;
 
-    return matchesSearch && matchesStatus && matchesType && matchesPriority;
+    return matchesSearch && matchesStatus && matchesType && matchesPriority && matchesTag;
   });
 
   // Pagination
@@ -278,7 +309,7 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, typeFilter, priorityFilter]);
+  }, [searchTerm, statusFilter, typeFilter, priorityFilter, tagFilter]);
 
   // Calculate stats
   const stats = {
@@ -419,6 +450,19 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
+
+            <select
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white text-sm"
+              title="Filter by /get-funded pipeline segment"
+            >
+              <option value="all">All Segments</option>
+              <option value="MS+CAP-Switcher">Switcher + Capital</option>
+              <option value="CAP-Only">Capital only</option>
+              <option value="MS+CAP-NewMerchant">New Merchant + Capital</option>
+              <option value="Existing-Customer-Upsell">Existing Customer Upsell</option>
+            </select>
           </div>
         </div>
       </div>
@@ -434,11 +478,11 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
             <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg text-gray-900 mb-2">No leads found</h3>
             <p className="text-sm text-gray-500 mb-6">
-              {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' || priorityFilter !== 'all'
+              {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' || priorityFilter !== 'all' || tagFilter !== 'all'
                 ? 'Try adjusting your filters or search terms'
                 : 'Get started by creating your first lead'}
             </p>
-            {!searchTerm && statusFilter === 'all' && typeFilter === 'all' && priorityFilter === 'all' && (
+            {!searchTerm && statusFilter === 'all' && typeFilter === 'all' && priorityFilter === 'all' && tagFilter === 'all' && (
               <button
                 onClick={() => setShowNewLeadDrawer(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
@@ -457,6 +501,7 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Business</th>
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Contact</th>
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Type</th>
+                    <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Segment</th>
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Lead Source</th>
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Monthly Sales</th>
                     <th className="px-4 py-3 text-left text-xs text-gray-600 uppercase tracking-wider whitespace-nowrap">Amount Requested</th>
@@ -511,6 +556,18 @@ export function Leads({ user, onConvertToDeal }: LeadsProps) {
                         }`}>
                           {lead.leadType}
                         </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {lead.leadTag ? (
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAD_TAG_STYLES[lead.leadTag]}`}
+                            title={lead.queue ? `Queue: ${lead.queue}` : undefined}
+                          >
+                            {LEAD_TAG_LABELS[lead.leadTag]}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-4">
                         <p className="text-sm text-gray-900 whitespace-nowrap">

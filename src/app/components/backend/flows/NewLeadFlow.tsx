@@ -34,7 +34,12 @@ import {
 } from './OnboardingFlow';
 import {
   leadActions,
+  deriveLeadTag,
+  LEAD_PLAYBOOK,
   type Lead,
+  type LeadTag,
+  type AcceptsCards,
+  type OpenToSwitch,
   type KybIntake,
   type BeneficialOwner,
   type BusinessStructure,
@@ -238,6 +243,12 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
     attestCertified: false,
     attestAuthorized: false,
     attestSignedByName: '',
+
+    // Pipeline tagging — mirrors the /get-funded gate questions.
+    // Auto-derived from acceptsCards + openToSwitch but agent can override.
+    acceptsCards: '' as AcceptsCards | '',
+    openToSwitch: '' as OpenToSwitch | '',
+    leadTagOverride: '' as LeadTag | '',
   }));
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
@@ -339,6 +350,18 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
 
     const score = calcLeadScore(kyb);
 
+    // Derive (or honor manual override of) the pipeline tag.
+    const derivedTag = deriveLeadTag(
+      form.acceptsCards || undefined,
+      form.openToSwitch || undefined,
+    );
+    const finalTag: LeadTag | null = (form.leadTagOverride as LeadTag) || derivedTag;
+    const playbook = finalTag ? LEAD_PLAYBOOK[finalTag] : null;
+
+    const numericMonthlyVolume = Number((form.monthlyVolume || '').replace(/[^0-9.]/g, '')) || undefined;
+    const numericAvgTicket     = Number((form.avgTicket     || '').replace(/[^0-9.]/g, '')) || undefined;
+    const numericCurrentRate   = Number(form.currentEffectiveRate) || undefined;
+
     const created = leadActions.create({
       businessName: form.dba.trim() || form.legalName.trim(),
       industry: form.industry,
@@ -351,9 +374,17 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
       amountRequested: form.fundingRequested ? formatMoneyLabel(form.fundingAmount) : '',
       score,
       assignedAgent: form.assignedAgent,
-      priority: form.priority,
+      // If we have a tag, route via playbook unless the agent picked a stricter priority.
+      priority: playbook ? (form.priority || playbook.priority) : form.priority,
+      stage: playbook?.initialStage,
       notes: form.notes,
       kyb,
+      leadTag: finalTag,
+      acceptsCards: (form.acceptsCards || undefined) as AcceptsCards | undefined,
+      openToSwitch: (form.openToSwitch || undefined) as OpenToSwitch | undefined,
+      monthlyVolumeEstimate: numericMonthlyVolume,
+      avgTicket: numericAvgTicket,
+      currentRate: numericCurrentRate,
     });
 
     onCreated?.(created);
@@ -1131,6 +1162,75 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
                   onChange={v => update('priority', v as Lead['priority'])}
                   options={['High', 'Medium', 'Low']}
                 />
+              </div>
+
+              {/* Pipeline tagging — mirrors /get-funded qualifying questions. */}
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-3 space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-emerald-900">Pipeline segment</p>
+                  <p className="text-xs text-emerald-800/70">
+                    Mirrors the two questions on /get-funded. Auto-derives the segment so the lead routes to the right queue.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <SelectField
+                    label="Currently accepts cards?"
+                    value={form.acceptsCards || ''}
+                    onChange={v => update('acceptsCards', (v || '') as AcceptsCards | '')}
+                    options={[
+                      { label: '— select —', value: '' },
+                      { label: 'Yes — with another processor', value: 'yes' },
+                      { label: 'No — not yet accepting cards', value: 'no' },
+                      { label: 'Already a Delt merchant', value: 'already-delt' },
+                    ]}
+                  />
+                  {form.acceptsCards === 'yes' && (
+                    <SelectField
+                      label="Open to switching to Delt?"
+                      value={form.openToSwitch || ''}
+                      onChange={v => update('openToSwitch', (v || '') as OpenToSwitch | '')}
+                      options={[
+                        { label: '— select —', value: '' },
+                        { label: 'Yes', value: 'yes' },
+                        { label: 'Maybe', value: 'maybe' },
+                        { label: 'No — capital only', value: 'no' },
+                      ]}
+                    />
+                  )}
+                </div>
+                {(() => {
+                  const derived = deriveLeadTag(
+                    form.acceptsCards || undefined,
+                    form.openToSwitch || undefined,
+                  );
+                  const tag = (form.leadTagOverride as LeadTag) || derived;
+                  const pb = tag ? LEAD_PLAYBOOK[tag] : null;
+                  return (
+                    <div className="flex items-start gap-3 rounded-md bg-white border border-emerald-200 p-2.5">
+                      <div className="flex-1">
+                        <p className="text-xs uppercase tracking-wider text-emerald-700/70">Derived segment</p>
+                        <p className="text-sm font-medium text-gray-900">{tag || 'Not enough signal yet'}</p>
+                        {pb && (
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            Routes to <span className="font-medium">{pb.queue}</span> · {pb.priority} priority · starts at {pb.initialStage}
+                          </p>
+                        )}
+                      </div>
+                      <SelectField
+                        label="Override"
+                        value={form.leadTagOverride || ''}
+                        onChange={v => update('leadTagOverride', (v || '') as LeadTag | '')}
+                        options={[
+                          { label: 'Auto', value: '' },
+                          { label: 'MS+CAP-Switcher', value: 'MS+CAP-Switcher' },
+                          { label: 'CAP-Only', value: 'CAP-Only' },
+                          { label: 'MS+CAP-NewMerchant', value: 'MS+CAP-NewMerchant' },
+                          { label: 'Existing-Customer-Upsell', value: 'Existing-Customer-Upsell' },
+                        ]}
+                      />
+                    </div>
+                  );
+                })()}
               </div>
 
               <TextArea
