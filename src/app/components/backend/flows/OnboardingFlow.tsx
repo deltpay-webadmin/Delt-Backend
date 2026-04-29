@@ -150,15 +150,15 @@ export function OnboardingFlow({
             onClick={onClose}
           />
 
-          {/* Panel */}
+          {/* Panel — top-down partial sheet (covers ~85vh, page peeks at bottom) */}
           <motion.div
             ref={panelRef}
             tabIndex={-1}
-            className="absolute right-0 top-0 h-full w-full sm:max-w-[560px] bg-white shadow-2xl flex flex-col outline-none"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            className="absolute left-0 right-0 top-0 mx-auto w-full max-w-[1200px] h-[88vh] bg-white shadow-2xl flex flex-col outline-none rounded-b-2xl overflow-hidden"
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ type: 'spring', damping: 34, stiffness: 320 }}
           >
             {/* Thin progress bar at the very top */}
             <div className="h-[3px] bg-gray-100 relative overflow-hidden">
@@ -226,15 +226,16 @@ export function OnboardingFlow({
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto px-6 py-6">
+              <div className="mx-auto w-full max-w-[860px]">
               {success ? (
                 <SuccessPanel success={success} onClose={onClose} />
               ) : (
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, x: 12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -12 }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.18 }}
                   >
                     <div className="mb-5">
@@ -252,6 +253,7 @@ export function OnboardingFlow({
                   </motion.div>
                 </AnimatePresence>
               )}
+              </div>
             </div>
 
             {/* Footer */}
