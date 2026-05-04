@@ -38,6 +38,19 @@ import { BackendDocuments } from './pages/BackendDocuments';
 import { BackendPayments } from './pages/BackendPayments';
 import { BackendReports } from './pages/BackendReports';
 import {
+  McaPipeline,
+  McaFunding,
+  McaSyndication,
+  McaCollections,
+  McaReferrals,
+  PayoutRuns,
+  Chargebacks,
+  Terminals,
+  AiUsage,
+  BillingEvents,
+  OperationsReports,
+} from './pages/operations';
+import {
   LayoutDashboard,
   Users,
   Store,
@@ -83,6 +96,7 @@ import {
   PenTool,
   Wallet,
   BarChart3,
+  Cpu,
 } from 'lucide-react';
 
 // ── Types ──
@@ -105,6 +119,37 @@ const adminSections: NavSection[] = [
       { label: 'Leads', path: '/leads' },
       { label: 'Underwriting', path: '/underwriting' },
       { label: 'Analysis', path: '/analysis' },
+    ],
+  },
+  {
+    id: 'mca-ops',
+    label: 'MCA Operations',
+    icon: Banknote,
+    children: [
+      { label: 'MCA Pipeline', path: '/mca/pipeline' },
+      { label: 'Funding Queue', path: '/mca/funding' },
+      { label: 'Syndication', path: '/mca/syndication' },
+      { label: 'Collections', path: '/mca/collections' },
+      { label: 'Referral Partners', path: '/mca/referrals' },
+    ],
+  },
+  {
+    id: 'merchant-ops',
+    label: 'Merchant Operations',
+    icon: CreditCard,
+    children: [
+      { label: 'Payout Runs', path: '/ms/payouts' },
+      { label: 'Chargebacks', path: '/ms/chargebacks' },
+      { label: 'Terminals', path: '/ms/terminals' },
+    ],
+  },
+  {
+    id: 'ai-billing',
+    label: 'AI & Websites Billing',
+    icon: Sparkles,
+    children: [
+      { label: 'AI Usage', path: '/ai/usage' },
+      { label: 'Billing Events', path: '/ai/billing' },
     ],
   },
   {
@@ -152,6 +197,7 @@ const adminSections: NavSection[] = [
       { label: 'Lens AI', path: '/lens-ai' },
       { label: 'Financials', path: '/financials' },
       { label: 'Reports', path: '/reports' },
+      { label: 'Operations Reports', path: '/reports/operations' },
     ],
   },
   {
@@ -204,6 +250,9 @@ function sectionForPath(path: string): string | null {
   if (path.startsWith('/disputes')) return 'disputes';
   if (path.startsWith('/outreach')) return 'outreach';
   if (path.startsWith('/agents') || path.startsWith('/employees') || path.startsWith('/payroll') || path.startsWith('/commissions')) return 'team';
+  if (path.startsWith('/mca/')) return 'mca-ops';
+  if (path.startsWith('/ms/')) return 'merchant-ops';
+  if (path.startsWith('/ai/')) return 'ai-billing';
   if (path.startsWith('/lens-ai') || path.startsWith('/financials') || path.startsWith('/reports')) return 'intelligence';
   if (path.startsWith('/compliance')) return 'compliance';
   if (path.startsWith('/settings')) return 'settings';
@@ -261,6 +310,17 @@ const allCommands: CommandItem[] = [
   { label: 'Lens AI', path: '/lens-ai', group: 'Intelligence', icon: Sparkles, keywords: 'ai analysis' },
   { label: 'Financials', path: '/financials', group: 'Intelligence', icon: DollarSign, keywords: 'revenue profit' },
   { label: 'Reports', path: '/reports', group: 'Intelligence', icon: BarChart3, keywords: 'data visualization' },
+  { label: 'Operations Reports', path: '/reports/operations', group: 'Intelligence', icon: BarChart3, keywords: 'mca residuals chargeback ai usage kpi rollup' },
+  { label: 'MCA Pipeline', path: '/mca/pipeline', group: 'MCA', icon: Banknote, keywords: 'origination underwriting funding collections referrals lifecycle' },
+  { label: 'Funding Queue', path: '/mca/funding', group: 'MCA', icon: Banknote, keywords: 'wire ach signed contract' },
+  { label: 'Syndication', path: '/mca/syndication', group: 'MCA', icon: Wallet, keywords: 'syndicators capital partners participation' },
+  { label: 'Collections', path: '/mca/collections', group: 'MCA', icon: ShieldAlert, keywords: 'past due workout charge off recovery' },
+  { label: 'Referral Partners', path: '/mca/referrals', group: 'MCA', icon: HandshakeIcon, keywords: 'iso broker partner submissions commissions' },
+  { label: 'Payout Runs', path: '/ms/payouts', group: 'Merchant Services', icon: Wallet, keywords: 'residuals agent monthly payouts' },
+  { label: 'Chargebacks', path: '/ms/chargebacks', group: 'Merchant Services', icon: ShieldAlert, keywords: 'dispute representment evidence card network' },
+  { label: 'Terminals', path: '/ms/terminals', group: 'Merchant Services', icon: Cpu, keywords: 'pax clover terminal parameters firmware' },
+  { label: 'AI Usage', path: '/ai/usage', group: 'AI Billing', icon: Sparkles, keywords: 'lens ai chat tokens minutes website hosting metered' },
+  { label: 'Billing Events', path: '/ai/billing', group: 'AI Billing', icon: Receipt, keywords: 'invoices payments billing events' },
   { label: 'Compliance Hub', path: '/compliance', group: 'Compliance', icon: ShieldCheck, keywords: 'compliance rules' },
   { label: 'Websites', path: '/websites', group: 'Products', icon: Globe, keywords: 'sites domain builder analytics' },
   { label: 'Subscriptions', path: '/subscriptions', group: 'Products', icon: CreditCard, keywords: 'billing plans MRR SaaS' },
@@ -432,6 +492,17 @@ export function DeltBackendLayout() {
       case '/documents': return <BackendDocuments />;
       case '/payments': return <BackendPayments />;
       case '/reports': return <BackendReports />;
+      case '/reports/operations': return <OperationsReports />;
+      case '/mca/pipeline': return <McaPipeline />;
+      case '/mca/funding': return <McaFunding />;
+      case '/mca/syndication': return <McaSyndication />;
+      case '/mca/collections': return <McaCollections />;
+      case '/mca/referrals': return <McaReferrals />;
+      case '/ms/payouts': return <PayoutRuns />;
+      case '/ms/chargebacks': return <Chargebacks />;
+      case '/ms/terminals': return <Terminals />;
+      case '/ai/usage': return <AiUsage />;
+      case '/ai/billing': return <BillingEvents />;
       default: return <BackendDashboard />;
     }
   };
