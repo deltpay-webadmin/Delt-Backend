@@ -6,6 +6,7 @@ import {
   ChevronRight, ExternalLink,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { NewDealFlow } from '../flows/NewDealFlow';
 
 // ── Deal Data ──
 type DealStatus = 'active' | 'paid' | 'slow' | 'default';
@@ -73,6 +74,7 @@ export function BackendCapital() {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'portfolio' | 'collections' | 'risk' | 'fraud' | 'renewals' | 'stacking' | 'concentration'>('portfolio');
   const [collectionModal, setCollectionModal] = useState<string | null>(null);
+  const [newDealOpen, setNewDealOpen] = useState(false);
 
   const filtered = useMemo(() => DEALS.filter(m => {
     if (filter !== 'all' && m.status !== filter) return false;
@@ -179,7 +181,10 @@ export function BackendCapital() {
                 Synced Apr 14
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button
+              onClick={() => setNewDealOpen(true)}
+              className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" /> New Deal
             </button>
           </div>
