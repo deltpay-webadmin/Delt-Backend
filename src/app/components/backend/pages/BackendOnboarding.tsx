@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useOnboarding, onboardingActions, type OnboardingApp, type SLAStatus, type OnbStep } from '../crmStore';
+import { PageHeader, KpiCard } from '../shared';
 
 // ── Local aliases (kept to minimize diff) ──
 type StepName = OnbStep;
@@ -280,42 +281,42 @@ export function BackendOnboarding() {
   };
 
   return (
-    <div className="px-6 py-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Onboarding Tracker</h1>
-        <p className="text-sm text-gray-500 mt-1">Monitor application progress and step-level SLAs.</p>
-      </div>
+    <div className="px-6 py-6 space-y-5 bg-canvas min-h-full">
+      <PageHeader
+        title="Onboarding Tracker"
+        icon={ClipboardList}
+        subtitle="Monitor application progress and step-level SLAs"
+      />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard
+      {/* Summary KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiCard
           icon={ClipboardList}
           label="Active Applications"
-          value={String(activeApps)}
+          value={activeApps}
           sub={`${applications.length} total in pipeline`}
-          variant="indigo"
+          tone="brand"
         />
-        <SummaryCard
+        <KpiCard
           icon={Clock}
           label="Avg Time to Funded"
-          value={`${avgTimeToFunded} days`}
+          value={`${avgTimeToFunded}d`}
           sub="From submission to funded"
-          variant="blue"
+          tone="blue"
         />
-        <SummaryCard
+        <KpiCard
           icon={AlertTriangle}
-          label="SLA Breaches This Week"
-          value={String(slaBreaches)}
+          label="SLA Breaches"
+          value={slaBreaches}
           sub={slaBreaches > 0 ? 'Action required' : 'All clear'}
-          variant={slaBreaches > 0 ? 'red' : 'emerald'}
+          tone={slaBreaches > 0 ? 'red' : 'emerald'}
         />
-        <SummaryCard
+        <KpiCard
           icon={TrendingUp}
           label="Completion Rate"
           value={`${completionRate}%`}
           sub="Applications reaching funded"
-          variant="emerald"
+          tone="emerald"
         />
       </div>
 
@@ -465,34 +466,6 @@ export function BackendOnboarding() {
   );
 }
 
-// ── Summary Card ──
-function SummaryCard({ icon: Icon, label, value, sub, variant }: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  sub: string;
-  variant: 'indigo' | 'emerald' | 'blue' | 'red';
-}) {
-  const map = {
-    indigo: { bg: 'bg-indigo-50', icon: 'text-indigo-600' },
-    emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600' },
-    blue: { bg: 'bg-blue-50', icon: 'text-blue-600' },
-    red: { bg: 'bg-red-50', icon: 'text-red-600' },
-  };
-  const v = map[variant];
-  return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-gray-600">{label}</p>
-        <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
-          <Icon className={`w-5 h-5 ${v.icon}`} />
-        </div>
-      </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-xs mt-2 text-gray-500">{sub}</p>
-    </div>
-  );
-}
 
 // ── Slide-out Panel ──
 function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => void }) {

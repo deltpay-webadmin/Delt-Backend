@@ -6,6 +6,7 @@ import {
   Plus, Search, Building2, Store, DollarSign, CreditCard, Heart,
   Banknote, Globe, Brain, ChevronDown,
 } from 'lucide-react';
+import { PageHeader, KpiCard } from '../shared';
 
 // ── Types ──
 type MerchantStatus = 'Active' | 'Inactive' | 'Pending';
@@ -173,30 +174,33 @@ export function BackendMerchants() {
     'bg-purple-50 text-purple-700';
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-canvas">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between px-6 pt-6 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">All Merchants</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{total} merchants across all products and plans</p>
-        </div>
-        <button
-          onClick={() => setNewMerchantOpen(true)}
-          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Merchant
-        </button>
+      <div className="px-6 pt-6 pb-4">
+        <PageHeader
+          title="Merchants"
+          icon={Store}
+          subtitle={`${total} merchants across all products and plans`}
+          actions={
+            <button
+              onClick={() => setNewMerchantOpen(true)}
+              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Merchant
+            </button>
+          }
+        />
       </div>
 
-      {/* ── Summary Cards ── */}
+      {/* ── Summary KPIs ── */}
       <div className="px-6 pb-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <Card label="Total Merchants" value={total.toString()} icon={<Store className="w-4 h-4 text-brand" />} />
-          <Card label="Subscription Revenue" value={fmt(totalSubRevenue)} sub="/month" icon={<CreditCard className="w-4 h-4 text-blue-600" />} />
-          <Card label="Capital Deployed" value={fmt(totalCapitalDeployed)} icon={<Banknote className="w-4 h-4 text-violet-600" />} />
-          <Card label="Outstanding Balance" value={fmt(totalOutstanding)} icon={<DollarSign className="w-4 h-4 text-amber-600" />} />
-          <Card label="Avg Health Score" value={avgHealth.toString()} icon={<Heart className="w-4 h-4 text-rose-500" />} />
+          <KpiCard label="Total Merchants" value={total} icon={Store} tone="brand" />
+          <KpiCard label="Subscription Revenue" value={fmt(totalSubRevenue)} sub="per month" icon={CreditCard} tone="blue" />
+          <KpiCard label="Capital Deployed" value={fmt(totalCapitalDeployed)} icon={Banknote} tone="violet" />
+          <KpiCard label="Outstanding Balance" value={fmt(totalOutstanding)} icon={DollarSign} tone="amber" />
+          <KpiCard label="Avg Health Score" value={avgHealth} sub="0–100 scale" icon={Heart} tone={avgHealth >= 75 ? 'emerald' : avgHealth >= 60 ? 'amber' : 'red'} />
         </div>
       </div>
 
@@ -375,21 +379,6 @@ export function BackendMerchants() {
 // ══════════════════════════════════════
 // Shared sub-components
 // ══════════════════════════════════════
-
-function Card({ label, value, icon, sub }: { label: string; value: string; icon: React.ReactNode; sub?: string }) {
-  return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-3.5">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[11px] text-gray-500 font-medium leading-tight">{label}</span>
-        {icon}
-      </div>
-      <p className="text-lg font-bold text-gray-900 leading-none">
-        {value}
-        {sub && <span className="text-xs font-normal text-gray-400 ml-0.5">{sub}</span>}
-      </p>
-    </div>
-  );
-}
 
 function Th({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
