@@ -407,7 +407,8 @@ export function DeltBackendLayout() {
       case '/merchants': return <BackendMerchants />;
       case '/retention': return <BackendRetention />;
       case '/underwriting': return <BackendUnderwriting />;
-      case '/deals': return <BackendDeals />;
+      // /deals consolidated into Capital > Deals tab
+      case '/deals': return <BackendCapital />;
       case '/agents': return <BackendAgents />;
       case '/financials': return <BackendFinancials />;
       case '/lens-ai': return <BackendLensAI />;
