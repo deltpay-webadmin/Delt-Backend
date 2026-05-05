@@ -6,6 +6,8 @@ import {
   ChevronRight, ExternalLink,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { NewDealFlow } from '../flows/NewDealFlow';
+import { BackendDeals } from './BackendDeals';
 
 // ── Deal Data ──
 type DealStatus = 'active' | 'paid' | 'slow' | 'default';
@@ -71,8 +73,12 @@ export function BackendCapital() {
   const [channelFilter, setChannelFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'collections' | 'risk' | 'fraud' | 'renewals' | 'stacking' | 'concentration'>('portfolio');
+  const { currentPage } = useAppNavigate();
+  const initialTab: 'portfolio' | 'deals' | 'collections' | 'risk' | 'fraud' | 'renewals' | 'stacking' | 'concentration' =
+    currentPage === '/deals' || currentPage.startsWith('/deals?') ? 'deals' : 'portfolio';
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'deals' | 'collections' | 'risk' | 'fraud' | 'renewals' | 'stacking' | 'concentration'>(initialTab);
   const [collectionModal, setCollectionModal] = useState<string | null>(null);
+  const [newDealOpen, setNewDealOpen] = useState(false);
 
   const filtered = useMemo(() => DEALS.filter(m => {
     if (filter !== 'all' && m.status !== filter) return false;
@@ -179,7 +185,10 @@ export function BackendCapital() {
                 Synced Apr 14
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button
+              onClick={() => setNewDealOpen(true)}
+              className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" /> New Deal
             </button>
           </div>
@@ -190,6 +199,7 @@ export function BackendCapital() {
           <div className="flex gap-1">
             {([
               { key: 'portfolio' as const, label: 'Portfolio Overview' },
+              { key: 'deals' as const, label: 'Deals' },
               { key: 'collections' as const, label: 'Collections' },
               { key: 'risk' as const, label: 'Risk Signals' },
               { key: 'fraud' as const, label: 'Fraud Detection' },
@@ -470,6 +480,11 @@ export function BackendCapital() {
             <p className="text-xs text-gray-400"><span className="text-brand font-bold">delt</span>pay.com</p>
           </div>
         </>}
+
+        {/* ═══ DEALS TAB (consolidated from /deals) ═══ */}
+        {activeTab === 'deals' && (
+          <div className="-mx-6"><BackendDeals /></div>
+        )}
 
         {/* ═══ COLLECTIONS TAB ═══ */}
         {activeTab === 'collections' && (
