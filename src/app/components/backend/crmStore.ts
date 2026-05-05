@@ -22,6 +22,7 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { normalizePhone, phoneMatches, phoneDigits } from '../../lib/phone';
 
 // ══════════════════════════════════════════════════════════════
 // Types (unchanged — pages depend on this exact shape)
@@ -384,6 +385,51 @@ export interface ReferralProgram {
   planTier: string;
 }
 
+// ── Call logs (customer-service phone tracking) ──
+export type CallDirection = 'inbound' | 'outbound';
+export type CallStatus =
+  | 'queued'
+  | 'ringing'
+  | 'in-progress'
+  | 'completed'
+  | 'no-answer'
+  | 'busy'
+  | 'failed'
+  | 'voicemail'
+  | 'canceled';
+export type CallSubjectKind = 'merchant' | 'lead' | 'none';
+
+export interface CallLog {
+  id: string;
+  /** E.164-ish canonical form, e.g. "+15551234567". */
+  phoneNormalized: string;
+  /** Original string the agent entered (for audit). */
+  phoneRaw: string;
+  direction: CallDirection;
+  status: CallStatus;
+  subjectKind: CallSubjectKind;
+  subjectId: string | null;
+  subjectLabel: string | null;
+  agent: string;
+  startedAt: string;       // ISO timestamp
+  endedAt: string | null;
+  durationSeconds: number | null;
+  notes: string;
+  provider: string | null;       // 'twilio' | 'click-to-call' | null
+  providerCallSid: string | null;
+  recordingUrl: string | null;
+}
+
+/** Lightweight "who-is-this" result for a phone-number search. */
+export interface PhoneMatch {
+  kind: CallSubjectKind;          // 'merchant' | 'lead' | 'none'
+  id: string;
+  label: string;                  // business name to show in the UI
+  contactName?: string;
+  matchedField: 'merchant.contactPhone' | 'lead.contactPhone' | 'lead.kyb.business' | 'lead.kyb.representative';
+  phone: string;                  // the field value we matched against
+}
+
 export interface CrmState {
   leads: Lead[];
   onboarding: OnboardingApp[];
@@ -393,6 +439,8 @@ export interface CrmState {
   /** Client-side only — merchants & deals aren't persisted to Supabase yet. */
   merchants: Merchant[];
   deals: Deal[];
+  /** Customer-service call history. */
+  callLogs: CallLog[];
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -453,6 +501,7 @@ let state: CrmState = {
   program: { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
   merchants: [],
   deals: [],
+  callLogs: [],
 };
 
 let sync: SyncState = {
@@ -697,6 +746,48 @@ function toDbProgram(p: Partial<ReferralProgram>): Record<string, any> {
   return out;
 }
 
+function fromDbCallLog(r: any): CallLog {
+  return {
+    id: r.id,
+    phoneNormalized: r.phone_normalized,
+    phoneRaw: r.phone_raw ?? '',
+    direction: r.direction,
+    status: r.status,
+    subjectKind: r.matched_subject_kind ?? 'none',
+    subjectId: r.matched_subject_id ?? null,
+    subjectLabel: r.matched_subject_label ?? null,
+    agent: r.agent ?? '',
+    startedAt: r.started_at,
+    endedAt: r.ended_at ?? null,
+    durationSeconds: r.duration_seconds ?? null,
+    notes: r.notes ?? '',
+    provider: r.provider ?? null,
+    providerCallSid: r.provider_call_sid ?? null,
+    recordingUrl: r.recording_url ?? null,
+  };
+}
+
+function toDbCallLog(c: Partial<CallLog>): Record<string, any> {
+  const out: Record<string, any> = {};
+  if (c.id !== undefined) out.id = c.id;
+  if (c.phoneNormalized !== undefined) out.phone_normalized = c.phoneNormalized;
+  if (c.phoneRaw !== undefined) out.phone_raw = c.phoneRaw;
+  if (c.direction !== undefined) out.direction = c.direction;
+  if (c.status !== undefined) out.status = c.status;
+  if (c.subjectKind !== undefined) out.matched_subject_kind = c.subjectKind;
+  if (c.subjectId !== undefined) out.matched_subject_id = c.subjectId;
+  if (c.subjectLabel !== undefined) out.matched_subject_label = c.subjectLabel;
+  if (c.agent !== undefined) out.agent = c.agent;
+  if (c.startedAt !== undefined) out.started_at = c.startedAt;
+  if (c.endedAt !== undefined) out.ended_at = c.endedAt;
+  if (c.durationSeconds !== undefined) out.duration_seconds = c.durationSeconds;
+  if (c.notes !== undefined) out.notes = c.notes;
+  if (c.provider !== undefined) out.provider = c.provider;
+  if (c.providerCallSid !== undefined) out.provider_call_sid = c.providerCallSid;
+  if (c.recordingUrl !== undefined) out.recording_url = c.recordingUrl;
+  return out;
+}
+
 // ══════════════════════════════════════════════════════════════
 // Hydration + realtime
 // ══════════════════════════════════════════════════════════════
@@ -719,13 +810,26 @@ async function maybeHydrate() {
   setSync({ isLoading: true, lastError: null });
 
   try {
-    const [leadsRes, onbRes, uwRes, refRes, progRes] = await Promise.all([
+    const [leadsRes, onbRes, uwRes, refRes, progRes, callsRes] = await Promise.all([
       supabase.from('leads').select('*').order('id', { ascending: true }),
       supabase.from('onboarding_apps').select('*').order('id', { ascending: true }),
       supabase.from('underwriting_apps').select('*').order('id', { ascending: true }),
       supabase.from('referrals').select('*').order('id', { ascending: true }),
       supabase.from('referral_program').select('*').eq('id', 1).maybeSingle(),
+      // call_logs is allowed to fail (migration may not be applied yet) — we
+      // catch and ignore the error below so the rest of hydration still works.
+      supabase
+        .from('call_logs')
+        .select('*')
+        .order('started_at', { ascending: false })
+        .limit(500),
     ]);
+
+    // Treat call_logs failure as soft (table may not exist on older deployments).
+    if (callsRes.error) {
+      // eslint-disable-next-line no-console
+      console.warn('[Delt CRM] call_logs not available — skipping:', callsRes.error.message);
+    }
 
     const firstErr =
       leadsRes.error || onbRes.error || uwRes.error || refRes.error || progRes.error;
@@ -739,6 +843,7 @@ async function maybeHydrate() {
       program: progRes.data
         ? fromDbProgram(progRes.data)
         : { rewardAmount: '100', freeMonths: '1', planTier: 'Growth' },
+      callLogs: callsRes.error ? [] : (callsRes.data || []).map(fromDbCallLog),
     });
 
     hydrated = true;
@@ -784,6 +889,11 @@ function subscribeRealtime() {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'referral_program' },
       payload => applyRealtime('referral_program', payload),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'call_logs' },
+      payload => applyRealtime('call_logs', payload),
     )
     .subscribe();
   // Keep reference so it isn't GC'd.
@@ -842,6 +952,18 @@ function applyRealtime(table: string, payload: any) {
     }
   } else if (table === 'referral_program') {
     if (newRow) set({ program: fromDbProgram(newRow) });
+  } else if (table === 'call_logs') {
+    if (eventType === 'DELETE') {
+      set({ callLogs: state.callLogs.filter(c => c.id !== oldRow?.id) });
+    } else {
+      const mapped = fromDbCallLog(newRow);
+      const exists = state.callLogs.some(c => c.id === mapped.id);
+      set({
+        callLogs: exists
+          ? state.callLogs.map(c => (c.id === mapped.id ? mapped : c))
+          : [mapped, ...state.callLogs],
+      });
+    }
   }
 }
 
@@ -914,6 +1036,88 @@ export function useReferrals() {
 export function useReferralProgram() {
   const selector = useCallback(() => state.program, []);
   return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useCallLogs() {
+  const selector = useCallback(() => state.callLogs, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Phone search — find merchants/leads by phone number on file.
+// Used by the Call Center page for inbound caller-ID lookup and
+// outbound dial-by-number flows.
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Returns every CRM record whose stored phone matches the input.
+ *
+ * Searches:
+ *   • merchants.contactPhone           (in-memory store + onboarding-created merchants)
+ *   • leads.contactPhone               (Supabase-backed)
+ *   • leads.kyb.business.phone         (KYB intake)
+ *   • leads.kyb.representative.phone   (KYB intake)
+ *
+ * Empty / too-short input returns []. Use `phoneMatches` so that
+ * "(555) 123-4567" matches a stored "+15551234567" (etc.).
+ */
+export function searchByPhone(input: string): PhoneMatch[] {
+  const norm = normalizePhone(input);
+  if (!norm && phoneDigits(input).length < 7) return [];
+
+  const out: PhoneMatch[] = [];
+
+  for (const m of state.merchants) {
+    if (m.contactPhone && phoneMatches(m.contactPhone, input)) {
+      out.push({
+        kind: 'merchant',
+        id: m.id,
+        label: m.name,
+        contactName: m.contactName,
+        matchedField: 'merchant.contactPhone',
+        phone: m.contactPhone,
+      });
+    }
+  }
+
+  for (const l of state.leads) {
+    if (l.contactPhone && phoneMatches(l.contactPhone, input)) {
+      out.push({
+        kind: 'lead',
+        id: l.id,
+        label: l.businessName,
+        contactName: l.contactName,
+        matchedField: 'lead.contactPhone',
+        phone: l.contactPhone,
+      });
+      continue;
+    }
+    const bizPhone = l.kyb?.business?.phone;
+    if (bizPhone && phoneMatches(bizPhone, input)) {
+      out.push({
+        kind: 'lead',
+        id: l.id,
+        label: l.businessName,
+        contactName: l.contactName,
+        matchedField: 'lead.kyb.business',
+        phone: bizPhone,
+      });
+      continue;
+    }
+    const repPhone = l.kyb?.representative?.phone;
+    if (repPhone && phoneMatches(repPhone, input)) {
+      out.push({
+        kind: 'lead',
+        id: l.id,
+        label: l.businessName,
+        contactName: l.contactName,
+        matchedField: 'lead.kyb.representative',
+        phone: repPhone,
+      });
+    }
+  }
+
+  return out;
 }
 
 /** Exposes hydration & connectivity status for UI indicators. */
@@ -1383,5 +1587,96 @@ export const dealActions = {
 
   remove(id: string) {
     set({ deals: state.deals.filter(d => d.id !== id) });
+  },
+};
+
+// ══════════════════════════════════════════════════════════════
+// Call log actions
+// ══════════════════════════════════════════════════════════════
+
+interface LogCallInput {
+  phone: string;                           // raw, as entered
+  direction?: CallDirection;               // default 'outbound'
+  status?: CallStatus;                     // default 'completed'
+  subjectKind?: CallSubjectKind;           // default 'none'
+  subjectId?: string | null;
+  subjectLabel?: string | null;
+  agent?: string;
+  startedAt?: string;                      // ISO; defaults to now
+  endedAt?: string | null;
+  durationSeconds?: number | null;
+  notes?: string;
+  provider?: string | null;                // 'twilio' | 'click-to-call' | null
+  providerCallSid?: string | null;
+  recordingUrl?: string | null;
+}
+
+function newCallLogId(): string {
+  // Use a sortable-ish ID so the optimistic insert keeps the newest-first order.
+  const ts = Date.now().toString(36);
+  const rand = Math.random().toString(36).slice(2, 7);
+  return `call-${ts}-${rand}`;
+}
+
+export const callLogActions = {
+  /**
+   * Insert a call log row. The phone number is normalized before insert
+   * so all rows in `call_logs.phone_normalized` share a single canonical
+   * format — this is what makes caller-ID lookup cheap.
+   */
+  log(input: LogCallInput): CallLog {
+    const phoneRaw = input.phone || '';
+    const phoneNormalized = normalizePhone(phoneRaw) || phoneRaw;
+    const startedAt = input.startedAt || new Date().toISOString();
+    const log: CallLog = {
+      id: newCallLogId(),
+      phoneRaw,
+      phoneNormalized,
+      direction: input.direction || 'outbound',
+      status: input.status || 'completed',
+      subjectKind: input.subjectKind || 'none',
+      subjectId: input.subjectId ?? null,
+      subjectLabel: input.subjectLabel ?? null,
+      agent: input.agent || 'Unassigned',
+      startedAt,
+      endedAt: input.endedAt ?? null,
+      durationSeconds: input.durationSeconds ?? null,
+      notes: input.notes || '',
+      provider: input.provider ?? null,
+      providerCallSid: input.providerCallSid ?? null,
+      recordingUrl: input.recordingUrl ?? null,
+    };
+    const prev = state.callLogs;
+    persist(
+      'call log',
+      () => set({ callLogs: [log, ...state.callLogs] }),
+      () => set({ callLogs: prev }),
+      () => supabase!.from('call_logs').insert(toDbCallLog(log)).then(r => ({ error: r.error })),
+    );
+    return log;
+  },
+
+  update(id: string, patch: Partial<CallLog>) {
+    const prev = state.callLogs;
+    persist(
+      'call log',
+      () => set({ callLogs: state.callLogs.map(c => (c.id === id ? { ...c, ...patch } : c)) }),
+      () => set({ callLogs: prev }),
+      () => supabase!.from('call_logs').update(toDbCallLog(patch)).eq('id', id).then(r => ({ error: r.error })),
+    );
+  },
+
+  associate(id: string, kind: CallSubjectKind, subjectId: string | null, subjectLabel: string | null) {
+    callLogActions.update(id, { subjectKind: kind, subjectId, subjectLabel });
+  },
+
+  remove(id: string) {
+    const prev = state.callLogs;
+    persist(
+      'call log delete',
+      () => set({ callLogs: state.callLogs.filter(c => c.id !== id) }),
+      () => set({ callLogs: prev }),
+      () => supabase!.from('call_logs').delete().eq('id', id).then(r => ({ error: r.error })),
+    );
   },
 };

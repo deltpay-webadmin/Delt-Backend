@@ -37,6 +37,7 @@ import { BackendSubscriptions } from './pages/BackendSubscriptions';
 import { BackendDocuments } from './pages/BackendDocuments';
 import { BackendPayments } from './pages/BackendPayments';
 import { BackendReports } from './pages/BackendReports';
+import { BackendCallCenter } from './pages/BackendCallCenter';
 import {
   LayoutDashboard,
   Users,
@@ -83,6 +84,7 @@ import {
   PenTool,
   Wallet,
   BarChart3,
+  Phone,
 } from 'lucide-react';
 
 // ── Types ──
@@ -246,6 +248,7 @@ interface CommandItem {
 const allCommands: CommandItem[] = [
   { label: 'Dashboard', path: '/', group: 'Navigation', icon: Home },
   { label: 'Workspace', path: '/workspace', group: 'Navigation', icon: Inbox, keywords: 'inbox email sms call messages tasks activity timeline' },
+  { label: 'Call Center', path: '/call-center', group: 'Navigation', icon: Phone, keywords: 'phone dialer caller id customer service log calls' },
   { label: 'Leads', path: '/leads', group: 'Pipeline', icon: Users, keywords: 'sales pipeline' },
   { label: 'Underwriting', path: '/underwriting', group: 'Pipeline', icon: ClipboardCheck },
   { label: 'Analysis', path: '/analysis', group: 'Pipeline', icon: FileText, keywords: 'deal analysis review cost calculator' },
@@ -432,6 +435,7 @@ export function DeltBackendLayout() {
       case '/documents': return <BackendDocuments />;
       case '/payments': return <BackendPayments />;
       case '/reports': return <BackendReports />;
+      case '/call-center': return <BackendCallCenter />;
       default: return <BackendDashboard />;
     }
   };
@@ -488,6 +492,19 @@ export function DeltBackendLayout() {
                 Workspace
               </button>
             )}
+
+            {/* Call Center — phone search + call logging */}
+            <button
+              onClick={() => handleNavigate('/call-center')}
+              className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
+                currentPage === '/call-center'
+                  ? 'text-brand bg-brand/[0.06] font-semibold'
+                  : 'text-gray-700 hover:bg-gray-50 font-medium'
+              }`}
+            >
+              <Phone className="w-[16px] h-[16px]" />
+              Call Center
+            </button>
 
             {userRole === 'agent' ? (
               /* Agent flat nav */
@@ -762,6 +779,19 @@ export function DeltBackendLayout() {
                     Workspace
                   </button>
                 )}
+
+                {/* Call Center (mobile) */}
+                <button
+                  onClick={() => handleNavigate('/call-center')}
+                  className={`w-full flex items-center gap-2.5 px-3 py-[7px] rounded-[6px] text-[13px] transition-colors mb-0.5 ${
+                    currentPage === '/call-center'
+                      ? 'text-brand bg-brand/[0.06] font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50 font-medium'
+                  }`}
+                >
+                  <Phone className="w-[16px] h-[16px]" />
+                  Call Center
+                </button>
 
                 {userRole === 'agent' ? (
                   agentItems.filter(i => i.path !== '/').map(item => {
