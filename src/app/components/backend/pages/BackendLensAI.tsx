@@ -58,7 +58,7 @@ function HealthRing({ score, size = 100 }: { score: number; size?: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-2xl font-bold text-gray-900">{score}</span>
+        <span className="delt-page-title">{score}</span>
         <span className="text-[10px] text-gray-500 -mt-0.5">/ 100</span>
       </div>
     </div>
@@ -178,8 +178,8 @@ export function BackendLensAI() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lens AI</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Predictive intelligence for your portfolio</p>
+            <h1 className="delt-page-title">Lens AI</h1>
+            <p className="delt-page-subtitle">Predictive intelligence for your portfolio</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex bg-gray-100 rounded-[6px] p-0.5">
@@ -232,48 +232,48 @@ function DashboardTab() {
       {/* Portfolio Health Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Health Score */}
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5 flex flex-col items-center">
+        <div className="delt-card p-5 flex flex-col items-center">
           <HealthRing score={74} size={96} />
           <p className="text-sm font-semibold text-gray-900 mt-3">Portfolio Health</p>
           <p className="text-xs text-gray-500">Good — 2 items need attention</p>
         </div>
 
         {/* Predicted Collections */}
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <div className="delt-card p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
             </div>
             <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full">+8.2%</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">$142K</p>
-          <p className="text-sm text-gray-500 mt-1">Predicted Collections</p>
+          <p className="delt-page-title">$142K</p>
+          <p className="delt-page-subtitle">Predicted Collections</p>
           <p className="text-xs text-gray-400 mt-0.5">Next 30 days</p>
         </div>
 
         {/* At-Risk Deals */}
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <div className="delt-card p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
             </div>
             <span className="text-xs text-red-600 font-medium bg-red-50 px-2 py-0.5 rounded-full">+1 this week</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">5</p>
-          <p className="text-sm text-gray-500 mt-1">At-Risk Deals</p>
+          <p className="delt-page-title">5</p>
+          <p className="delt-page-subtitle">At-Risk Deals</p>
           <p className="text-xs text-gray-400 mt-0.5">$214K total exposure</p>
         </div>
 
         {/* Renewal Opportunities */}
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <div className="delt-card p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center">
               <RotateCcw className="w-5 h-5 text-indigo-600" />
             </div>
             <span className="text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded-full">$340K potential</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">4</p>
-          <p className="text-sm text-gray-500 mt-1">Renewal Opportunities</p>
+          <p className="delt-page-title">4</p>
+          <p className="delt-page-subtitle">Renewal Opportunities</p>
           <p className="text-xs text-gray-400 mt-0.5">&gt;50% repaid</p>
         </div>
       </div>
@@ -330,7 +330,7 @@ function DashboardTab() {
       </div>
 
       {/* FlowCast Chart */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">FlowCast</h2>

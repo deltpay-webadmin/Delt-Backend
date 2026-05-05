@@ -120,7 +120,7 @@ function QuickNoteModal({ onClose, onSave }: { onClose: () => void; onSave: (not
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
           <button onClick={() => { onSave({ merchant, content, type }); onClose(); }}
-            className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Log Activity</button>
+            className="delt-btn-primary">Log Activity</button>
         </div>
       </div>
     </div>
@@ -183,18 +183,18 @@ export function BackendActivityTimeline() {
             <Activity className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Activity Timeline</h1>
+            <h1 className="delt-page-title">Activity Timeline</h1>
             <p className="text-sm text-gray-500">Every interaction across all merchants and deals</p>
           </div>
         </div>
         <button onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors">
+          className="delt-btn-primary">
           <Plus className="w-3.5 h-3.5" /> Log Activity
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+      <div className="delt-card p-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -230,7 +230,7 @@ export function BackendActivityTimeline() {
       </div>
 
       {/* Timeline */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         {grouped.map((group, gi) => (
           <div key={gi}>
             {/* Date header */}

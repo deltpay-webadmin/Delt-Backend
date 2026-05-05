@@ -139,7 +139,7 @@ export function DealDetail() {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 mb-1.5">
-                <h1 className="text-2xl font-bold text-gray-900">{deal.merchant}</h1>
+                <h1 className="delt-page-title">{deal.merchant}</h1>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${st.bg} ${st.text}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
                   {st.label}
@@ -198,7 +198,7 @@ export function DealDetail() {
               </button>
               <button
                 onClick={() => navigate(`/merchants/${encodeURIComponent(deal.merchant)}`)}
-                className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+                className="delt-btn-primary">
                 <ExternalLink className="w-4 h-4" /> View Merchant
               </button>
             </div>
@@ -652,7 +652,7 @@ export function DealDetail() {
 
 function Card({ title, children, icon, right }: { title: string; children: React.ReactNode; icon?: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {icon}
@@ -672,7 +672,7 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string; 
     orange: 'border-t-orange-500', violet: 'border-t-violet-500',
   };
   return (
-    <div className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${accentMap[accent] || ''} p-4`}>
+    <div className={`delt-card border-t-2 ${accentMap[accent] || ''} p-4`}>
       <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{label}</p>
       <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-1.5">{sub}</p>}

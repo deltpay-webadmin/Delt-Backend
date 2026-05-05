@@ -80,7 +80,7 @@ function UploadModal({ onClose, onUpload }: { onClose: () => void; onUpload: (in
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={handleSubmit} disabled={!canUpload} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">Upload</button>
+          <button onClick={handleSubmit} disabled={!canUpload} className="delt-btn-primary">Upload</button>
         </div>
       </div>
     </div>
@@ -126,7 +126,7 @@ export function BackendDocuments() {
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Documents & E-Sign</h1>
+            <h1 className="delt-page-title">Documents & E-Sign</h1>
             <p className="text-sm text-gray-500">{documents.length} documents &middot; {pendingCount} awaiting signature</p>
           </div>
         </div>
@@ -140,7 +140,7 @@ export function BackendDocuments() {
               setStatusFilter('draft');
               // Toast hint: user can fill details from the table after creation.
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            className="delt-btn-primary">
             <PenTool className="w-3.5 h-3.5" /> New E-Sign Request
           </button>
         </div>
@@ -156,19 +156,19 @@ export function BackendDocuments() {
         ].map((kpi, i) => {
           const Icon = kpi.icon;
           return (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${kpi.color} px-4 py-3`}>
+            <div key={i} className={`delt-card border-t-[3px] ${kpi.color} px-4 py-3`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Icon className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{kpi.label}</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
+              <p className="delt-page-title">{kpi.value}</p>
             </div>
           );
         })}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex items-center gap-3 flex-wrap">
+      <div className="delt-card p-4 flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..."
@@ -190,7 +190,7 @@ export function BackendDocuments() {
       </div>
 
       {/* Document Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+      <div className="delt-card overflow-hidden">
         <div className="bg-gray-50 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wide font-semibold border-b border-gray-200">
           <span className="flex-1">Document</span>
           <span className="w-32">Type</span>

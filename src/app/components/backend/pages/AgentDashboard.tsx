@@ -77,8 +77,8 @@ export function AgentDashboard() {
     <div className="px-6 py-6 space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {agent.name}</h1>
-        <p className="text-sm text-gray-500 mt-1">Here's your pipeline and performance overview for April 2026.</p>
+        <h1 className="delt-page-title">Welcome back, {agent.name}</h1>
+        <p className="delt-page-subtitle">Here's your pipeline and performance overview for April 2026.</p>
       </div>
 
       {/* Summary Cards */}
@@ -92,7 +92,7 @@ export function AgentDashboard() {
                 <p className="text-sm text-gray-600">{card.label}</p>
                 <div className={v.icon}><Icon className="w-5 h-5" /></div>
               </div>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{card.value}</p>
+              <p className="text-xl sm:delt-page-title">{card.value}</p>
               <p className="text-xs mt-2 text-gray-500">{card.trend}</p>
             </div>
           );
@@ -102,7 +102,7 @@ export function AgentDashboard() {
       {/* Pipeline + Activity row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mini Pipeline */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">My Pipeline</h2>
             <p className="text-xs text-gray-500 mt-0.5">{pipelineTotal} total deals in pipeline</p>
@@ -134,7 +134,7 @@ export function AgentDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
           </div>
@@ -158,7 +158,7 @@ export function AgentDashboard() {
       </div>
 
       {/* Monthly Funded Chart */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Monthly Funded Deals</h2>
           <p className="text-xs text-gray-500 mt-0.5">Your personal funding volume — last 6 months</p>

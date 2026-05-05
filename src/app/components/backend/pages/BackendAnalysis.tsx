@@ -187,8 +187,8 @@ export function BackendAnalysis() {
       <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
         {/* ── Header ── */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analysis</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Cost calculator and statement analysis tools.</p>
+          <h1 className="delt-page-title">Analysis</h1>
+          <p className="delt-page-subtitle">Cost calculator and statement analysis tools.</p>
         </div>
 
         {/* ── View Tabs ── */}
@@ -221,7 +221,7 @@ export function BackendAnalysis() {
           <>
             {/* ── Upload Section ── */}
             {status !== 'done' && (
-              <div className="bg-white rounded-[8px] border border-gray-200 p-6">
+              <div className="delt-card p-6">
                 {/* Drop zone */}
                 <div
                   onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -280,7 +280,7 @@ export function BackendAnalysis() {
                   <button
                     onClick={analyze}
                     disabled={!files.length || status === 'uploading' || status === 'analyzing'}
-                    className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="delt-btn-primary"
                   >
                     {status === 'uploading' || status === 'analyzing' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -331,7 +331,7 @@ export function BackendAnalysis() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => navigate('/leads')}
-                        className="px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
+                        className="delt-btn-primary"
                       >
                         View in Pipeline
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -348,7 +348,7 @@ export function BackendAnalysis() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* ── Left: Extracted Data ── */}
-                  <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+                  <div className="delt-card overflow-hidden">
                     <div className="px-5 py-4 border-b border-gray-100">
                       <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <FileText className="w-4 h-4 text-brand" />
@@ -399,7 +399,7 @@ export function BackendAnalysis() {
                   </div>
 
                   {/* ── Right: Delt Savings Proposal ── */}
-                  <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden flex flex-col">
+                  <div className="delt-card overflow-hidden flex flex-col">
                     <div className="px-5 py-4 border-b border-gray-100">
                       <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <TrendingDown className="w-4 h-4 text-emerald-600" />
@@ -449,7 +449,7 @@ export function BackendAnalysis() {
 
                       {/* CTA buttons */}
                       <div className="mt-auto pt-5 flex items-center gap-3">
-                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+                        <button className="delt-btn-primary flex-1">
                           <Download className="w-4 h-4" />
                           Generate Proposal PDF
                         </button>
@@ -475,7 +475,7 @@ export function BackendAnalysis() {
             )}
 
             {/* ── History Table ── */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-400" />

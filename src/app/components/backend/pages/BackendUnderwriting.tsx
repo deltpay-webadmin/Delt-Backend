@@ -118,7 +118,7 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
   const risk = getRiskColor(app.riskScore);
   const overSLA = app.daysInStage >= app.slaThreshold;
   return (
-    <div onClick={onView} className="bg-white rounded-[8px] border border-gray-200 p-3 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group">
+    <div onClick={onView} className="delt-card p-3 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group">
       <div className="flex items-start justify-between mb-2">
         <span className="text-[10px] font-mono text-brand">{app.applicationId}</span>
         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${risk.bg} ${risk.text} ${risk.border}`}>{app.riskScore}</span>
@@ -244,7 +244,7 @@ export function BackendUnderwriting() {
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Underwriting Queue</h1>
+            <h1 className="delt-page-title">Underwriting Queue</h1>
             <p className="text-sm text-gray-500">{inQueueCount} applications in pipeline &middot; {overSLACount > 0 ? <span className="text-red-600 font-medium">{overSLACount} over SLA</span> : 'All within SLA'}</p>
           </div>
         </div>
@@ -259,7 +259,7 @@ export function BackendUnderwriting() {
           </div>
           <button
             onClick={() => setNewAppOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover"
+            className="delt-btn-primary"
           >
             <Plus className="w-3.5 h-3.5" /> New Application
           </button>
@@ -277,12 +277,12 @@ export function BackendUnderwriting() {
         ].map((kpi, i) => {
           const Icon = kpi.icon;
           return (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${kpi.color} px-4 py-3`}>
+            <div key={i} className={`delt-card border-t-[3px] ${kpi.color} px-4 py-3`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Icon className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{kpi.label}</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
+              <p className="delt-page-title">{kpi.value}</p>
               <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
             </div>
           );
@@ -290,7 +290,7 @@ export function BackendUnderwriting() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex items-center gap-3 flex-wrap">
+      <div className="delt-card p-4 flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search applications..."
@@ -385,7 +385,7 @@ export function BackendUnderwriting() {
         </div>
       ) : (
         /* ── TABLE VIEW ── */
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -595,7 +595,7 @@ function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCr
         </div>
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-[6px] hover:bg-white">Cancel</button>
-          <button type="submit" className="px-4 py-2 text-sm bg-brand text-white rounded-[6px] hover:bg-brand-hover">Create Application</button>
+          <button type="submit" className="delt-btn-primary">Create Application</button>
         </div>
       </form>
     </div>

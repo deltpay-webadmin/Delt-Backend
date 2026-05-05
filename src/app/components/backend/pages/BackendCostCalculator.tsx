@@ -417,7 +417,7 @@ export function BackendCostCalculator() {
 
             {canAdvanceTo2 && (
               <div className="flex justify-end pt-5 border-t border-gray-100 mt-6">
-                <button onClick={() => setStep(2)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
+                <button onClick={() => setStep(2)} className="delt-btn-primary">
                   Continue to Pricing <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -550,7 +550,7 @@ export function BackendCostCalculator() {
 
             <div className="flex justify-between pt-5 border-t border-gray-100">
               <button onClick={() => setStep(1)} className="px-4 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-500 bg-white hover:bg-gray-50 font-medium">← Back</button>
-              <button onClick={() => setStep(3)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
+              <button onClick={() => setStep(3)} className="delt-btn-primary">
                 View Playbook <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -564,7 +564,7 @@ export function BackendCostCalculator() {
             <div className="flex items-start justify-between bg-indigo-50/50 border border-indigo-100 rounded-[8px] p-5">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">{strategy.approach}</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="delt-page-subtitle">
                   {merchantName || mtData?.label} · {RECEPTIVITY_LEVELS.find(r => r.key === receptivity)?.label} · CD Fit: {cdScore}/100
                 </p>
               </div>

@@ -47,6 +47,7 @@ import {
   programActions,
   type Lead as StoreLead,
 } from '../crmStore';
+import { BackendButton, BackendPageHeader } from '../ui';
 
 // ── Full pipeline stages ──
 const ALL_STAGES = [
@@ -156,7 +157,7 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors"
+            className="delt-btn-primary"
           >
             <Gift className="w-3.5 h-3.5" />
             Assign Bundle
@@ -598,7 +599,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
               />
               <button
                 onClick={handleAddNote}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+                className="delt-btn-primary"
               >
                 Add Note
               </button>
@@ -633,7 +634,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 />
                 <button
                   onClick={handleAddTask}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap"
+                  className="delt-btn-primary whitespace-nowrap"
                 >
                   Add Task
                 </button>
@@ -653,13 +654,13 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
             </button>
             <button
               onClick={handleSubmitApp}
-              className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[6px] hover:bg-emerald-700 transition-colors"
+              className="inline-flex flex-1 items-center justify-center gap-2 h-10 px-4 rounded-[6px] bg-emerald-600 text-white text-[13px] font-semibold whitespace-nowrap transition-colors hover:bg-emerald-700"
             >
               Submit Application
             </button>
             <button
               onClick={handleMarkLost}
-              className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors"
+              className="delt-btn-secondary"
             >
               Mark Lost
             </button>
@@ -760,7 +761,7 @@ function ReferralsTab() {
       </div>
 
       {/* Referrals Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+      <div className="delt-card overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-200">
           <h3 className="text-sm font-semibold text-gray-900">Referral Activity</h3>
           <p className="text-xs text-gray-500 mt-0.5">{referrals.length} referrals &middot; {convertedThisMonth} converted</p>
@@ -852,7 +853,7 @@ function ReferralsTab() {
             </div>
             <div className="flex items-center gap-3 mt-5">
               <button onClick={saveProgram} className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
-              <button onClick={() => setEditModalOpen(false)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Cancel</button>
+              <button onClick={() => setEditModalOpen(false)} className="delt-btn-secondary">Cancel</button>
             </div>
           </div>
         </div>
@@ -959,19 +960,19 @@ export function BackendLeads() {
     <div className="h-full flex flex-col bg-canvas">
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Sales Leads</h1>
-            <p className="text-sm text-gray-600 mt-1">{totalLeads} total leads in pipeline</p>
-          </div>
-          <button
-            onClick={() => setNewLeadOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            New Lead
-          </button>
-        </div>
+        <BackendPageHeader
+          title="Sales Leads"
+          subtitle={`${totalLeads} total leads in pipeline`}
+          actions={
+            <BackendButton
+              variant="primary"
+              leftIcon={<Plus className="w-4 h-4" />}
+              onClick={() => setNewLeadOpen(true)}
+            >
+              New Lead
+            </BackendButton>
+          }
+        />
       </div>
 
       {/* Summary Cards */}
@@ -1013,7 +1014,7 @@ export function BackendLeads() {
       ) : (
         <div className="px-6 pb-6 flex-1 overflow-y-auto space-y-6">
           {/* Filter Bar */}
-          <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+          <div className="delt-card p-4">
             <div className="flex flex-col lg:flex-row gap-3">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -1094,7 +1095,7 @@ export function BackendLeads() {
                           <button
                             key={lead.id}
                             onClick={() => setSelectedLead(lead)}
-                            className="w-full text-left bg-white rounded-[8px] border border-gray-200 p-3 hover:shadow-md transition-all"
+                            className="w-full text-left delt-card p-3 hover:shadow-md transition-all"
                           >
                             <div className="flex items-start justify-between mb-2">
                               <p className="text-sm font-semibold text-gray-900 leading-tight">{lead.businessName}</p>
@@ -1117,7 +1118,7 @@ export function BackendLeads() {
             </div>
           ) : (
           /* Leads Table */
-          <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+          <div className="delt-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">

@@ -130,7 +130,7 @@ export function BackendPayments() {
             <Wallet className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payments & Collections</h1>
+            <h1 className="delt-page-title">Payments & Collections</h1>
             <p className="text-sm text-gray-500">Track ACH collections, fundings, and payment health</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function BackendPayments() {
           <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button className="delt-btn-primary">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
           </button>
         </div>
@@ -154,12 +154,12 @@ export function BackendPayments() {
         ].map((kpi, i) => {
           const Icon = kpi.icon;
           return (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${kpi.color} px-4 py-3`}>
+            <div key={i} className={`delt-card border-t-[3px] ${kpi.color} px-4 py-3`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Icon className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{kpi.label}</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
+              <p className="delt-page-title">{kpi.value}</p>
               <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
             </div>
           );
@@ -179,7 +179,7 @@ export function BackendPayments() {
       {activeTab === 'transactions' ? (
         <>
           {/* Transaction Filters */}
-          <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex items-center gap-3 flex-wrap">
+          <div className="delt-card p-4 flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search transactions..."
@@ -196,7 +196,7 @@ export function BackendPayments() {
           </div>
 
           {/* Transaction Table */}
-          <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+          <div className="delt-card overflow-hidden">
             <div className="bg-gray-50 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wide font-semibold border-b border-gray-200">
               <span className="w-20">ID</span>
               <span className="flex-1">Merchant</span>
@@ -242,7 +242,7 @@ export function BackendPayments() {
       ) : (
         <>
           {/* Collection Filters */}
-          <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex items-center gap-3 flex-wrap">
+          <div className="delt-card p-4 flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search accounts..."
@@ -259,7 +259,7 @@ export function BackendPayments() {
           </div>
 
           {/* Collection Accounts */}
-          <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+          <div className="delt-card overflow-hidden">
             <div className="bg-gray-50 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wide font-semibold border-b border-gray-200">
               <span className="flex-1">Merchant / Deal</span>
               <span className="w-24">Status</span>

@@ -156,8 +156,8 @@ export function BackendCallCenter() {
     <div className="px-6 py-6 space-y-6">
       {/* ── Header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Call Center</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="delt-page-title">Call Center</h1>
+        <p className="delt-page-subtitle">
           Look up merchants by phone number, place click-to-call calls, and log customer-service interactions.
         </p>
       </div>
@@ -198,7 +198,7 @@ export function BackendCallCenter() {
         {/* Right: history                                  */}
         {/* ─────────────────────────────────────────────── */}
         <div>
-          <div className="bg-white rounded-[8px] border border-gray-200">
+          <div className="delt-card">
             <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-gray-500" />
@@ -256,7 +256,7 @@ function Dialer(props: {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-4 py-3 border-b border-gray-200">
         <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
           <Phone className="w-4 h-4 text-brand" />
@@ -383,7 +383,7 @@ function Matches(props: {
   const { phone, matches, picked, setPicked, onOpenSubject } = props;
 
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
           <Search className="w-4 h-4 text-gray-500" />

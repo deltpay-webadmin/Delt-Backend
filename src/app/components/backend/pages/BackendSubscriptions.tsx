@@ -237,8 +237,8 @@ export function BackendSubscriptions() {
         <>
           {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Merchant Subscriptions</h1>
-            <p className="text-sm text-gray-500 mt-1">Track plan tiers, billing, and upgrades across all merchants.</p>
+            <h1 className="delt-page-title">Merchant Subscriptions</h1>
+            <p className="delt-page-subtitle">Track plan tiers, billing, and upgrades across all merchants.</p>
           </div>
 
           {/* Summary Cards */}
@@ -250,7 +250,7 @@ export function BackendSubscriptions() {
           </div>
 
           {/* Filter Bar */}
-          <div className="bg-white rounded-[8px] border border-gray-200">
+          <div className="delt-card">
             <div className="px-5 py-4 border-b border-gray-200 flex flex-col xl:flex-row xl:items-center gap-3">
               {/* Search */}
               <div className="relative flex-1 max-w-sm">
@@ -439,14 +439,14 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   };
   const v = map[variant];
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
+    <div className="delt-card p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
         <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xl sm:delt-page-title">{value}</p>
       <p className="text-xs mt-2 text-gray-500">{sub}</p>
     </div>
   );
@@ -463,7 +463,7 @@ function PlanDistribution({ starter, growth, intelligence, total }: {
   ];
 
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-5 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">Plan Distribution</h3>
         <p className="text-xs text-gray-500 mt-0.5">{total} total merchants across all plan tiers</p>
@@ -516,8 +516,8 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ISO Tenants</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage ISOs licensing the Delt platform</p>
+          <h1 className="delt-page-title">ISO Tenants</h1>
+          <p className="delt-page-subtitle">Manage ISOs licensing the Delt platform</p>
         </div>
         <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">
           <Plus className="w-4 h-4" />
@@ -534,7 +534,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -666,7 +666,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900">{tenant.name}</h1>
+                <h1 className="delt-page-title">{tenant.name}</h1>
                 <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium border rounded-md ${sBadge.cls}`}>
                   <SIcon className="w-3 h-3" />
                   {tenant.status}
@@ -675,7 +675,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
                   {tenant.tier}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Onboarded {tenant.onboardDate} &middot; {tenant.id}</p>
+              <p className="delt-page-subtitle">Onboarded {tenant.onboardDate} &middot; {tenant.id}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -691,7 +691,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
 
       {/* ISO Info + White-Label Config */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <div className="delt-card p-5">
           <h3 className="text-sm font-semibold text-gray-900 mb-4">ISO Information</h3>
           <div className="space-y-0">
             {[
@@ -710,7 +710,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
           </div>
         </div>
 
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <div className="delt-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <Palette className="w-4 h-4 text-gray-400" />
             <h3 className="text-sm font-semibold text-gray-900">White-Label Configuration</h3>
@@ -769,7 +769,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
             const RcIcon = rc.icon;
             const c = colorMap[rc.color];
             return (
-              <div key={rc.label} className="bg-white rounded-[8px] border border-gray-200 p-4">
+              <div key={rc.label} className="delt-card p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs text-gray-500">{rc.label}</p>
                   <div className={`w-8 h-8 ${c.bg} rounded-lg flex items-center justify-center`}>
@@ -786,28 +786,28 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
 
       {/* Counts */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5 flex items-center gap-4">
+        <div className="delt-card p-5 flex items-center gap-4">
           <div className="w-11 h-11 bg-indigo-50 rounded-lg flex items-center justify-center">
             <Users className="w-5 h-5 text-indigo-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{tenant.agents}</p>
+            <p className="delt-page-title">{tenant.agents}</p>
             <p className="text-sm text-gray-500">Active Agents</p>
           </div>
         </div>
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5 flex items-center gap-4">
+        <div className="delt-card p-5 flex items-center gap-4">
           <div className="w-11 h-11 bg-emerald-50 rounded-lg flex items-center justify-center">
             <Store className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{tenant.merchants}</p>
+            <p className="delt-page-title">{tenant.merchants}</p>
             <p className="text-sm text-gray-500">Merchants Under ISO</p>
           </div>
         </div>
       </div>
 
       {/* 6-Month Usage Chart */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-gray-400" />
           <h3 className="text-sm font-semibold text-gray-900">6-Month Revenue Breakdown</h3>

@@ -268,7 +268,7 @@ export function MerchantResidualDetail() {
         <div className="flex items-start justify-between flex-wrap gap-4 mt-4 mb-5">
           <div>
             <div className="flex items-center gap-3 flex-wrap mb-1.5">
-              <h1 className="text-2xl font-bold text-gray-900">{M.name}</h1>
+              <h1 className="delt-page-title">{M.name}</h1>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-600">{M.industry.split('/')[0].trim()}</span>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {M.status}
@@ -285,7 +285,7 @@ export function MerchantResidualDetail() {
             <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
               <Edit3 className="w-4 h-4" /> Edit
             </button>
-            <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+            <button className="delt-btn-primary">
               <Download className="w-4 h-4" /> Export Statement
             </button>
           </div>
@@ -488,7 +488,7 @@ export function MerchantResidualDetail() {
         {activeTab === 'interchange' && (
           <div className="space-y-6">
             {/* Interchange Card with Verify Toggle */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">Interchange Breakdown by Card Type</h3>
@@ -1120,8 +1120,8 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
-                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
+                  {cb.status !== 'Won' && <button className="delt-btn-primary">Submit Representment</button>}
+                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="delt-btn-secondary">Close</button>
                 </div>
               </div>
             </div>
@@ -1143,7 +1143,7 @@ function Th({ children }: { children: React.ReactNode }) {
 
 function Card({ title, sub, children, right }: { title: string; sub?: string; children: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
@@ -1162,7 +1162,7 @@ function KpiCard({ label, value, sub, accent, delta }: { label: string; value: s
     red: 'border-t-red-500', blue: 'border-t-blue-500',
   };
   return (
-    <div className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${accentMap[accent] || ''} p-4`}>
+    <div className={`delt-card border-t-2 ${accentMap[accent] || ''} p-4`}>
       <p className="text-[11px] text-gray-500 font-medium mb-1.5">{label}</p>
       <div className="flex items-center gap-2">
         <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
@@ -1182,7 +1182,7 @@ function LensScoreCard({ score }: { score: number }) {
   const color = score >= 70 ? '#0E9F6E' : score >= 50 ? '#E3A008' : '#F05252';
   const circumference = 2 * Math.PI * 18;
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-emerald-500 p-4">
+    <div className="delt-card border-t-2 border-t-emerald-500 p-4">
       <p className="text-[11px] text-gray-500 font-medium mb-1.5">Lens Health Score</p>
       <svg width="44" height="44" viewBox="0 0 44 44">
         <circle cx="22" cy="22" r="18" fill="none" stroke="#F0F2F8" strokeWidth="4" />

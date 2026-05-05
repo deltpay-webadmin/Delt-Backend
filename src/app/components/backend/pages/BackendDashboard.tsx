@@ -4,6 +4,7 @@ import {
   Landmark, Info, Shield, BarChart3, Users, DollarSign, Activity,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { BackendButton, BackendPageHeader } from '../ui';
 
 // ─── ALERTS / NOTIFICATIONS ─────────────────────────────────────
 const ALERTS = [
@@ -83,21 +84,24 @@ export function BackendDashboard() {
       <div className="max-w-[1440px] mx-auto px-6 py-6 space-y-5">
 
         {/* ═══ HEADER ═══ */}
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">{greeting}, David</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+        <BackendPageHeader
+          title={`${greeting}, David`}
+          subtitle={
+            <>
               {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
               <span className="mx-2 text-gray-300">·</span>
-              <span className="text-gray-500 font-medium">{MERCHANTS_DATA.total} merchants</span>
+              <span className="text-gray-600 font-medium">{MERCHANTS_DATA.total} merchants</span>
               <span className="mx-2 text-gray-300">·</span>
-              <span className="text-gray-500 font-medium">{fmtK(MERCHANTS_DATA.totalVolume)} processed this period</span>
-            </p>
-          </div>
-          <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
-            <RefreshCw className="w-4 h-4" /> Refresh Data
-          </button>
-        </div>
+              <span className="text-gray-600 font-medium">{fmtK(MERCHANTS_DATA.totalVolume)} processed this period</span>
+            </>
+          }
+          actions={
+            <BackendButton variant="primary" leftIcon={<RefreshCw className="w-4 h-4" />}>
+              Refresh Data
+            </BackendButton>
+          }
+        />
+
 
         {/* ═══ CRITICAL ALERT STRIP ═══ */}
         {criticalCount > 0 && (
@@ -138,7 +142,7 @@ export function BackendDashboard() {
             </div>
 
             {/* Revenue Trend */}
-            <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+            <div className="delt-card p-5">
               <div className="flex items-baseline justify-between mb-4">
                 <p className="text-sm font-bold text-gray-900">Revenue Trend</p>
                 <p className="text-[11px] text-gray-400">Last 6 months · Net revenue</p>
@@ -166,7 +170,7 @@ export function BackendDashboard() {
             {/* Pipeline + Capital */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Pipeline */}
-              <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+              <div className="delt-card p-5">
                 <div className="flex items-center gap-2 mb-3.5">
                   <Activity className="w-4 h-4 text-brand" />
                   <span className="text-sm font-bold text-gray-900 flex-1">Pipeline</span>
@@ -188,7 +192,7 @@ export function BackendDashboard() {
               </div>
 
               {/* Capital */}
-              <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+              <div className="delt-card p-5">
                 <div className="flex items-center gap-2 mb-3.5">
                   <Landmark className="w-4 h-4 text-brand" />
                   <span className="text-sm font-bold text-gray-900 flex-1">Capital</span>
@@ -211,7 +215,7 @@ export function BackendDashboard() {
             </div>
 
             {/* Top Merchants */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="flex items-baseline justify-between px-5 pt-4 pb-3">
                 <p className="text-sm font-bold text-gray-900">Top Merchants by Volume</p>
                 <button onClick={() => navigate('/merchants')} className="text-[11px] text-brand font-semibold hover:underline">All Merchants →</button>
@@ -371,7 +375,7 @@ export function BackendDashboard() {
 // ─── SUB-COMPONENTS ─────────────────────────────────────────────
 function BigKPI({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+    <div className="delt-card p-4">
       <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{label}</p>
       <p className={`text-xl font-extrabold font-mono tracking-tight ${color || 'text-gray-900'}`}>{value}</p>
       {sub && <p className="text-[11px] text-gray-400 mt-1">{sub}</p>}

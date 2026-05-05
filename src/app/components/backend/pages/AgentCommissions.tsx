@@ -67,8 +67,8 @@ export function AgentCommissions() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Commissions</h1>
-          <p className="text-sm text-gray-500 mt-1">Track your earnings and download statements.</p>
+          <h1 className="delt-page-title">Commissions</h1>
+          <p className="delt-page-subtitle">Track your earnings and download statements.</p>
         </div>
         <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
           <Download className="w-4 h-4" />
@@ -77,7 +77,7 @@ export function AgentCommissions() {
       </div>
 
       {/* Current Period Card */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Current Period</h2>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md">
@@ -108,7 +108,7 @@ export function AgentCommissions() {
       </div>
 
       {/* Commission Statement Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Statement — {currentPeriod.month}</h2>
         </div>
@@ -155,7 +155,7 @@ export function AgentCommissions() {
       </div>
 
       {/* Historical Statements */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Historical Statements</h2>
         </div>

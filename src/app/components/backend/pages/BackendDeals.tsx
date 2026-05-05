@@ -227,8 +227,8 @@ export function BackendDeals() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Portfolio</h1>
-          <p className="text-sm text-gray-500 mt-1">Capital deployment and deal management across all merchants.</p>
+          <h1 className="delt-page-title">Portfolio</h1>
+          <p className="delt-page-subtitle">Capital deployment and deal management across all merchants.</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
@@ -388,7 +388,7 @@ function SummaryCard({
         <p className="text-sm text-gray-600">{label}</p>
         <div className={iconColor}>{icon}</div>
       </div>
-      <p className={`text-xl sm:text-2xl font-bold text-gray-900`}>{value}</p>
+      <p className={`text-xl sm:delt-page-title`}>{value}</p>
       {trend && (
         <p className={`text-xs mt-2 ${trendPositive ? 'text-emerald-600' : 'text-red-600'}`}>{trend}</p>
       )}

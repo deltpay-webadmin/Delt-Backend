@@ -154,12 +154,12 @@ export function BackendResiduals() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Residual Reports</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Upload processor residual reports and distribute agent commissions.</p>
+            <h1 className="delt-page-title">Residual Reports</h1>
+            <p className="delt-page-subtitle">Upload processor residual reports and distribute agent commissions.</p>
           </div>
           <button
             onClick={() => { setShowUpload(true); setStep('idle'); setFiles([]); }}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            className="delt-btn-primary"
           >
             <Upload className="w-4 h-4" />
             Upload Report
@@ -168,7 +168,7 @@ export function BackendResiduals() {
 
         {/* ── Upload Section ── */}
         {showUpload && (
-          <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+          <div className="delt-card overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                 <FileSpreadsheet className="w-4 h-4 text-brand" />
@@ -226,7 +226,7 @@ export function BackendResiduals() {
                       ))}
                       <button
                         onClick={startMapping}
-                        className="mt-3 px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+                        className="mt-3 delt-btn-primary"
                       >
                         <ArrowUpDown className="w-4 h-4" />
                         Detect & Map Columns
@@ -289,7 +289,7 @@ export function BackendResiduals() {
                   <div className="flex items-center gap-3 mt-4">
                     <button
                       onClick={processReport}
-                      className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+                      className="delt-btn-primary"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Process Report
@@ -366,7 +366,7 @@ export function BackendResiduals() {
             </div>
 
             {/* ── Parsed Report Table ── */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1050px]">
                   <thead>
@@ -424,7 +424,7 @@ export function BackendResiduals() {
         )}
 
         {/* ── Upload History ── */}
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
               <CalendarDays className="w-4 h-4 text-gray-400" />
@@ -511,8 +511,8 @@ export function AgentResiduals() {
       <div className="max-w-[1200px] mx-auto px-6 py-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Residuals</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Your residual income from merchant processing portfolios.</p>
+          <h1 className="delt-page-title">My Residuals</h1>
+          <p className="delt-page-subtitle">Your residual income from merchant processing portfolios.</p>
         </div>
 
         {/* Summary Cards */}
@@ -520,7 +520,7 @@ export function AgentResiduals() {
           <SummaryCard label="My Merchants" value={agentMerchants.length.toString()} icon={<Building2 className="w-4 h-4 text-brand" />} />
           <SummaryCard label="My Volume" value={fmtWhole(myVolume)} icon={<BarChart3 className="w-4 h-4 text-emerald-600" />} />
           <SummaryCard label="My Commission" value={fmt(myTotal)} icon={<DollarSign className="w-4 h-4 text-amber-600" />} />
-          <div className="bg-white rounded-[8px] border border-gray-200 p-3.5">
+          <div className="delt-card p-3.5">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] text-gray-500 font-medium leading-tight">vs Last Period</span>
               {trend >= 0 ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
@@ -533,7 +533,7 @@ export function AgentResiduals() {
         </div>
 
         {/* Agent Table */}
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900">March 2026 — My Merchants</h2>
           </div>
@@ -570,7 +570,7 @@ export function AgentResiduals() {
         </div>
 
         {/* Historical Statements */}
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
               <CalendarDays className="w-4 h-4 text-gray-400" />
@@ -619,7 +619,7 @@ export function AgentResiduals() {
 
 function SummaryCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-3.5">
+    <div className="delt-card p-3.5">
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] text-gray-500 font-medium leading-tight">{label}</span>
         {icon}

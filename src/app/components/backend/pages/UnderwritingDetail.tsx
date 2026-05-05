@@ -565,13 +565,13 @@ export function UnderwritingDetail() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-xs text-gray-600 mb-1">Loan Amount</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="delt-page-title">
                     ${loanAmount.toLocaleString('en-US', { minimumFractionDigits: 0 })}
                   </p>
                 </div>
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-xs text-gray-600 mb-1">Total Payback</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="delt-page-title">
                     ${payback.toLocaleString('en-US', { minimumFractionDigits: 0 })}
                   </p>
                 </div>
@@ -583,7 +583,7 @@ export function UnderwritingDetail() {
                 </div>
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-xs text-gray-600 mb-1">APR</p>
-                  <p className="text-2xl font-bold text-gray-900">{apr}%</p>
+                  <p className="delt-page-title">{apr}%</p>
                 </div>
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-xs text-gray-600 mb-1">Daily Payment</p>

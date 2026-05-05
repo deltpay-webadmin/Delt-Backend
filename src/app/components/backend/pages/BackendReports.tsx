@@ -123,11 +123,11 @@ export function BackendReports() {
             <BarChart3 className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports & Export Center</h1>
+            <h1 className="delt-page-title">Reports & Export Center</h1>
             <p className="text-sm text-gray-500">{REPORTS.length} reports &middot; {REPORTS.filter(r => r.schedule).length} scheduled</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+        <button className="delt-btn-primary">
           <Plus className="w-3.5 h-3.5" /> Custom Report
         </button>
       </div>
@@ -145,7 +145,7 @@ export function BackendReports() {
       {activeTab === 'library' ? (
         <>
           {/* Filters */}
-          <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex items-center gap-3 flex-wrap">
+          <div className="delt-card p-4 flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search reports..."
@@ -175,7 +175,7 @@ export function BackendReports() {
                   const ccfg = CATEGORY_CONFIG[report.category];
                   const CatIcon = ccfg.icon;
                   return (
-                    <div key={report.id} className="bg-white rounded-[8px] border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all">
+                    <div key={report.id} className="delt-card p-4 hover:shadow-md hover:border-gray-300 transition-all">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <div className={`w-7 h-7 rounded-[6px] flex items-center justify-center border ${ccfg.bg}`}>
@@ -216,7 +216,7 @@ export function BackendReports() {
           {/* All Reports */}
           <div>
             {starredReports.length > 0 && <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">All Reports</h3>}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               {unstarredReports.map((report, i) => {
                 const ccfg = CATEGORY_CONFIG[report.category];
                 const CatIcon = ccfg.icon;
@@ -260,7 +260,7 @@ export function BackendReports() {
         </>
       ) : (
         /* Recent Exports Tab */
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="bg-gray-50 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wide font-semibold border-b border-gray-200">
             <span className="flex-1">Report</span>
             <span className="w-16">Format</span>

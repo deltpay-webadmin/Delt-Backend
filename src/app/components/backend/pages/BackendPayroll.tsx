@@ -108,7 +108,7 @@ function StatCard({ label, value, icon, sub, highlight }: { label: string; value
         <p className="text-sm text-gray-600">{label}</p>
         <div className={highlight ? 'text-brand' : 'text-gray-400'}>{icon}</div>
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="delt-page-title">{value}</p>
       {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
     </div>
   );
@@ -137,10 +137,10 @@ export function BackendPayroll() {
       <div className="bg-white border-b border-gray-200 px-6 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payroll</h1>
+            <h1 className="delt-page-title">Payroll</h1>
             <p className="text-sm text-gray-600 mt-1">Manage employee and agent commission payouts</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button className="delt-btn-primary">
             <Banknote className="w-4 h-4" /> Run Payroll
           </button>
         </div>
@@ -183,7 +183,7 @@ export function BackendPayroll() {
             </div>
 
             {/* Employees Section */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
                 <Users className="w-4 h-4 text-indigo-600" />
                 <h3 className="text-sm font-semibold text-gray-900">Employees</h3>
@@ -225,7 +225,7 @@ export function BackendPayroll() {
             </div>
 
             {/* Agent Commissions Section */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
                 <UserCircle className="w-4 h-4 text-purple-600" />
                 <h3 className="text-sm font-semibold text-gray-900">Agent Commissions</h3>
@@ -266,7 +266,7 @@ export function BackendPayroll() {
             </div>
 
             {/* Totals Row */}
-            <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+            <div className="delt-card p-5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Total Gross</p>
@@ -290,7 +290,7 @@ export function BackendPayroll() {
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                   Review all line items before approving. Approved payroll is final.
                 </div>
-                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+                <button className="delt-btn-primary">
                   <CheckCircle className="w-4 h-4" /> Approve & Run
                 </button>
               </div>
@@ -302,7 +302,7 @@ export function BackendPayroll() {
         {tab === 'calendar' && (
           <div className="space-y-6">
             {/* Calendar Grid */}
-            <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+            <div className="delt-card overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">Payroll Calendar — April 2026</h3>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -346,7 +346,7 @@ export function BackendPayroll() {
             </div>
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+            <div className="delt-card p-5">
               <h3 className="text-sm font-semibold text-gray-900 mb-3">Upcoming Deadlines</h3>
               <div className="space-y-2">
                 {[
@@ -367,7 +367,7 @@ export function BackendPayroll() {
             </div>
 
             {/* Commission Integration Summary */}
-            <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+            <div className="delt-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <UserCircle className="w-5 h-5 text-purple-600" />
                 <h3 className="text-sm font-semibold text-gray-900">Agent Commission Integration</h3>
@@ -411,7 +411,7 @@ export function BackendPayroll() {
 
         {/* ── History Tab ── */}
         {tab === 'history' && (
-          <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+          <div className="delt-card overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-200">
               <h3 className="text-sm font-semibold text-gray-900">Payroll History</h3>
               <p className="text-xs text-gray-500 mt-0.5">{pastRuns.length} payroll runs this year</p>

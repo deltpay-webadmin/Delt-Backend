@@ -272,8 +272,8 @@ export function BackendRetention() {
     <div className="px-6 py-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Retention &amp; Churn</h1>
-        <p className="text-sm text-gray-500 mt-1">Detect at-risk merchants and trigger save workflows.</p>
+        <h1 className="delt-page-title">Retention &amp; Churn</h1>
+        <p className="delt-page-subtitle">Detect at-risk merchants and trigger save workflows.</p>
       </div>
 
       {/* Summary Cards */}
@@ -295,11 +295,11 @@ export function BackendRetention() {
             <p className="text-xs text-gray-500 mt-0.5">6 of 8 engaged merchants show rising health scores — 2 disengaged merchants are declining. <span className="font-medium text-gray-700">Merchants who open &amp; respond to outreach churn 42% less.</span></p>
           </div>
         </div>
-        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
+        <button onClick={() => navigate('/outreach')} className="delt-btn-primary transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200">
           <h2 className="text-sm font-semibold text-gray-900">Churn Risk Analysis</h2>
           <p className="text-xs text-gray-500 mt-0.5">{merchants.length} merchants monitored &middot; Sorted by risk score</p>
@@ -417,14 +417,14 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   };
   const v = map[variant];
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
+    <div className="delt-card p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
         <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xl sm:delt-page-title">{value}</p>
       <p className="text-xs mt-2 text-gray-500">{sub}</p>
     </div>
   );

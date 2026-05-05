@@ -122,7 +122,7 @@ function NewTaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (i
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={handleCreate} disabled={!title.trim()} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">Create Task</button>
+          <button onClick={handleCreate} disabled={!title.trim()} className="delt-btn-primary">Create Task</button>
         </div>
       </div>
     </div>
@@ -174,7 +174,7 @@ export function BackendTasks() {
             <CheckSquare className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
+            <h1 className="delt-page-title">Tasks</h1>
             <p className="text-sm text-gray-500">{tasks.filter(t => t.status !== 'done').length} open &middot; {overdueTasks.length} overdue &middot; {statusCounts.done} completed</p>
           </div>
         </div>
@@ -184,7 +184,7 @@ export function BackendTasks() {
             <button onClick={() => setView('board')} className={`p-1.5 rounded-[4px] ${view === 'board' ? 'bg-white shadow-sm' : ''}`}><LayoutGrid className="w-3.5 h-3.5 text-gray-600" /></button>
           </div>
           <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            className="delt-btn-primary">
             <Plus className="w-3.5 h-3.5" /> New Task
           </button>
         </div>
@@ -200,19 +200,19 @@ export function BackendTasks() {
         ]).map((s, i) => {
           const Icon = s.icon;
           return (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${s.color} px-4 py-3`}>
+            <div key={i} className={`delt-card border-t-[3px] ${s.color} px-4 py-3`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <Icon className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{s.label}</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{s.count}</p>
+              <p className="delt-page-title">{s.count}</p>
             </div>
           );
         })}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+      <div className="delt-card p-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -266,7 +266,7 @@ export function BackendTasks() {
                     const ccfg = CATEGORY_CONFIG[task.category];
                     const CatIcon = ccfg.icon;
                     return (
-                      <div key={task.id} className={`bg-white rounded-[8px] border border-gray-200 border-l-[3px] ${pcfg.border} p-3 hover:shadow-sm transition-all`}>
+                      <div key={task.id} className={`delt-card border-l-[3px] ${pcfg.border} p-3 hover:shadow-sm transition-all`}>
                         <div className="flex items-start gap-2 mb-2">
                           <button onClick={() => toggleStatus(task.id)} className="mt-0.5 shrink-0">
                             {task.status === 'done'
@@ -293,7 +293,7 @@ export function BackendTasks() {
         </div>
       ) : (
         /* List View */
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="bg-gray-50 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-wide font-semibold border-b border-gray-200">
             <span className="w-6"></span>
             <span className="flex-1">Task</span>

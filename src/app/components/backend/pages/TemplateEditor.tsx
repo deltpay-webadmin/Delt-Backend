@@ -210,7 +210,7 @@ export function TemplateEditor() {
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+            className="delt-btn-primary"
           >
             <Save className="w-3.5 h-3.5" />
             Save Template

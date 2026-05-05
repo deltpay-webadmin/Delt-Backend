@@ -183,7 +183,7 @@ export function BackendWorkspace() {
             <Inbox className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Workspace</h1>
+            <h1 className="delt-page-title">Workspace</h1>
             <p className="text-sm text-gray-500">Inbox, activity, and tasks — all in one place</p>
           </div>
         </div>
@@ -197,7 +197,7 @@ export function BackendWorkspace() {
           { label: 'Overdue', value: overdueCount, color: overdueCount > 0 ? 'text-red-600' : 'text-gray-900', accent: overdueCount > 0 ? 'border-t-red-500' : 'border-t-gray-300' },
           { label: 'Active deals', value: activeDeals, color: 'text-gray-900', accent: 'border-t-emerald-500' },
         ].map((kpi, i) => (
-          <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${kpi.accent} px-4 py-3`}>
+          <div key={i} className={`delt-card border-t-[3px] ${kpi.accent} px-4 py-3`}>
             <p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">{kpi.label}</p>
             <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}</p>
           </div>
@@ -227,7 +227,7 @@ export function BackendWorkspace() {
 
       {/* ── INBOX PANEL ── */}
       {activePanel === 'inbox' && (
-        <div className="flex-1 bg-white rounded-[8px] border border-gray-200 overflow-hidden flex flex-col">
+        <div className="flex-1 delt-card overflow-hidden flex flex-col">
           <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -277,7 +277,7 @@ export function BackendWorkspace() {
 
       {/* ── ACTIVITY PANEL ── */}
       {activePanel === 'activity' && (
-        <div className="flex-1 bg-white rounded-[8px] border border-gray-200 overflow-hidden flex flex-col">
+        <div className="flex-1 delt-card overflow-hidden flex flex-col">
           <div className="px-4 py-3 border-b border-gray-200">
             <div className="relative max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -326,7 +326,7 @@ export function BackendWorkspace() {
 
       {/* ── TASKS PANEL ── */}
       {activePanel === 'tasks' && (
-        <div className="flex-1 bg-white rounded-[8px] border border-gray-200 overflow-hidden flex flex-col">
+        <div className="flex-1 delt-card overflow-hidden flex flex-col">
           <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-3">
             <div className="flex items-center gap-1">
               {(['all', 'overdue', 'today'] as const).map(f => (

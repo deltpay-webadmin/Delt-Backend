@@ -463,14 +463,14 @@ export function BackendCompliance() {
             <ShieldCheck className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Compliance</h1>
+            <h1 className="delt-page-title">Compliance</h1>
             <p className="text-sm text-gray-500">System of record, action, and intelligence</p>
           </div>
         </div>
       </div>
 
       {/* ── Tab Bar ── */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-1 pt-1 border-b border-gray-200 flex gap-0.5 overflow-x-auto">
           {TABS.map(t => {
             const Icon = t.icon;
@@ -507,7 +507,7 @@ export function BackendCompliance() {
                 ].map((k, i) => {
                   const Icon = k.icon;
                   return (
-                    <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${k.color} p-4`}>
+                    <div key={i} className={`delt-card border-t-[3px] ${k.color} p-4`}>
                       <div className="flex items-center gap-1.5 mb-2">
                         <Icon className="w-3.5 h-3.5 text-gray-400" />
                         <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{k.label}</span>
@@ -922,7 +922,7 @@ export function BackendCompliance() {
                     const typeIcons = { regulatory: Landmark, network: CreditCard, vendor: Building2 };
                     const TypeIcon = typeIcons[ch.type];
                     return (
-                      <div key={ch.id} className="bg-white rounded-[8px] border border-gray-200 p-4">
+                      <div key={ch.id} className="delt-card p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <TypeIcon className="w-4 h-4 text-gray-400" />
                           <span className="text-[10px] font-mono text-gray-400">{ch.date}</span>

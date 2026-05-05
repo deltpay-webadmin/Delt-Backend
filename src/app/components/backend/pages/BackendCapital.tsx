@@ -168,8 +168,8 @@ export function BackendCapital() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Capital</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Self-funded positions + Fundomate referral pipeline</p>
+            <h1 className="delt-page-title">Capital</h1>
+            <p className="delt-page-subtitle">Self-funded positions + Fundomate referral pipeline</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -179,7 +179,7 @@ export function BackendCapital() {
                 Synced Apr 14
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button className="delt-btn-primary">
               <Plus className="w-4 h-4" /> New Deal
             </button>
           </div>
@@ -217,7 +217,7 @@ export function BackendCapital() {
           {/* Channel Summary Strip */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Self-Funded Block */}
-            <div className="lg:col-span-2 bg-white rounded-[8px] border border-gray-200 p-5 relative overflow-hidden">
+            <div className="lg:col-span-2 delt-card p-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand to-brand-light" />
               <div className="flex items-center gap-2 mb-4">
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-indigo-50 text-indigo-600">Self-Funded</span>
@@ -232,7 +232,7 @@ export function BackendCapital() {
               </div>
             </div>
             {/* Fundomate Block */}
-            <div className="bg-white rounded-[8px] border border-gray-200 p-5 relative overflow-hidden">
+            <div className="delt-card p-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-orange-400 to-transparent" />
               <div className="flex items-center gap-2 mb-4">
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-orange-50 text-orange-600">Fundomate</span>
@@ -484,7 +484,7 @@ export function BackendCapital() {
             </div>
 
             {/* Collection Escalation Workflow */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-500" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Collection Escalation Workflow</h3><p className="text-xs text-gray-500 mt-0.5">Automated escalation stages for delinquent accounts</p></div>
@@ -527,7 +527,7 @@ export function BackendCapital() {
             </div>
 
             {/* ACH Status Overview */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Banknote className="w-4 h-4 text-emerald-500" />
                 <div><h3 className="text-sm font-semibold text-gray-900">ACH Status Overview</h3><p className="text-xs text-gray-500 mt-0.5">Real-time debit status for all active deals</p></div>
@@ -579,7 +579,7 @@ export function BackendCapital() {
             </div>
 
             {/* Cross-Product Risk Correlation */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Activity className="w-4 h-4 text-brand" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Cross-Product Risk Correlation</h3><p className="text-xs text-gray-500 mt-0.5">Processing health alongside MCA repayment — early warning signals</p></div>
@@ -621,7 +621,7 @@ export function BackendCapital() {
             </div>
 
             {/* Payment Velocity */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Zap className="w-4 h-4 text-blue-500" />
                 <h3 className="text-sm font-semibold text-gray-900">Payment Velocity Monitor</h3>
@@ -668,7 +668,7 @@ export function BackendCapital() {
             </div>
 
             {/* First-Party Fraud Detection Flags */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-red-500" /><div><h3 className="text-sm font-semibold text-gray-900">First-Party Fraud Detection (CPFPP)</h3><p className="text-xs text-gray-500 mt-0.5">Auto-flagged patterns across portfolio — DataMerch + FiCoSo cross-reference</p></div></div>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700">{(() => { let c = 0; DEALS.forEach(m => { if (m.stackCount >= 2) c++; if (m.status === 'default' && m.avg7d === 0) c++; }); return c; })()} flags active</span>
@@ -708,7 +708,7 @@ export function BackendCapital() {
             </div>
 
             {/* Merchant Fraud Risk Matrix */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-brand" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Merchant Fraud Risk Matrix</h3><p className="text-xs text-gray-500 mt-0.5">Per-merchant fraud indicator scoring</p></div>
@@ -753,7 +753,7 @@ export function BackendCapital() {
             </div>
 
             {/* Renewal Scoring Model */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <RefreshCw className="w-4 h-4 text-violet-500" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Renewal Scoring Model</h3><p className="text-xs text-gray-500 mt-0.5">{DEALS.filter(d => d.renewalEligible).length} merchants approaching payoff — scored by likelihood</p></div>
@@ -785,7 +785,7 @@ export function BackendCapital() {
             </div>
 
             {/* All Deals - Renewal Readiness */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Full Portfolio — Renewal Readiness</h3><p className="text-xs text-gray-500 mt-0.5">Collection progress toward renewal eligibility (50% threshold)</p></div>
@@ -825,7 +825,7 @@ export function BackendCapital() {
             </div>
 
             {/* DataMerch Stacking Monitor */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-500" /><div><h3 className="text-sm font-semibold text-gray-900">DataMerch Stacking Monitor</h3><p className="text-xs text-gray-500 mt-0.5">Cross-lender MCA position detection — synced daily</p></div></div>
                 <span className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />DataMerch synced Apr 14</span>
@@ -853,7 +853,7 @@ export function BackendCapital() {
             </div>
 
             {/* FiCoSo UCC Filing Status */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-brand" /><div><h3 className="text-sm font-semibold text-gray-900">FiCoSo UCC Filing Status</h3><p className="text-xs text-gray-500 mt-0.5">UCC-1 lien positions and expiration tracking</p></div></div>
                 <span className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />FiCoSo synced Apr 14</span>
@@ -918,8 +918,8 @@ export function BackendCapital() {
                   ))}
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
-                  <button onClick={() => setCollectionModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
+                  <button className="delt-btn-primary">Advance to Next Stage</button>
+                  <button onClick={() => setCollectionModal(null)} className="delt-btn-secondary">Close</button>
                 </div>
               </div>
             </div>
@@ -968,7 +968,7 @@ export function BackendCapital() {
             </div>
 
             {/* Vintage Cohort */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <CalendarClock className="w-4 h-4 text-emerald-500" />
                 <h3 className="text-sm font-semibold text-gray-900">Vintage Cohort Performance</h3>
@@ -1048,7 +1048,7 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string; 
     orange: 'border-t-orange-500', violet: 'border-t-violet-500',
   };
   return (
-    <div className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${accentMap[accent] || ''} p-4`}>
+    <div className={`delt-card border-t-2 ${accentMap[accent] || ''} p-4`}>
       <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{label}</p>
       <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-1.5">{sub}</p>}
@@ -1103,7 +1103,7 @@ function ConcentrationCard({ title, icon, data, total, colors, warnThreshold, fo
   total: number; colors: string[]; warnThreshold?: number; footer?: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200">
+    <div className="delt-card">
       <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
         {icon}
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>

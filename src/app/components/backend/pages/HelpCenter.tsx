@@ -120,7 +120,7 @@ function SectionHeader({ title }: { title: string }) {
 function Card({ card }: { card: ArticleCard }) {
   const Icon = card.icon;
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-6 hover:border-brand/30 hover:shadow-[0_2px_12px_rgba(67,24,255,0.06)] transition-all group">
+    <div className="delt-card p-6 hover:border-brand/30 hover:shadow-[0_2px_12px_rgba(67,24,255,0.06)] transition-all group">
       <div className="w-10 h-10 bg-brand/[0.06] rounded-[8px] flex items-center justify-center mb-4 group-hover:bg-brand/10 transition-colors">
         <Icon className="w-5 h-5 text-brand" />
       </div>
@@ -297,7 +297,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
             {/* Still need help? */}
             {!q && (
               <section>
-                <div className="bg-white rounded-[8px] border border-gray-200 p-8 text-center">
+                <div className="delt-card p-8 text-center">
                   <div className="w-12 h-12 bg-brand/[0.06] rounded-xl flex items-center justify-center mx-auto mb-4">
                     <MessageCircle className="w-6 h-6 text-brand" />
                   </div>
@@ -306,7 +306,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
                     Can't find what you're looking for? Our support team is available Monday–Friday, 9 AM–6 PM EST.
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+                    <button className="delt-btn-primary">
                       <MessageCircle className="w-4 h-4" />
                       Contact Support
                     </button>

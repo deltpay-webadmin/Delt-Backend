@@ -235,8 +235,8 @@ export function BackendAgents() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Agents</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your sales team, Sub-ISOs, and agent performance.</p>
+          <h1 className="delt-page-title">Agents</h1>
+          <p className="delt-page-subtitle">Manage your sales team, Sub-ISOs, and agent performance.</p>
         </div>
         <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors shadow-sm">
           <Plus className="w-4 h-4" />
@@ -253,7 +253,7 @@ export function BackendAgents() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -379,14 +379,14 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   };
   const v = variantMap[variant];
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
+    <div className="delt-card p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
         <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xl sm:delt-page-title">{value}</p>
       <p className="text-xs mt-2 text-gray-500">{sub}</p>
     </div>
   );
@@ -512,7 +512,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
           Back to Agents
         </button>
 
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-6 py-5 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
             {/* Agent Info */}
             <div className="flex items-start gap-4">
@@ -605,7 +605,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
                                   </div>
-                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">
+                                  <button onClick={saveCustomSplit} className="delt-btn-primary">
                                     Save
                                   </button>
                                 </div>
@@ -655,7 +655,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 border-b border-gray-200 flex gap-0">
           {([
             { key: 'portfolio' as const, label: 'Merchant Portfolio', icon: Store },
@@ -962,7 +962,7 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
         <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Reassign Portfolio</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Transfer {agent.name}'s {agent.merchants} merchants to another agent.</p>
+            <p className="delt-page-subtitle">Transfer {agent.name}'s {agent.merchants} merchants to another agent.</p>
           </div>
           <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />

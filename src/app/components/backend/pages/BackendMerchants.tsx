@@ -187,12 +187,12 @@ export function BackendMerchants() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-6 pt-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">All Merchants</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{total} merchants across all products and plans</p>
+          <h1 className="delt-page-title">All Merchants</h1>
+          <p className="delt-page-subtitle">{total} merchants across all products and plans</p>
         </div>
         <button
           onClick={() => setNewMerchantOpen(true)}
-          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+          className="delt-btn-primary"
         >
           <Plus className="w-4 h-4" />
           Add Merchant
@@ -397,7 +397,7 @@ export function BackendMerchants() {
 
 function Card({ label, value, icon, sub }: { label: string; value: string; icon: React.ReactNode; sub?: string }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-3.5">
+    <div className="delt-card p-3.5">
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] text-gray-500 font-medium leading-tight">{label}</span>
         {icon}

@@ -347,8 +347,8 @@ export function BackendDisputes() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Disputes</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Chargeback management, representment workflow & analytics</p>
+            <h1 className="delt-page-title">Disputes</h1>
+            <p className="delt-page-subtitle">Chargeback management, representment workflow & analytics</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -358,7 +358,7 @@ export function BackendDisputes() {
                 Live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button className="delt-btn-primary">
               <Plus className="w-4 h-4" /> Log Dispute
             </button>
           </div>
@@ -372,7 +372,7 @@ export function BackendDisputes() {
             { label: 'Normal (> 7 days)', count: activeDisputes.filter(d => d.daysLeft > 7).length, amount: activeDisputes.filter(d => d.daysLeft > 7).reduce((s, d) => s + d.amount, 0), color: 'emerald', accent: 'border-t-emerald-500' },
             { label: 'Win Rate (Resolved)', count: analytics.resolved, amount: analytics.recoveredAmount, color: 'indigo', accent: 'border-t-brand', isRate: true },
           ].map((s, i) => (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${s.accent} p-4`}>
+            <div key={i} className={`delt-card border-t-2 ${s.accent} p-4`}>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{s.label}</p>
               <div className="flex items-end justify-between">
                 <p className="text-xl font-bold text-gray-900 leading-none">
@@ -607,7 +607,7 @@ export function BackendDisputes() {
                 const lostDisputes = stage === 'won' ? DISPUTES.filter(d => d.stage === 'lost') : [];
                 const sc = stageConfig[stage];
                 return (
-                  <div key={stage} className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+                  <div key={stage} className="delt-card overflow-hidden">
                     <div className={`px-3 py-2.5 border-b border-gray-100 ${sc.bg}`}>
                       <div className="flex items-center justify-between">
                         <p className={`text-[11px] font-bold uppercase tracking-wide ${sc.color}`}>{sc.label}</p>
@@ -672,7 +672,7 @@ export function BackendDisputes() {
             </div>
 
             {/* SLA Tracking */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-500" />
                 <h3 className="text-sm font-semibold text-gray-900">SLA Tracking — Response Deadlines</h3>
@@ -721,7 +721,7 @@ export function BackendDisputes() {
         {/* ════════════════════════════════════════ */}
         {activeTab === 'codes' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-brand" />
                 <div>
@@ -797,7 +797,7 @@ export function BackendDisputes() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Win Rate by Reason Code */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-brand" />
                   <h3 className="text-sm font-semibold text-gray-900">Win Rate by Reason Code</h3>
@@ -822,7 +822,7 @@ export function BackendDisputes() {
               </div>
 
               {/* Win Rate by Vertical */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-emerald-500" />
                   <h3 className="text-sm font-semibold text-gray-900">Win Rate by Vertical</h3>
@@ -846,7 +846,7 @@ export function BackendDisputes() {
               </div>
 
               {/* Win Rate by Evidence Type */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-purple-500" />
                   <h3 className="text-sm font-semibold text-gray-900">Win Rate by Evidence Type</h3>
@@ -871,7 +871,7 @@ export function BackendDisputes() {
             </div>
 
             {/* Representment Argument Effectiveness */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-500" />
                 <div><h3 className="text-sm font-semibold text-gray-900">Representment Argument Effectiveness</h3><p className="text-xs text-gray-500 mt-0.5">Which evidence combinations actually win disputes</p></div>
@@ -930,7 +930,7 @@ export function BackendDisputes() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-amber-500" />
@@ -992,7 +992,7 @@ export function BackendDisputes() {
             </div>
 
             {/* CB Ratio Monitor */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Activity className="w-4 h-4 text-red-500" />
                 <h3 className="text-sm font-semibold text-gray-900">Chargeback Ratio Monitor</h3>
@@ -1107,32 +1107,32 @@ export function BackendDisputes() {
 
               {/* Aggregate Cost KPIs */}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-red-500 p-4">
+                <div className="delt-card border-t-2 border-t-red-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total CB Fees</p>
                   <p className="text-lg font-bold text-red-700 tabular-nums">{fmt(totalCBFees)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">${CB_FEE_MIN}-${CB_FEE_MAX} per dispute</p>
                 </div>
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-red-500 p-4">
+                <div className="delt-card border-t-2 border-t-red-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Lost Revenue</p>
                   <p className="text-lg font-bold text-red-700 tabular-nums">{fmt(totalLostRevenue)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">{DISPUTES.length} txn amounts</p>
                 </div>
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-amber-500 p-4">
+                <div className="delt-card border-t-2 border-t-amber-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Labor Cost</p>
                   <p className="text-lg font-bold text-amber-700 tabular-nums">{fmt(totalLaborCost)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">{AVG_HOURS_PER_DISPUTE}h × ${LABOR_RATE_PER_HOUR}/hr</p>
                 </div>
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-amber-500 p-4">
+                <div className="delt-card border-t-2 border-t-amber-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Fine Exposure</p>
                   <p className="text-lg font-bold text-amber-700 tabular-nums">{fmt(totalNetworkFines)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">If ratio breaches</p>
                 </div>
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-red-500 p-4">
+                <div className="delt-card border-t-2 border-t-red-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Cost (Inaction)</p>
                   <p className="text-lg font-bold text-red-700 tabular-nums">{fmt(totalInaction)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">If no disputes fought</p>
                 </div>
-                <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-emerald-500 p-4">
+                <div className="delt-card border-t-2 border-t-emerald-500 p-4">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">Actual Saved</p>
                   <p className="text-lg font-bold text-emerald-700 tabular-nums">{fmt(actualSaved)}</p>
                   <p className="text-[10px] text-gray-400 mt-1">{wonDisputes.length} won disputes</p>
@@ -1140,7 +1140,7 @@ export function BackendDisputes() {
               </div>
 
               {/* Per-Dispute Cost Breakdown Table */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-red-500" />
@@ -1225,7 +1225,7 @@ export function BackendDisputes() {
               </div>
 
               {/* Card Network Fine Exposure */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -1490,11 +1490,11 @@ export function BackendDisputes() {
                         {submitted && <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Submitted</span>}
                       </div>
                       <div className="flex items-center gap-3">
-                        <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
+                        <button onClick={() => setEvidenceModal(null)} className="delt-btn-secondary">Cancel</button>
                         <button
                           onClick={() => { disputeActions.submitForReview(dispute.id); setEvidenceModal(null); }}
                           disabled={collectedCount < dispute.evidenceTypes.length || submitted}
-                          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                          className="delt-btn-primary">
                           <Send className="w-3.5 h-3.5" /> {submitted ? 'Submitted' : 'Submit for Review'}
                         </button>
                       </div>
@@ -1570,8 +1570,8 @@ export function BackendDisputes() {
               </div>
 
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3">
-                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
-                <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Close</button>
+                <button className="flex-1 delt-btn-primary">Fight This Dispute</button>
+                <button onClick={() => setCostCalcId(null)} className="delt-btn-secondary">Close</button>
               </div>
             </div>
           </div>
@@ -1599,7 +1599,7 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string; 
     red: 'border-t-red-500', blue: 'border-t-blue-500',
   };
   return (
-    <div className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${accentMap[accent] || ''} p-4`}>
+    <div className={`delt-card border-t-2 ${accentMap[accent] || ''} p-4`}>
       <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{label}</p>
       <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-1.5">{sub}</p>}

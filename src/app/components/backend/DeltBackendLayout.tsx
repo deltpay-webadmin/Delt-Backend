@@ -374,18 +374,18 @@ export function DeltBackendLayout() {
         case '/commissions': return <AgentCommissions />;
         case '/my-residuals': return <AgentResiduals />;
         case '/support': return (
-          <div className="px-6 py-6 space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900">Support</h1>
-            <div className="bg-white rounded-[8px] border border-gray-200 p-6">
+          <div className="delt-page">
+            <h1 className="delt-page-title">Support</h1>
+            <div className="delt-card p-6">
               <div className="max-w-lg">
                 <p className="text-sm text-gray-600 mb-4">Need help? Contact the operations team or submit a support ticket.</p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-[6px]">
-                    <HelpCircle className="w-5 h-5 text-indigo-600" />
+                    <HelpCircle className="w-5 h-5 text-brand" />
                     <div><p className="text-sm font-medium text-gray-900">Email Support</p><p className="text-xs text-gray-500">support@deltpay.com</p></div>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-[6px]">
-                    <HelpCircle className="w-5 h-5 text-indigo-600" />
+                    <HelpCircle className="w-5 h-5 text-brand" />
                     <div><p className="text-sm font-medium text-gray-900">Phone</p><p className="text-xs text-gray-500">(800) 555-DELT</p></div>
                   </div>
                 </div>
@@ -938,12 +938,12 @@ export function DeltBackendLayout() {
 // ── Placeholder page for new sections ──
 function PlaceholderPage({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="px-6 py-6 space-y-6">
+    <div className="delt-page">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+        <h1 className="delt-page-title">{title}</h1>
+        <p className="delt-page-subtitle">{subtitle}</p>
       </div>
-      <div className="bg-white rounded-[8px] border border-gray-200 p-12 flex flex-col items-center justify-center text-center">
+      <div className="delt-card p-12 flex flex-col items-center justify-center text-center">
         <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
           <Settings className="w-8 h-8 text-gray-400" />
         </div>

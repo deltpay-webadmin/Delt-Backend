@@ -76,7 +76,7 @@ function ComposeModal({ onClose, onSend }: { onClose: () => void; onSend: (input
           </div>
           <div className="flex items-center gap-2">
             <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-            <button onClick={handleSend} disabled={!canSend} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={handleSend} disabled={!canSend} className="delt-btn-primary">
               <Send className="w-3.5 h-3.5" /> Send
             </button>
           </div>
@@ -135,18 +135,18 @@ export function BackendInbox() {
             <Inbox className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Inbox</h1>
+            <h1 className="delt-page-title">Inbox</h1>
             <p className="text-sm text-gray-500">{unreadCount} unread &middot; {threads.length} conversations across all merchants</p>
           </div>
         </div>
         <button onClick={() => setShowCompose(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          className="delt-btn-primary">
           <Plus className="w-3.5 h-3.5" /> Compose
         </button>
       </div>
 
       {/* Split view */}
-      <div className="bg-white rounded-[8px] border border-gray-200 flex" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="delt-card flex" style={{ minHeight: 'calc(100vh - 200px)' }}>
         {/* Thread list */}
         <div className={`${selectedThread ? 'w-[380px] border-r border-gray-200' : 'flex-1'} flex flex-col shrink-0`}>
           {/* Filters */}

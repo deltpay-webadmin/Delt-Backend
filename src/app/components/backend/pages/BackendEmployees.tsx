@@ -210,12 +210,12 @@ const deptCls = (d: Department) => {
 // ── Stat Card ──
 function StatCard({ label, value, icon, sub }: { label: string; value: string; icon: React.ReactNode; sub?: string }) {
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+    <div className="delt-card p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
         <div className="text-gray-400">{icon}</div>
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="delt-page-title">{value}</p>
       {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
     </div>
   );
@@ -374,7 +374,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               ))}
               <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
-              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Add Note</button>
+              <button className="delt-btn-primary">Add Note</button>
             </div>
           )}
 
@@ -445,10 +445,10 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
 
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+          <button className="delt-btn-primary flex-1">
             <Edit className="w-4 h-4" /> Edit Employee
           </button>
-          <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">
+          <button className="delt-btn-secondary">
             Manage Leave
           </button>
         </div>
@@ -481,10 +481,10 @@ export function BackendEmployees() {
       <div className="bg-white border-b border-gray-200 px-6 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
+            <h1 className="delt-page-title">Employees</h1>
             <p className="text-sm text-gray-600 mt-1">{totalEmployees} active employees across all departments</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button className="delt-btn-primary">
             <Plus className="w-4 h-4" /> Add Employee
           </button>
         </div>
@@ -500,7 +500,7 @@ export function BackendEmployees() {
         </div>
 
         {/* Search */}
-        <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+        <div className="delt-card p-4">
           <div className="flex flex-col lg:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -525,7 +525,7 @@ export function BackendEmployees() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">

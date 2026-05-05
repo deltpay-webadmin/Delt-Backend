@@ -136,7 +136,7 @@ export function BackendFinancials() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">Financials</h1>
+          <h1 className="delt-page-title">Financials</h1>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 border border-red-200 rounded-md">
             Super Admin
           </span>
@@ -176,7 +176,7 @@ export function BackendFinancials() {
                 <p className="text-sm text-gray-600">{card.label}</p>
                 <div className={v.icon}><Icon className="w-5 h-5" /></div>
               </div>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{card.value}</p>
+              <p className="text-xl sm:delt-page-title">{card.value}</p>
               <p className={`text-xs mt-2 flex items-center gap-1 ${card.positive ? 'text-emerald-600' : 'text-red-600'}`}>
                 {card.positive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 {card.trend} vs last period
@@ -189,7 +189,7 @@ export function BackendFinancials() {
       {/* Revenue & Expense Breakdown — Two Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Breakdown */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Revenue Breakdown</h2>
             <p className="text-xs text-gray-500 mt-0.5">Total: {fmt(revenueBreakdown.reduce((s, r) => s + r.value, 0))}</p>
@@ -213,7 +213,7 @@ export function BackendFinancials() {
         </div>
 
         {/* Expense Breakdown */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Expense Breakdown</h2>
             <p className="text-xs text-gray-500 mt-0.5">Total: {fmt(expenseBreakdown.reduce((s, e) => s + e.value, 0))}</p>
@@ -238,7 +238,7 @@ export function BackendFinancials() {
       </div>
 
       {/* Cash Flow Forecast */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Cash Flow Forecast</h2>
@@ -318,14 +318,14 @@ export function BackendFinancials() {
                   <p className="text-sm text-gray-600">{card.label}</p>
                   <div className={v.icon}><Icon className="w-5 h-5" /></div>
                 </div>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">{card.value}</p>
+                <p className="text-xl sm:delt-page-title">{card.value}</p>
               </div>
             );
           })}
         </div>
 
         {/* Funding Source Table */}
-        <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
+        <div className="delt-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -379,7 +379,7 @@ export function BackendFinancials() {
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="px-5 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
         </div>

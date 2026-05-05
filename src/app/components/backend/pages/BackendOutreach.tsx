@@ -349,8 +349,8 @@ export function BackendOutreach() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Outreach</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Campaign management, automated outreach & engagement analytics</p>
+            <h1 className="delt-page-title">Outreach</h1>
+            <p className="delt-page-subtitle">Campaign management, automated outreach & engagement analytics</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -359,7 +359,7 @@ export function BackendOutreach() {
                 {AUTO_TRIGGERS.filter(t => t.status === 'active').length} automations live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button className="delt-btn-primary">
               <Plus className="w-4 h-4" /> New Campaign
             </button>
           </div>
@@ -374,7 +374,7 @@ export function BackendOutreach() {
             { label: 'Response Rate', value: fmtPct(metrics.responseRate), accent: 'border-t-emerald-500', sub: `${metrics.totalResponded} responses` },
             { label: 'Opt-Out', value: metrics.totalOptOut.toString(), accent: 'border-t-red-500', sub: `${metrics.totalSent > 0 ? fmtPct(metrics.totalOptOut / metrics.totalSent) : '0%'} rate` },
           ].map((kpi, i) => (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-2 ${kpi.accent} p-4`}>
+            <div key={i} className={`delt-card border-t-2 ${kpi.accent} p-4`}>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1.5">{kpi.label}</p>
               <p className="text-xl font-bold text-gray-900 leading-none">{kpi.value}</p>
               <p className="text-xs text-gray-400 mt-1.5">{kpi.sub}</p>
@@ -417,7 +417,7 @@ export function BackendOutreach() {
                 const data = metrics.byChannel[ch];
                 const Icon = c.icon;
                 return (
-                  <div key={ch} className="bg-white rounded-[8px] border border-gray-200 p-4">
+                  <div key={ch} className="delt-card p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <div className={`w-8 h-8 rounded-[6px] ${c.bg} flex items-center justify-center`}>
                         <Icon className={`w-4 h-4 ${c.text}`} />
@@ -474,7 +474,7 @@ export function BackendOutreach() {
             </div>
 
             {/* Campaign Table */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1000px]">
                   <thead>
@@ -540,7 +540,7 @@ export function BackendOutreach() {
             </div>
 
             {/* Recent Outreach Events */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-gray-400" />
                 <h3 className="text-sm font-semibold text-gray-900">Recent Outreach History</h3>
@@ -592,7 +592,7 @@ export function BackendOutreach() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               {/* Builder */}
-              <div className="lg:col-span-2 bg-white rounded-[8px] border border-gray-200">
+              <div className="lg:col-span-2 delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100">
                   <h3 className="text-sm font-semibold text-gray-900">Build Campaign</h3>
                 </div>
@@ -704,7 +704,7 @@ export function BackendOutreach() {
               </div>
 
               {/* Recent Campaigns Sidebar */}
-              <div className="bg-white rounded-[8px] border border-gray-200">
+              <div className="delt-card">
                 <div className="px-5 py-3.5 border-b border-gray-100">
                   <h3 className="text-sm font-semibold text-gray-900">Recent Campaigns</h3>
                 </div>
@@ -754,19 +754,19 @@ export function BackendOutreach() {
 
             {/* Trigger KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-emerald-500 p-4">
+              <div className="delt-card border-t-2 border-t-emerald-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Active Rules</p>
                 <p className="text-xl font-bold text-gray-900">{AUTO_TRIGGERS.filter(t => t.status === 'active').length}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
+              <div className="delt-card border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Fired</p>
                 <p className="text-xl font-bold text-gray-900">{AUTO_TRIGGERS.reduce((s, t) => s + t.firedCount, 0)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-purple-500 p-4">
+              <div className="delt-card border-t-2 border-t-purple-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Avg Conversion</p>
                 <p className="text-xl font-bold text-gray-900">{fmtPct(AUTO_TRIGGERS.filter(t => t.firedCount > 0).reduce((s, t) => s + t.conversionRate, 0) / AUTO_TRIGGERS.filter(t => t.firedCount > 0).length)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-amber-500 p-4">
+              <div className="delt-card border-t-2 border-t-amber-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Paused / Draft</p>
                 <p className="text-xl font-bold text-gray-900">{AUTO_TRIGGERS.filter(t => t.status !== 'active').length}</p>
               </div>
@@ -856,19 +856,19 @@ export function BackendOutreach() {
 
             {/* Drip KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-cyan-500 p-4">
+              <div className="delt-card border-t-2 border-t-cyan-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Active Sequences</p>
                 <p className="text-xl font-bold text-gray-900">{DRIP_SEQUENCES.filter(d => d.status === 'active').length}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
+              <div className="delt-card border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Currently Enrolled</p>
                 <p className="text-xl font-bold text-gray-900">{DRIP_SEQUENCES.reduce((s, d) => s + d.enrolled, 0)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-emerald-500 p-4">
+              <div className="delt-card border-t-2 border-t-emerald-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Completed</p>
                 <p className="text-xl font-bold text-gray-900">{DRIP_SEQUENCES.reduce((s, d) => s + d.completed, 0)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-purple-500 p-4">
+              <div className="delt-card border-t-2 border-t-purple-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Avg Conversion</p>
                 <p className="text-xl font-bold text-gray-900">{fmtPct(DRIP_SEQUENCES.filter(d => d.enrolled > 0).reduce((s, d) => s + d.conversionRate, 0) / Math.max(DRIP_SEQUENCES.filter(d => d.enrolled > 0).length, 1))}</p>
               </div>
@@ -985,26 +985,26 @@ export function BackendOutreach() {
 
             {/* CTA KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-purple-500 p-4">
+              <div className="delt-card border-t-2 border-t-purple-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Impressions</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{PORTAL_CTAS.reduce((s, c) => s + c.impressions, 0).toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-brand p-4">
+              <div className="delt-card border-t-2 border-t-brand p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Total Clicks</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{PORTAL_CTAS.reduce((s, c) => s + c.clicks, 0)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-emerald-500 p-4">
+              <div className="delt-card border-t-2 border-t-emerald-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Conversions</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{PORTAL_CTAS.reduce((s, c) => s + c.conversions, 0)}</p>
               </div>
-              <div className="bg-white rounded-[8px] border border-gray-200 border-t-2 border-t-amber-500 p-4">
+              <div className="delt-card border-t-2 border-t-amber-500 p-4">
                 <p className="text-[11px] text-gray-500 uppercase tracking-wide font-medium mb-1">Avg CTR</p>
                 <p className="text-xl font-bold text-gray-900 tabular-nums">{fmtPct(PORTAL_CTAS.reduce((s, c) => s + c.clicks, 0) / PORTAL_CTAS.reduce((s, c) => s + c.impressions, 0))}</p>
               </div>
             </div>
 
             {/* CTA Table */}
-            <div className="bg-white rounded-[8px] border border-gray-200">
+            <div className="delt-card">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -1116,7 +1116,7 @@ export function BackendOutreach() {
 
             <div className="space-y-4">
               {AGENT_ACTIVITY.map(agent => (
-                <div key={agent.agent} className="bg-white rounded-[8px] border border-gray-200">
+                <div key={agent.agent} className="delt-card">
                   <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center">
@@ -1228,8 +1228,8 @@ export function BackendOutreach() {
               <div className="flex justify-between"><span className="text-gray-500">Recipients:</span><span className="font-bold text-brand">{segments.find(s => s.label === bulkSegment)?.count || 0} merchants</span></div>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center justify-center gap-2">
+              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 delt-btn-secondary">Cancel</button>
+              <button onClick={() => setShowBulkConfirm(false)} className="delt-btn-primary flex-1">
                 <Send className="w-4 h-4" /> Send Now
               </button>
             </div>

@@ -283,8 +283,8 @@ export function BackendOnboarding() {
     <div className="px-6 py-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Onboarding Tracker</h1>
-        <p className="text-sm text-gray-500 mt-1">Monitor application progress and step-level SLAs.</p>
+        <h1 className="delt-page-title">Onboarding Tracker</h1>
+        <p className="delt-page-subtitle">Monitor application progress and step-level SLAs.</p>
       </div>
 
       {/* Summary Cards */}
@@ -320,7 +320,7 @@ export function BackendOnboarding() {
       </div>
 
       {/* Pipeline Visual */}
-      <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+      <div className="delt-card p-5">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">Pipeline Overview</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {livePipelineData.map((p, i) => (
@@ -332,7 +332,7 @@ export function BackendOnboarding() {
                 </div>
               )}
               <p className="text-xs text-gray-500 mb-1 truncate">{STEP_SHORT[p.step]}</p>
-              <p className="text-2xl font-bold text-gray-900">{p.count}</p>
+              <p className="delt-page-title">{p.count}</p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-[11px] text-gray-500">{p.avgTime}</span>
                 <div className={`w-2.5 h-2.5 rounded-full ${slaDot(p.sla)}`} title={p.sla} />
@@ -368,7 +368,7 @@ export function BackendOnboarding() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[8px] border border-gray-200">
+      <div className="delt-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -481,14 +481,14 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   };
   const v = map[variant];
   return (
-    <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
+    <div className="delt-card p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
         <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
-      <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xl sm:delt-page-title">{value}</p>
       <p className="text-xs mt-2 text-gray-500">{sub}</p>
     </div>
   );

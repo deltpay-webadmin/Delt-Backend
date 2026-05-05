@@ -75,12 +75,12 @@ export function BackendBundles() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Bundle Settings</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Configure credit amounts, expiration periods, and automation rules for merchant bundles.</p>
+            <h1 className="delt-page-title">Bundle Settings</h1>
+            <p className="delt-page-subtitle">Configure credit amounts, expiration periods, and automation rules for merchant bundles.</p>
           </div>
           <button
             onClick={handleSaveAll}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            className="delt-btn-primary"
           >
             <Save className="w-4 h-4" />
             {saved ? 'Saved!' : 'Save Changes'}
@@ -88,7 +88,7 @@ export function BackendBundles() {
         </div>
 
         {/* Section 1: Credit Amounts */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Credit Amounts</h2>
             <p className="text-xs text-gray-500 mt-0.5">Set the dollar value, expiration, and eligible categories for each bundle type.</p>
@@ -231,7 +231,7 @@ export function BackendBundles() {
         </div>
 
         {/* Section 2: Defaults */}
-        <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="delt-card">
           <div className="px-5 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Defaults</h2>
             <p className="text-xs text-gray-500 mt-0.5">Global bundle defaults and automation toggles.</p>
