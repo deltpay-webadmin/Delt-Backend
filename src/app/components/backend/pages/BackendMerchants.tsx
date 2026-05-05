@@ -118,6 +118,8 @@ export function BackendMerchants() {
   const [planFilter, setPlanFilter] = useState<PlanTier | 'All'>('All');
   const [industryFilter, setIndustryFilter] = useState('All');
   const [agentFilter, setAgentFilter] = useState('All');
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 25;
 
   const toggleProduct = (p: string) => {
     setProductFilters(prev => {
@@ -144,6 +146,14 @@ export function BackendMerchants() {
       return true;
     });
   }, [allMerchants, search, statusFilter, planFilter, industryFilter, agentFilter, productFilters]);
+
+  // Reset to first page whenever filters change.
+  React.useEffect(() => { setPage(0); }, [search, statusFilter, planFilter, industryFilter, agentFilter, productFilters]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageStart = safePage * PAGE_SIZE;
+  const paged = filtered.slice(pageStart, pageStart + PAGE_SIZE);
 
   // ── Aggregates ──
   const total = allMerchants.length;
@@ -247,7 +257,7 @@ export function BackendMerchants() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.map(m => (
+            {paged.map(m => (
               <tr
                 key={m.id}
                 onClick={() => navigate(`/merchants/${m.id}`)}
@@ -326,11 +336,20 @@ export function BackendMerchants() {
       {/* ── Pagination ── */}
       <div className="bg-white border-t border-gray-200 px-6 py-3 flex items-center justify-between shrink-0">
         <p className="text-sm text-gray-500">
-          Showing <span className="font-medium text-gray-700">{filtered.length}</span> of <span className="font-medium text-gray-700">{total}</span> merchants
+          Showing <span className="font-medium text-gray-700">{filtered.length === 0 ? 0 : pageStart + 1}-{Math.min(pageStart + PAGE_SIZE, filtered.length)}</span> of <span className="font-medium text-gray-700">{filtered.length}</span> merchants{filtered.length !== total ? ` (${total} total)` : ''}
         </p>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40" disabled>Previous</button>
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40" disabled>Next</button>
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={safePage === 0}
+            className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >Previous</button>
+          <span className="text-xs text-gray-500 px-2">Page {safePage + 1} of {totalPages}</span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={safePage >= totalPages - 1}
+            className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >Next</button>
         </div>
       </div>
 

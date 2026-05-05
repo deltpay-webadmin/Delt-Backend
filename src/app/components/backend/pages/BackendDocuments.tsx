@@ -6,31 +6,7 @@ import {
   File, FileCheck, FileClock, FileX, Shield, Trash2,
   ExternalLink, Copy, Filter, BarChart3, FolderOpen,
 } from 'lucide-react';
-
-// ── Types ──
-type DocStatus = 'signed' | 'pending_signature' | 'sent' | 'draft' | 'expired' | 'voided';
-type DocType = 'mca_agreement' | 'disclosure' | 'ucc_filing' | 'bank_auth' | 'id_verification' | 'tax_document' | 'amendment' | 'adverse_action';
-
-interface Document {
-  id: string;
-  name: string;
-  type: DocType;
-  status: DocStatus;
-  merchant: string;
-  merchantId: string;
-  dealId?: string;
-  createdDate: string;
-  sentDate?: string;
-  signedDate?: string;
-  expiryDate?: string;
-  signer?: string;
-  signerEmail?: string;
-  agent: string;
-  pages: number;
-  size: string;
-  requiresNotarization: boolean;
-  envelopeId?: string;
-}
+import { useDocuments, documentActions, type CrmDocument as Document, type DocStatus, type DocType } from '../crmStore';
 
 const STATUS_CONFIG: Record<DocStatus, { color: string; bg: string; label: string; icon: React.ElementType }> = {
   signed: { color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', label: 'Signed', icon: FileCheck },
@@ -52,24 +28,20 @@ const TYPE_LABELS: Record<DocType, string> = {
   adverse_action: 'Adverse Action Notice',
 };
 
-const DOCUMENTS: Document[] = [
-  { id: 'DOC-001', name: 'MCA Agreement — Brooklyn Vinyl Records', type: 'mca_agreement', status: 'pending_signature', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-16', sentDate: '2026-04-16', signer: 'David Park', signerEmail: 'david@brooklynvinyl.com', agent: 'Sarah Kim', pages: 14, size: '2.4 MB', requiresNotarization: false, envelopeId: 'ENV-8842' },
-  { id: 'DOC-002', name: 'NY CFDL Disclosure — Brooklyn Vinyl Records', type: 'disclosure', status: 'pending_signature', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-16', sentDate: '2026-04-16', signer: 'David Park', signerEmail: 'david@brooklynvinyl.com', agent: 'Sarah Kim', pages: 9, size: '1.8 MB', requiresNotarization: false, envelopeId: 'ENV-8843' },
-  { id: 'DOC-003', name: 'VA HB 1027 Disclosure — Richmond Auto Detailing', type: 'disclosure', status: 'sent', merchant: 'Richmond Auto Detailing', merchantId: 'M-1003', dealId: 'DL-2026-0416', createdDate: '2026-04-17', sentDate: '2026-04-17', signer: 'James Richardson', signerEmail: 'james@richmondauto.com', agent: 'Marcus Johnson', pages: 11, size: '2.1 MB', requiresNotarization: false, envelopeId: 'ENV-8850', expiryDate: '2026-04-22' },
-  { id: 'DOC-004', name: 'MCA Agreement — Havana Bites Cafe', type: 'mca_agreement', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', createdDate: '2026-04-12', sentDate: '2026-04-12', signedDate: '2026-04-13', signer: 'Maria Gonzalez', signerEmail: 'maria@havanabites.com', agent: 'Marcus Johnson', pages: 12, size: '2.2 MB', requiresNotarization: false, envelopeId: 'ENV-8801' },
-  { id: 'DOC-005', name: 'UCC-1 Filing — Havana Bites Cafe', type: 'ucc_filing', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', createdDate: '2026-04-14', signedDate: '2026-04-14', agent: 'Marcus Johnson', pages: 3, size: '480 KB', requiresNotarization: false },
-  { id: 'DOC-006', name: 'Bank Authorization — Havana Bites Cafe', type: 'bank_auth', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', createdDate: '2026-04-12', sentDate: '2026-04-12', signedDate: '2026-04-13', signer: 'Maria Gonzalez', signerEmail: 'maria@havanabites.com', agent: 'Marcus Johnson', pages: 2, size: '320 KB', requiresNotarization: false, envelopeId: 'ENV-8802' },
-  { id: 'DOC-007', name: 'MCA Agreement — SoBe Cycle & Fitness', type: 'mca_agreement', status: 'signed', merchant: 'SoBe Cycle & Fitness', merchantId: 'M-1010', createdDate: '2026-04-09', sentDate: '2026-04-09', signedDate: '2026-04-09', signer: 'Carlos Mendez', signerEmail: 'carlos@sobecycle.com', agent: 'James Miller', pages: 12, size: '2.1 MB', requiresNotarization: false, envelopeId: 'ENV-8790' },
-  { id: 'DOC-008', name: 'Adverse Action Notice — Doral Fresh Market', type: 'adverse_action', status: 'draft', merchant: 'Doral Fresh Market', merchantId: 'M-1008', createdDate: '2026-04-15', agent: 'Marcus Johnson', pages: 2, size: '180 KB', requiresNotarization: false },
-  { id: 'DOC-009', name: 'ID Verification — Brooklyn Vinyl Records', type: 'id_verification', status: 'signed', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', createdDate: '2026-04-16', signedDate: '2026-04-16', signer: 'David Park', agent: 'Sarah Kim', pages: 1, size: '3.6 MB', requiresNotarization: false },
-  { id: 'DOC-010', name: 'Amendment — Little Havana Barbershop', type: 'amendment', status: 'draft', merchant: 'Little Havana Barbershop', merchantId: 'M-1006', createdDate: '2026-04-16', agent: 'Marcus Johnson', pages: 4, size: '520 KB', requiresNotarization: false },
-  { id: 'DOC-011', name: 'Tax Document (W-9) — Havana Bites Cafe', type: 'tax_document', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', createdDate: '2026-04-10', signedDate: '2026-04-11', signer: 'Maria Gonzalez', agent: 'Marcus Johnson', pages: 1, size: '140 KB', requiresNotarization: false },
-  { id: 'DOC-012', name: 'Broker Compensation Disclosure — Brooklyn Vinyl', type: 'disclosure', status: 'draft', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-17', agent: 'Sarah Kim', pages: 3, size: '290 KB', requiresNotarization: false },
-];
 
 // ── Upload Modal ──
-function UploadModal({ onClose }: { onClose: () => void }) {
+function UploadModal({ onClose, onUpload }: { onClose: () => void; onUpload: (input: { type: DocType; merchant: string; name: string; sendForSign: boolean }) => void }) {
   const [dragOver, setDragOver] = useState(false);
+  const [type, setType] = useState<DocType>('mca_agreement');
+  const [merchant, setMerchant] = useState('');
+  const [name, setName] = useState('');
+  const [sendForSign, setSendForSign] = useState(false);
+  const canUpload = name.trim().length > 0 && merchant.trim().length > 0;
+  const handleSubmit = () => {
+    if (!canUpload) return;
+    onUpload({ type, merchant: merchant.trim(), name: name.trim(), sendForSign });
+    onClose();
+  };
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-[8px] shadow-xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
@@ -80,13 +52,17 @@ function UploadModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 space-y-4">
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Document Type</label>
-            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
+            <select value={type} onChange={e => setType(e.target.value as DocType)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
               {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
+            <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Document Name</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. MCA Agreement — Acme Corp" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+          </div>
+          <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant</label>
-            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+            <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Merchant name..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
           <div
             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -98,13 +74,13 @@ function UploadModal({ onClose }: { onClose: () => void }) {
             <p className="text-[10px] text-gray-400">PDF, DOCX, PNG, JPG up to 25 MB</p>
           </div>
           <div className="flex items-center gap-2">
-            <input type="checkbox" id="esign" className="rounded" />
+            <input type="checkbox" id="esign" checked={sendForSign} onChange={e => setSendForSign(e.target.checked)} className="rounded" />
             <label htmlFor="esign" className="text-xs text-gray-600">Send for e-signature after upload</label>
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Upload</button>
+          <button onClick={handleSubmit} disabled={!canUpload} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">Upload</button>
         </div>
       </div>
     </div>
@@ -117,9 +93,10 @@ export function BackendDocuments() {
   const [statusFilter, setStatusFilter] = useState<DocStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<DocType | 'all'>('all');
   const [showUpload, setShowUpload] = useState(false);
+  const documents = useDocuments();
 
   const filtered = useMemo(() => {
-    return DOCUMENTS.filter(d => {
+    return documents.filter(d => {
       if (statusFilter !== 'all' && d.status !== statusFilter) return false;
       if (typeFilter !== 'all' && d.type !== typeFilter) return false;
       if (search) {
@@ -128,13 +105,13 @@ export function BackendDocuments() {
       }
       return true;
     });
-  }, [search, statusFilter, typeFilter]);
+  }, [documents, search, statusFilter, typeFilter]);
 
   const statusCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    DOCUMENTS.forEach(d => { c[d.status] = (c[d.status] || 0) + 1; });
+    documents.forEach(d => { c[d.status] = (c[d.status] || 0) + 1; });
     return c;
-  }, []);
+  }, [documents]);
 
   const pendingCount = (statusCounts['pending_signature'] || 0) + (statusCounts['sent'] || 0);
   const signedCount = statusCounts['signed'] || 0;
@@ -150,14 +127,20 @@ export function BackendDocuments() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Documents & E-Sign</h1>
-            <p className="text-sm text-gray-500">{DOCUMENTS.length} documents &middot; {pendingCount} awaiting signature</p>
+            <p className="text-sm text-gray-500">{documents.length} documents &middot; {pendingCount} awaiting signature</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Upload className="w-3.5 h-3.5" /> Upload
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button
+            onClick={() => {
+              const doc = documentActions.create({ name: 'New E-Sign Request', type: 'mca_agreement', status: 'draft', merchant: 'Unassigned' });
+              setStatusFilter('draft');
+              // Toast hint: user can fill details from the table after creation.
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <PenTool className="w-3.5 h-3.5" /> New E-Sign Request
           </button>
         </div>
@@ -166,7 +149,7 @@ export function BackendDocuments() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Documents', value: DOCUMENTS.length, color: 'border-t-brand', icon: FolderOpen },
+          { label: 'Total Documents', value: documents.length, color: 'border-t-brand', icon: FolderOpen },
           { label: 'Signed & Complete', value: signedCount, color: 'border-t-emerald-500', icon: FileCheck },
           { label: 'Awaiting Action', value: pendingCount, color: 'border-t-amber-500', icon: FileClock },
           { label: 'Drafts', value: draftCount, color: 'border-t-gray-400', icon: File },
@@ -196,7 +179,7 @@ export function BackendDocuments() {
             <button key={s} onClick={() => setStatusFilter(s)}
               className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                 statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
-              }`}>{s === 'all' ? `All (${DOCUMENTS.length})` : STATUS_CONFIG[s].label}</button>
+              }`}>{s === 'all' ? `All (${documents.length})` : STATUS_CONFIG[s].label}</button>
           ))}
         </div>
         <select value={typeFilter} onChange={e => setTypeFilter(e.target.value as any)}
@@ -242,9 +225,10 @@ export function BackendDocuments() {
                 <SIcon className="w-3 h-3" />{scfg.label}
               </span>
               <div className="w-16 shrink-0 flex items-center gap-1">
-                <button className="p-1 hover:bg-gray-100 rounded" title="View"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-gray-400" /></button>
-                {(doc.status === 'draft') && <button className="p-1 hover:bg-blue-50 rounded" title="Send for signature"><Send className="w-3.5 h-3.5 text-blue-500" /></button>}
+                <button className="p-1 hover:bg-gray-100 rounded" title="View" onClick={() => alert(`Preview placeholder for ${doc.id}\n\nNo file payload — UI stores metadata only until the backend doc store is wired.`)}><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
+                <button className="p-1 hover:bg-gray-100 rounded" title="Download (no file payload yet)" onClick={() => alert(`No file is attached to ${doc.id}. Document records are metadata-only until backend storage is configured.`)}><Download className="w-3.5 h-3.5 text-gray-400" /></button>
+                {(doc.status === 'draft') && <button onClick={() => documentActions.send(doc.id)} className="p-1 hover:bg-blue-50 rounded" title="Send for signature"><Send className="w-3.5 h-3.5 text-blue-500" /></button>}
+                <button onClick={() => { if (confirm(`Delete document ${doc.id}?`)) documentActions.remove(doc.id); }} className="p-1 hover:bg-red-50 rounded" title="Delete"><Trash2 className="w-3.5 h-3.5 text-gray-400 hover:text-red-500" /></button>
               </div>
             </div>
           );
@@ -257,7 +241,25 @@ export function BackendDocuments() {
         )}
       </div>
 
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} />}
+      {showUpload && (
+        <UploadModal
+          onClose={() => setShowUpload(false)}
+          onUpload={({ type, merchant, name, sendForSign }) => {
+            const doc = documentActions.create({
+              name,
+              type,
+              status: sendForSign ? 'pending_signature' : 'draft',
+              merchant,
+              merchantId: '—',
+              sentDate: sendForSign ? new Date().toISOString().slice(0, 10) : undefined,
+              envelopeId: sendForSign ? `ENV-${Math.floor(Math.random() * 9000) + 1000}` : undefined,
+              size: '— KB',
+              pages: 1,
+            });
+            setStatusFilter(sendForSign ? 'pending_signature' : 'draft');
+          }}
+        />
+      )}
     </div>
   );
 }

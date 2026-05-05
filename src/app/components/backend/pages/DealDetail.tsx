@@ -164,10 +164,41 @@ export function DealDetail() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
+              <button
+                onClick={() => {
+                  // Build a CSV export from the deal data and trigger a download.
+                  const rows = [
+                    ['Field', 'Value'],
+                    ['Deal ID', deal.id],
+                    ['Merchant', deal.merchant],
+                    ['Type', deal.type],
+                    ['Channel', deal.channel],
+                    ['Funded', deal.funded],
+                    ['Funded Amount', String(deal.fundedAmt)],
+                    ['Factor', String(deal.factor)],
+                    ['Total Owed', String(deal.totalOwed)],
+                    ['Collected', String(deal.collected)],
+                    ['Daily Debit', String(deal.dailyDebit)],
+                    ['Status', deal.status],
+                    ['Last Payment', deal.lastPayment],
+                  ];
+                  const csv = rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(',')).join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${deal.id}.csv`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+              <button
+                onClick={() => navigate(`/merchants/${encodeURIComponent(deal.merchant)}`)}
+                className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
                 <ExternalLink className="w-4 h-4" /> View Merchant
               </button>
             </div>

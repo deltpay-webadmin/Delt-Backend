@@ -16,6 +16,7 @@ import {
   ScanLine, FileWarning, Server, Shield,
   Activity, Users, DollarSign, Store,
 } from 'lucide-react';
+import { useComplianceFlags, complianceActions } from '../crmStore';
 
 /* ═══════════════════════════════════════════════════
    CONTROL STATUS RIBBON — universal visual language
@@ -400,6 +401,7 @@ type Tab = 'today' | 'pipeline' | 'merchants' | 'monitoring' | 'audit' | 'rules'
 
 export function BackendCompliance() {
   const [tab, setTab] = useState<Tab>('today');
+  const complianceFlags = useComplianceFlags();
   const [selectedMerchant, setSelectedMerchant] = useState<string | null>(null);
   const [selectedDeal, setSelectedDeal] = useState<string | null>(null);
   const [activeControl, setActiveControl] = useState<string | null>(null);
@@ -1139,15 +1141,25 @@ export function BackendCompliance() {
                         <p className="text-xs text-gray-500 mt-0.5 ml-6">{sec.subtitle}</p>
                       </div>
                       <div className="space-y-2 ml-6">
-                        {sec.items.map((it, ii) => (
-                          <div key={ii} className="bg-gray-50 rounded-[6px] border border-gray-100 p-3 hover:border-gray-200 transition-colors">
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-sm font-semibold text-gray-900">{it.item}</span>
-                              <Tag type={it.type} />
-                            </div>
-                            <p className="text-xs text-gray-600 leading-relaxed">{it.detail}</p>
-                          </div>
-                        ))}
+                        {sec.items.map((it, ii) => {
+                          const itemId = `pci-${si}-${ii}`;
+                          const done = !!complianceFlags.completed[itemId];
+                          return (
+                            <button
+                              key={ii}
+                              onClick={() => complianceActions.toggleCompleted(itemId)}
+                              className={`w-full text-left rounded-[6px] border p-3 transition-colors ${done ? 'bg-emerald-50/40 border-emerald-200' : 'bg-gray-50 border-gray-100 hover:border-gray-200'}`}
+                              title="Click to toggle completion"
+                            >
+                              <div className="flex items-center gap-2 mb-1.5">
+                                {done ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> : <CircleDot className="w-3.5 h-3.5 text-gray-300 shrink-0" />}
+                                <span className={`text-sm font-semibold ${done ? 'text-emerald-800 line-through' : 'text-gray-900'}`}>{it.item}</span>
+                                <Tag type={it.type} />
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{it.detail}</p>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}

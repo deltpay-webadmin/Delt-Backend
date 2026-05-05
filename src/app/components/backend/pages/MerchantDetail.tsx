@@ -87,7 +87,10 @@ function DocumentItem({ name, type, date }: { name: string; type: string; date: 
           </div>
         </div>
       </div>
-      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors"><Download className="w-4 h-4 text-gray-600" /></button>
+      <button
+        onClick={() => alert(`No file payload for "${name}". Document records are metadata-only until backend storage is configured.`)}
+        title="Download (no file payload yet)"
+        className="p-2 hover:bg-gray-100 rounded-md transition-colors"><Download className="w-4 h-4 text-gray-600" /></button>
     </div>
   );
 }
@@ -141,13 +144,23 @@ function BundlesAndReferralsCard({ merchantName, merchantId }: { merchantName: s
 }
 
 /* ─── Outreach template helper ─── */
-function OutreachTemplateCard({ name, desc, tplId, onPreview }: { name: string; desc: string; tplId: string; onPreview: (id: string) => void }) {
+function OutreachTemplateCard({ name, desc, tplId, onPreview, onSend }: { name: string; desc: string; tplId: string; onPreview: (id: string) => void; onSend?: (tplId: string) => void }) {
+  const [sent, setSent] = useState(false);
+  const handleSend = () => {
+    if (sent) return;
+    onSend?.(tplId);
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  };
   return (
     <div className="border border-gray-200 rounded-lg p-3 flex items-center justify-between">
       <div className="min-w-0 flex-1"><p className="text-sm font-medium text-gray-900">{name}</p><p className="text-xs text-gray-500 mt-0.5">{desc}</p></div>
       <div className="flex items-center gap-2 ml-3 shrink-0">
         <button onClick={() => onPreview(tplId)} className="text-xs text-brand hover:underline">Preview</button>
-        <button className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1"><Send className="w-3 h-3" />Send</button>
+        <button onClick={handleSend} className={`px-3 py-1.5 text-white text-xs font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1 ${sent ? 'bg-emerald-500 hover:bg-emerald-500' : 'bg-brand'}`}>
+          {sent ? <CheckCircle className="w-3 h-3" /> : <Send className="w-3 h-3" />}
+          {sent ? 'Sent!' : 'Send'}
+        </button>
       </div>
     </div>
   );
@@ -240,8 +253,8 @@ export function MerchantDetail() {
               <p className="text-sm text-gray-600">Assigned to: <span className="font-medium text-gray-900">Sarah Johnson</span></p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"><Edit className="w-4 h-4" />Edit</button>
-              <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-2"><Plus className="w-4 h-4" />New MCA Application</button>
+              <button onClick={() => navigate('/merchants')} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2" title="Edit functionality opens in the merchant detail editor (coming soon)"><Edit className="w-4 h-4" />Edit</button>
+              <button onClick={() => navigate('/underwriting')} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-2"><Plus className="w-4 h-4" />New MCA Application</button>
             </div>
           </div>
         </div>
@@ -283,7 +296,7 @@ export function MerchantDetail() {
 
               {/* Document Vault */}
               <div className="bg-white rounded-lg border border-gray-200">
-                <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><div><h2 className="text-lg font-semibold text-gray-900">Document Vault</h2><p className="text-xs text-gray-500 mt-1">9 documents</p></div><button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">View All</button></div>
+                <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><div><h2 className="text-lg font-semibold text-gray-900">Document Vault</h2><p className="text-xs text-gray-500 mt-1">9 documents</p></div><button onClick={() => navigate('/documents')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">View All</button></div>
                 <div className="px-5 py-4">
                   <DocumentItem name="MCA Agreement - 2024-0847.pdf" type="Agreement" date="Jan 15, 2026" />
                   <DocumentItem name="Bank Statements - Oct 2025.pdf" type="Bank Statement" date="Nov 3, 2025" />
@@ -455,7 +468,7 @@ export function MerchantDetail() {
                     <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4"><Globe className="w-8 h-8 text-gray-300" /></div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Website Not Active</h3>
                     <p className="text-sm text-gray-500 mb-5 max-w-sm">This merchant hasn't activated a website yet.</p>
-                    <button className="px-5 py-2.5 bg-info text-white text-sm font-medium rounded-[6px] hover:bg-info-hover transition-colors">Send Website Offer</button>
+                    <button onClick={() => { setActiveTab('outreach'); setOutreachProduct('website'); }} className="px-5 py-2.5 bg-info text-white text-sm font-medium rounded-[6px] hover:bg-info-hover transition-colors">Send Website Offer</button>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg border border-gray-200 px-5 py-4 flex items-center justify-between">
@@ -503,7 +516,7 @@ export function MerchantDetail() {
         {activeTab === 'lens' && (
           <div className="space-y-6">
             {merchantProducts.lens === 'inactive' ? (
-              <div className="bg-white rounded-lg border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><button className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">Activate Lens AI</button></div></div>
+              <div className="bg-white rounded-lg border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><button onClick={() => navigate('/lens')} className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">Activate Lens AI</button></div></div>
             ) : (
               <>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -6,29 +6,9 @@ import {
   CheckSquare, LayoutGrid, List, BarChart3,
   Target, Users, Bell, Briefcase, Shield,
 } from 'lucide-react';
+import { useTasks, taskActions, type CrmTask, type TaskPriority as Priority, type TaskStatus, type TaskCategory } from '../crmStore';
 
-// ── Types ──
-type Priority = 'critical' | 'high' | 'medium' | 'low';
-type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
-type TaskCategory = 'compliance' | 'collections' | 'sales' | 'onboarding' | 'support' | 'internal';
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: Priority;
-  category: TaskCategory;
-  assignee: string;
-  merchant?: string;
-  merchantId?: string;
-  dealId?: string;
-  dueDate: string;
-  createdDate: string;
-  createdBy: string;
-  tags: string[];
-  overdue: boolean;
-}
+type Task = CrmTask;
 
 const PRIORITY_CONFIG: Record<Priority, { color: string; bg: string; label: string; border: string }> = {
   critical: { color: 'text-red-700', bg: 'bg-red-50', label: 'Critical', border: 'border-l-red-500' },
@@ -53,32 +33,30 @@ const CATEGORY_CONFIG: Record<TaskCategory, { color: string; bg: string; icon: R
   internal: { color: 'text-gray-600', bg: 'bg-gray-100', icon: Zap },
 };
 
-const TASKS: Task[] = [
-  { id: 'T-001', title: 'Issue VAMP intervention notice — Coral Reef Auto Spa', description: 'Fraud-to-sales at 0.82%. VAMP trigger is 0.9%. Must issue intervention notice and draft remediation plan before breach.', status: 'todo', priority: 'critical', category: 'compliance', assignee: 'James Miller', merchant: 'Coral Reef Auto Spa', merchantId: 'M-1004', dueDate: '2026-04-17', createdDate: '2026-04-17', createdBy: 'System', tags: ['VAMP', 'card networks', 'auto-generated'], overdue: true },
-  { id: 'T-002', title: 'Schedule ASV scans — 3 merchants overdue', description: 'Havana Bites, Coral Reef Auto Spa, and 1 other have ASV scans expiring within 48 hours. Non-compliance fees will activate.', status: 'todo', priority: 'critical', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['PCI', 'ASV', 'auto-generated'], overdue: false },
-  { id: 'T-003', title: 'Generate broker compensation disclosure — Brooklyn Vinyl', description: 'NY CFDL requires broker compensation disclosure when ISO/agent involved. Deal blocked from funding until generated and delivered.', status: 'in_progress', priority: 'critical', category: 'compliance', assignee: 'Sarah Kim', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['NY CFDL', 'disclosure', 'blocking'], overdue: false },
-  { id: 'T-004', title: 'Send adverse action notice — Doral Fresh Market', description: 'CRS credit report influenced partial decline on renewal. FCRA requires adverse action notice within 30 days.', status: 'todo', priority: 'high', category: 'compliance', assignee: 'Marcus Johnson', merchant: 'Doral Fresh Market', dueDate: '2026-04-19', createdDate: '2026-04-14', createdBy: 'System', tags: ['FCRA', 'adverse action'], overdue: false },
-  { id: 'T-005', title: 'Follow up — Richmond Auto Detailing funding', description: 'VA 3-day review period expires Apr 22. Collect signed disclosure acknowledgment and fund.', status: 'in_progress', priority: 'high', category: 'sales', assignee: 'Marcus Johnson', merchant: 'Richmond Auto Detailing', merchantId: 'M-1003', dealId: 'DL-2026-0416', dueDate: '2026-04-22', createdDate: '2026-04-17', createdBy: 'Marcus Johnson', tags: ['VA review', 'funding'], overdue: false },
-  { id: 'T-006', title: 'Collection call — Little Havana Barbershop', description: '3 consecutive NSFs. Status: Slow Pay. Need to discuss modified payment plan or ACH amount reduction.', status: 'todo', priority: 'high', category: 'collections', assignee: 'Marcus Johnson', merchant: 'Little Havana Barbershop', dueDate: '2026-04-18', createdDate: '2026-04-13', createdBy: 'System', tags: ['NSF', 'slow pay', 'ACH'], overdue: false },
-  { id: 'T-007', title: 'Reconcile CRS credit pulls — March', description: 'Monthly credit pull count vs billing reconciliation. Due by Apr 21.', status: 'todo', priority: 'medium', category: 'internal', assignee: 'Sarah Kim', dueDate: '2026-04-21', createdDate: '2026-04-01', createdBy: 'System', tags: ['CRS', 'vendor', 'monthly'], overdue: false },
-  { id: 'T-008', title: 'Draft ECM remediation plan — Midtown Taqueria', description: 'MC chargeback ratio at 1.17% (threshold 1.5%), 87 CBs (threshold 100). Climbing. Draft plan before breach.', status: 'todo', priority: 'medium', category: 'compliance', assignee: 'James Miller', merchant: 'Midtown Taqueria', merchantId: 'M-1005', dueDate: '2026-04-22', createdDate: '2026-04-15', createdBy: 'System', tags: ['ECM', 'Mastercard', 'chargeback'], overdue: false },
-  { id: 'T-009', title: 'Review stacking flag — Brooklyn Vinyl Records', description: 'DataMerch flagged 1 existing position: Rapid Capital $28k. Review and document stacking decision.', status: 'in_progress', priority: 'medium', category: 'onboarding', assignee: 'Sarah Kim', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['DataMerch', 'stacking'], overdue: false },
-  { id: 'T-010', title: 'Present renewal offer — Havana Bites Cafe', description: 'Merchant at 73% repaid. Auto-generated renewal: $50K at 1.36x. Schedule call to present.', status: 'todo', priority: 'medium', category: 'sales', assignee: 'Marcus Johnson', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', dueDate: '2026-04-21', createdDate: '2026-04-15', createdBy: 'System', tags: ['renewal', 'auto-generated'], overdue: false },
-  { id: 'T-011', title: 'MATCH re-screen Q2 batch', description: 'Quarterly MATCH/TMF re-screening for 127 active merchants. Batch job ready.', status: 'todo', priority: 'medium', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-23', createdDate: '2026-04-10', createdBy: 'System', tags: ['MATCH', 'quarterly', 'batch'], overdue: false },
-  { id: 'T-012', title: 'Report 2 defaults to DataMerch', description: 'Report default data back to DataMerch consortium per agreement. 2 defaults pending submission.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-23', createdDate: '2026-04-10', createdBy: 'System', tags: ['DataMerch', 'vendor'], overdue: false },
-  { id: 'T-013', title: 'Plaid security questionnaire renewal', description: 'Annual Plaid vendor security questionnaire due May 5. Begin preparation.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-05-05', createdDate: '2026-04-01', createdBy: 'System', tags: ['Plaid', 'vendor', 'annual'], overdue: false },
-  { id: 'T-014', title: 'Create NJ S1760 impact assessment', description: 'NJ bill passed committee. If enacted: APR via Reg Z for NJ merchants. Prepare impact analysis and contract modification plan.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Marcus Johnson', dueDate: '2026-04-30', createdDate: '2026-04-15', createdBy: 'System', tags: ['regulatory', 'NJ', 'proactive'], overdue: false },
-  { id: 'T-015', title: 'PCI SAQ follow-up — Midtown Taqueria', description: 'Confirmed scan completed Mar 15 — PASS. Close task.', status: 'done', priority: 'medium', category: 'compliance', assignee: 'Sarah Kim', merchant: 'Midtown Taqueria', merchantId: 'M-1005', dueDate: '2026-04-13', createdDate: '2026-04-01', createdBy: 'Sarah Kim', tags: ['PCI'], overdue: false },
-];
-
 // ── New Task Modal ──
-function NewTaskModal({ onClose }: { onClose: () => void }) {
+function NewTaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (input: Partial<Task>) => void }) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [category, setCategory] = useState<TaskCategory>('sales');
   const [assignee, setAssignee] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
+  const [merchant, setMerchant] = useState('');
+
+  const handleCreate = () => {
+    if (!title.trim()) return;
+    onCreate({
+      title: title.trim(),
+      description: description.trim(),
+      priority,
+      category,
+      assignee: assignee || 'Unassigned',
+      dueDate: dueDate || new Date().toISOString().slice(0, 10),
+      merchant: merchant.trim() || undefined,
+      tags: [],
+    });
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -139,12 +117,12 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant (optional)</label>
-            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+            <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Merchant name..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Create Task</button>
+          <button onClick={handleCreate} disabled={!title.trim()} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">Create Task</button>
         </div>
       </div>
     </div>
@@ -160,7 +138,7 @@ export function BackendTasks() {
   const [assigneeFilter, setAssigneeFilter] = useState<string | null>(null);
   const [view, setView] = useState<'list' | 'board'>('list');
   const [showModal, setShowModal] = useState(false);
-  const [tasks, setTasks] = useState(TASKS);
+  const tasks = useTasks();
 
   const filtered = useMemo(() => {
     return tasks.filter(t => {
@@ -176,9 +154,7 @@ export function BackendTasks() {
     });
   }, [tasks, search, statusFilter, priorityFilter, categoryFilter, assigneeFilter]);
 
-  const toggleStatus = (id: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: t.status === 'done' ? 'todo' : 'done' } : t));
-  };
+  const toggleStatus = (id: string) => taskActions.toggleDone(id);
 
   const statusCounts = useMemo(() => {
     const c: Record<string, number> = { todo: 0, in_progress: 0, blocked: 0, done: 0 };
@@ -327,6 +303,7 @@ export function BackendTasks() {
             <span className="w-32">Merchant</span>
             <span className="w-20">Due</span>
             <span className="w-20">Status</span>
+            <span className="w-6"></span>
           </div>
           {filtered.map(task => {
             const pcfg = PRIORITY_CONFIG[task.priority];
@@ -358,9 +335,24 @@ export function BackendTasks() {
                 <button onClick={() => setAssigneeFilter(task.assignee)} className="w-28 shrink-0 text-[10px] text-gray-600 hover:text-brand truncate text-left">{task.assignee}</button>
                 <span className="w-32 shrink-0 text-[10px] text-gray-500 truncate">{task.merchant || '—'}</span>
                 <span className={`w-20 shrink-0 text-[10px] font-mono ${task.overdue && task.status !== 'done' ? 'text-red-600 font-bold' : 'text-gray-500'}`}>{task.dueDate.replace('2026-', '')}</span>
-                <span className={`w-20 shrink-0 flex items-center gap-1 text-[10px] font-semibold ${scfg.color}`}>
+                <button
+                  onClick={() => {
+                    const order: TaskStatus[] = ['todo', 'in_progress', 'blocked', 'done'];
+                    const next = order[(order.indexOf(task.status) + 1) % order.length];
+                    taskActions.setStatus(task.id, next);
+                  }}
+                  className={`w-20 shrink-0 flex items-center gap-1 text-[10px] font-semibold ${scfg.color} hover:bg-gray-100 px-1 py-1 rounded`}
+                  title="Click to advance status"
+                >
                   <SIcon className="w-3 h-3" />{scfg.label}
-                </span>
+                </button>
+                <button
+                  onClick={() => taskActions.remove(task.id)}
+                  className="w-6 shrink-0 p-1 hover:bg-red-50 rounded text-gray-300 hover:text-red-500 transition-colors"
+                  title="Delete task"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
             );
           })}
@@ -373,7 +365,7 @@ export function BackendTasks() {
         </div>
       )}
 
-      {showModal && <NewTaskModal onClose={() => setShowModal(false)} />}
+      {showModal && <NewTaskModal onClose={() => setShowModal(false)} onCreate={(input) => taskActions.create(input)} />}
     </div>
   );
 }

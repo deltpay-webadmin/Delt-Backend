@@ -430,6 +430,104 @@ export interface PhoneMatch {
   phone: string;                  // the field value we matched against
 }
 
+// ── Tasks / Inbox / Documents / Disputes / Compliance ──
+// These are client-side only. The Supabase tables don't exist yet, so updates
+// live in memory for the duration of the SPA session. Seeds stay so the UI
+// looks alive on first load; user actions then mutate the in-memory list.
+
+export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
+export type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
+export type TaskCategory = 'compliance' | 'collections' | 'sales' | 'onboarding' | 'support' | 'internal';
+
+export interface CrmTask {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  category: TaskCategory;
+  assignee: string;
+  merchant?: string;
+  merchantId?: string;
+  dealId?: string;
+  dueDate: string;
+  createdDate: string;
+  createdBy: string;
+  tags: string[];
+  overdue: boolean;
+}
+
+export type InboxChannel = 'email' | 'sms' | 'call' | 'note';
+export type InboxThreadStatus = 'unread' | 'read' | 'replied' | 'archived';
+
+export interface InboxMessage {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  channel: InboxChannel;
+  from: string;
+  to: string;
+  subject?: string;
+  body: string;
+  timestamp: string;
+  attachments?: string[];
+}
+
+export interface InboxThread {
+  id: string;
+  merchant: string;
+  merchantId: string;
+  contact: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  channel: InboxChannel;
+  status: InboxThreadStatus;
+  starred: boolean;
+  lastMessage: string;
+  lastTimestamp: string;
+  messageCount: number;
+  agent: string;
+  dealId?: string;
+  messages: InboxMessage[];
+}
+
+export type DocStatus = 'signed' | 'pending_signature' | 'sent' | 'draft' | 'expired' | 'voided';
+export type DocType = 'mca_agreement' | 'disclosure' | 'ucc_filing' | 'bank_auth' | 'id_verification' | 'tax_document' | 'amendment' | 'adverse_action';
+
+export interface CrmDocument {
+  id: string;
+  name: string;
+  type: DocType;
+  status: DocStatus;
+  merchant: string;
+  merchantId: string;
+  dealId?: string;
+  createdDate: string;
+  sentDate?: string;
+  signedDate?: string;
+  expiryDate?: string;
+  signer?: string;
+  signerEmail?: string;
+  agent: string;
+  pages: number;
+  size: string;
+  requiresNotarization: boolean;
+  envelopeId?: string;
+}
+
+export interface DisputeEvidenceState {
+  /** Map of dispute id to evidence label list that has been uploaded. */
+  uploaded: Record<string, string[]>;
+  /** Map of dispute id to status overrides. */
+  submitted: Record<string, boolean>;
+}
+
+export interface ComplianceFlags {
+  /** Map of "merchantId:controlKey" -> override status (green|yellow|red|gray) */
+  overrides: Record<string, 'green' | 'yellow' | 'red' | 'gray'>;
+  /** Set of completed checklist item ids. */
+  completed: Record<string, boolean>;
+}
+
 export interface CrmState {
   leads: Lead[];
   onboarding: OnboardingApp[];
@@ -441,6 +539,16 @@ export interface CrmState {
   deals: Deal[];
   /** Customer-service call history. */
   callLogs: CallLog[];
+  /** Client-side: task board. */
+  tasks: CrmTask[];
+  /** Client-side: inbox conversations. */
+  threads: InboxThread[];
+  /** Client-side: e-sign / docs library. */
+  documents: CrmDocument[];
+  /** Client-side: dispute UI state. */
+  disputeState: DisputeEvidenceState;
+  /** Client-side: compliance checklist state. */
+  complianceFlags: ComplianceFlags;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -502,6 +610,11 @@ let state: CrmState = {
   merchants: [],
   deals: [],
   callLogs: [],
+  tasks: [],
+  threads: [],
+  documents: [],
+  disputeState: { uploaded: {}, submitted: {} },
+  complianceFlags: { overrides: {}, completed: {} },
 };
 
 let sync: SyncState = {
@@ -1040,6 +1153,31 @@ export function useReferralProgram() {
 
 export function useCallLogs() {
   const selector = useCallback(() => state.callLogs, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useTasks() {
+  const selector = useCallback(() => state.tasks, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useThreads() {
+  const selector = useCallback(() => state.threads, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useDocuments() {
+  const selector = useCallback(() => state.documents, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useDisputeState() {
+  const selector = useCallback(() => state.disputeState, []);
+  return useSyncExternalStore(subscribe, selector, selector);
+}
+
+export function useComplianceFlags() {
+  const selector = useCallback(() => state.complianceFlags, []);
   return useSyncExternalStore(subscribe, selector, selector);
 }
 
@@ -1678,5 +1816,287 @@ export const callLogActions = {
       () => set({ callLogs: prev }),
       () => supabase!.from('call_logs').delete().eq('id', id).then(r => ({ error: r.error })),
     );
+  },
+};
+
+// ══════════════════════════════════════════════════════════════
+// Tasks / Inbox / Documents / Disputes / Compliance — actions
+// ══════════════════════════════════════════════════════════════
+//
+// These mutate in-memory state. No Supabase persistence yet — the
+// underlying tables don't exist. Seeds are loaded once on first
+// subscriber so the UI feels populated; user-driven mutations are
+// session-scoped and reset on reload.
+
+const TASK_SEED: CrmTask[] = [
+  { id: 'T-001', title: 'Issue VAMP intervention notice — Coral Reef Auto Spa', description: 'Fraud-to-sales at 0.82%. VAMP trigger is 0.9%. Issue notice and draft remediation plan before breach.', status: 'todo', priority: 'critical', category: 'compliance', assignee: 'James Miller', merchant: 'Coral Reef Auto Spa', merchantId: 'M-1004', dueDate: '2026-04-17', createdDate: '2026-04-17', createdBy: 'System', tags: ['VAMP', 'card networks'], overdue: true },
+  { id: 'T-002', title: 'Schedule ASV scans — 3 merchants overdue', description: 'Havana Bites, Coral Reef Auto Spa, +1 have ASV scans expiring within 48 hours.', status: 'todo', priority: 'critical', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['PCI', 'ASV'], overdue: false },
+  { id: 'T-003', title: 'Generate broker compensation disclosure — Brooklyn Vinyl', description: 'NY CFDL requires broker compensation disclosure when ISO/agent involved.', status: 'in_progress', priority: 'critical', category: 'compliance', assignee: 'Sarah Kim', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['NY CFDL', 'disclosure'], overdue: false },
+  { id: 'T-004', title: 'Send adverse action notice — Doral Fresh Market', description: 'CRS credit report influenced partial decline. FCRA requires notice within 30 days.', status: 'todo', priority: 'high', category: 'compliance', assignee: 'Marcus Johnson', merchant: 'Doral Fresh Market', dueDate: '2026-04-19', createdDate: '2026-04-14', createdBy: 'System', tags: ['FCRA'], overdue: false },
+  { id: 'T-005', title: 'Follow up — Richmond Auto Detailing funding', description: 'VA 3-day review period expires Apr 22. Collect signed acknowledgment and fund.', status: 'in_progress', priority: 'high', category: 'sales', assignee: 'Marcus Johnson', merchant: 'Richmond Auto Detailing', merchantId: 'M-1003', dealId: 'DL-2026-0416', dueDate: '2026-04-22', createdDate: '2026-04-17', createdBy: 'Marcus Johnson', tags: ['VA review', 'funding'], overdue: false },
+  { id: 'T-006', title: 'Collection call — Little Havana Barbershop', description: '3 consecutive NSFs. Status: Slow Pay. Discuss payment plan.', status: 'todo', priority: 'high', category: 'collections', assignee: 'Marcus Johnson', merchant: 'Little Havana Barbershop', dueDate: '2026-04-18', createdDate: '2026-04-13', createdBy: 'System', tags: ['NSF', 'slow pay'], overdue: false },
+  { id: 'T-007', title: 'Reconcile CRS credit pulls — March', description: 'Monthly pull count vs billing reconciliation.', status: 'todo', priority: 'medium', category: 'internal', assignee: 'Sarah Kim', dueDate: '2026-04-21', createdDate: '2026-04-01', createdBy: 'System', tags: ['CRS', 'monthly'], overdue: false },
+  { id: 'T-008', title: 'Draft ECM remediation plan — Midtown Taqueria', description: 'MC chargeback ratio at 1.17% (threshold 1.5%).', status: 'todo', priority: 'medium', category: 'compliance', assignee: 'James Miller', merchant: 'Midtown Taqueria', merchantId: 'M-1005', dueDate: '2026-04-22', createdDate: '2026-04-15', createdBy: 'System', tags: ['ECM', 'Mastercard'], overdue: false },
+  { id: 'T-009', title: 'Review stacking flag — Brooklyn Vinyl Records', description: 'DataMerch flagged 1 existing position: Rapid Capital $28k.', status: 'in_progress', priority: 'medium', category: 'onboarding', assignee: 'Sarah Kim', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', dueDate: '2026-04-18', createdDate: '2026-04-16', createdBy: 'System', tags: ['DataMerch'], overdue: false },
+  { id: 'T-010', title: 'Present renewal offer — Havana Bites Cafe', description: '73% repaid. Auto-generated renewal: $50K at 1.36x.', status: 'todo', priority: 'medium', category: 'sales', assignee: 'Marcus Johnson', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', dueDate: '2026-04-21', createdDate: '2026-04-15', createdBy: 'System', tags: ['renewal'], overdue: false },
+  { id: 'T-011', title: 'MATCH re-screen Q2 batch', description: 'Quarterly MATCH/TMF re-screening for 127 active merchants.', status: 'todo', priority: 'medium', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-23', createdDate: '2026-04-10', createdBy: 'System', tags: ['MATCH', 'quarterly'], overdue: false },
+  { id: 'T-012', title: 'Report 2 defaults to DataMerch', description: 'Report default data to DataMerch consortium.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-04-23', createdDate: '2026-04-10', createdBy: 'System', tags: ['DataMerch'], overdue: false },
+  { id: 'T-013', title: 'Plaid security questionnaire renewal', description: 'Annual Plaid vendor security questionnaire due May 5.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Sarah Kim', dueDate: '2026-05-05', createdDate: '2026-04-01', createdBy: 'System', tags: ['Plaid', 'vendor'], overdue: false },
+  { id: 'T-014', title: 'Create NJ S1760 impact assessment', description: 'NJ bill: APR via Reg Z for NJ merchants if enacted.', status: 'todo', priority: 'low', category: 'compliance', assignee: 'Marcus Johnson', dueDate: '2026-04-30', createdDate: '2026-04-15', createdBy: 'System', tags: ['regulatory', 'NJ'], overdue: false },
+  { id: 'T-015', title: 'PCI SAQ follow-up — Midtown Taqueria', description: 'Confirmed scan completed Mar 15 — PASS. Close task.', status: 'done', priority: 'medium', category: 'compliance', assignee: 'Sarah Kim', merchant: 'Midtown Taqueria', merchantId: 'M-1005', dueDate: '2026-04-13', createdDate: '2026-04-01', createdBy: 'Sarah Kim', tags: ['PCI'], overdue: false },
+];
+
+const THREAD_SEED: InboxThread[] = [
+  { id: 'th-1', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', contact: 'David Park', contactEmail: 'david@brooklynvinyl.com', contactPhone: '(718) 555-0198', channel: 'email', status: 'unread', starred: true, lastMessage: 'Hi Sarah, I received the disclosure documents but I have a question about the broker compensation section...', lastTimestamp: '2026-04-17 10:30', messageCount: 4, agent: 'Sarah Kim', dealId: 'DL-2026-0415', messages: [
+    { id: 'm1a', direction: 'outbound', channel: 'email', from: 'Sarah Kim <sarah@deltpay.com>', to: 'david@brooklynvinyl.com', subject: 'NY CFDL Disclosure Package', body: 'Hi David,\n\nAttached is your Commercial Finance Disclosure as required by New York law.\n\nBest,\nSarah', timestamp: '2026-04-16 15:10', attachments: ['NY_CFDL_Disclosure_DL-2026-0415.pdf'] },
+    { id: 'm1b', direction: 'inbound', channel: 'email', from: 'david@brooklynvinyl.com', to: 'sarah@deltpay.com', subject: 'Re: NY CFDL Disclosure', body: 'Hi Sarah, two questions on the APR and broker compensation. Thanks, David', timestamp: '2026-04-16 16:45' },
+    { id: 'm1c', direction: 'outbound', channel: 'email', from: 'Sarah Kim <sarah@deltpay.com>', to: 'david@brooklynvinyl.com', subject: 'Re: Re: NY CFDL Disclosure', body: 'Hi David, the APR is required by NY. Broker compensation disclosure follows by EOD tomorrow. Best, Sarah', timestamp: '2026-04-16 17:20' },
+    { id: 'm1d', direction: 'inbound', channel: 'email', from: 'david@brooklynvinyl.com', to: 'sarah@deltpay.com', subject: 'Re: Re: Re: NY CFDL Disclosure', body: 'Hi Sarah, I received the disclosure documents but I have a question about the broker compensation section. Thanks, David', timestamp: '2026-04-17 10:30' },
+  ] },
+  { id: 'th-2', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', contact: 'Maria Gonzalez', contactEmail: 'maria@havanabites.com', contactPhone: '(305) 555-0142', channel: 'sms', status: 'read', starred: false, lastMessage: 'Great, thank you for the update! We are excited about the renewal offer.', lastTimestamp: '2026-04-16 14:15', messageCount: 2, agent: 'Marcus Johnson', messages: [
+    { id: 'm2a', direction: 'outbound', channel: 'sms', from: 'Delt Pay', to: '(305) 555-0142', body: 'Hi Maria! Pre-qualified for $50K renewal. Want details?', timestamp: '2026-04-15 09:15' },
+    { id: 'm2b', direction: 'inbound', channel: 'sms', from: '(305) 555-0142', to: 'Delt Pay', body: 'Great, thank you for the update! We are excited about the renewal offer.', timestamp: '2026-04-16 14:15' },
+  ] },
+  { id: 'th-3', merchant: 'Midtown Taqueria', merchantId: 'M-1005', contact: 'Roberto Fuentes', contactEmail: 'roberto@midtowntaq.com', contactPhone: '(212) 555-0167', channel: 'call', status: 'read', starred: false, lastMessage: 'Inbound call — 12m. Owner asked about chargeback on Mar 28.', lastTimestamp: '2026-04-14 16:45', messageCount: 1, agent: 'Marcus Johnson', messages: [
+    { id: 'm3a', direction: 'inbound', channel: 'call', from: '(212) 555-0167', to: 'Marcus Johnson', body: 'Inbound call — 12m 05s. Owner asked about chargeback on Mar 28 transaction ($315).', timestamp: '2026-04-14 16:45' },
+  ] },
+  { id: 'th-4', merchant: 'Coral Reef Auto Spa', merchantId: 'M-1004', contact: 'Carlos Mendez', contactEmail: 'carlos@coralreefauto.com', contactPhone: '(954) 555-0189', channel: 'email', status: 'unread', starred: false, lastMessage: 'I spoke with my web developer. He says enabling 3DS will cost about $200/mo. Is that normal?', lastTimestamp: '2026-04-16 09:20', messageCount: 1, agent: 'James Miller', messages: [
+    { id: 'm4a', direction: 'inbound', channel: 'email', from: 'carlos@coralreefauto.com', to: 'james.m@deltpay.com', subject: 'Re: Chargeback Prevention — 3DS', body: 'James, I spoke with my web developer. He says enabling 3DS will cost $200/mo. Is that normal? Carlos', timestamp: '2026-04-16 09:20' },
+  ] },
+];
+
+const DOCUMENT_SEED: CrmDocument[] = [
+  { id: 'DOC-001', name: 'MCA Agreement — Brooklyn Vinyl Records', type: 'mca_agreement', status: 'pending_signature', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-16', sentDate: '2026-04-16', signer: 'David Park', signerEmail: 'david@brooklynvinyl.com', agent: 'Sarah Kim', pages: 14, size: '2.4 MB', requiresNotarization: false, envelopeId: 'ENV-8842' },
+  { id: 'DOC-002', name: 'NY CFDL Disclosure — Brooklyn Vinyl Records', type: 'disclosure', status: 'pending_signature', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-16', sentDate: '2026-04-16', signer: 'David Park', signerEmail: 'david@brooklynvinyl.com', agent: 'Sarah Kim', pages: 9, size: '1.8 MB', requiresNotarization: false, envelopeId: 'ENV-8843' },
+  { id: 'DOC-003', name: 'VA HB 1027 Disclosure — Richmond Auto Detailing', type: 'disclosure', status: 'sent', merchant: 'Richmond Auto Detailing', merchantId: 'M-1003', dealId: 'DL-2026-0416', createdDate: '2026-04-17', sentDate: '2026-04-17', signer: 'James Richardson', signerEmail: 'james@richmondauto.com', agent: 'Marcus Johnson', pages: 11, size: '2.1 MB', requiresNotarization: false, envelopeId: 'ENV-8850', expiryDate: '2026-04-22' },
+  { id: 'DOC-004', name: 'MCA Agreement — Havana Bites Cafe', type: 'mca_agreement', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', createdDate: '2026-04-12', sentDate: '2026-04-12', signedDate: '2026-04-13', signer: 'Maria Gonzalez', signerEmail: 'maria@havanabites.com', agent: 'Marcus Johnson', pages: 12, size: '2.2 MB', requiresNotarization: false, envelopeId: 'ENV-8801' },
+  { id: 'DOC-005', name: 'UCC-1 Filing — Havana Bites Cafe', type: 'ucc_filing', status: 'signed', merchant: 'Havana Bites Cafe', merchantId: 'M-1001', dealId: 'DL-2026-0412', createdDate: '2026-04-14', signedDate: '2026-04-14', agent: 'Marcus Johnson', pages: 3, size: '480 KB', requiresNotarization: false },
+  { id: 'DOC-008', name: 'Adverse Action Notice — Doral Fresh Market', type: 'adverse_action', status: 'draft', merchant: 'Doral Fresh Market', merchantId: 'M-1008', createdDate: '2026-04-15', agent: 'Marcus Johnson', pages: 2, size: '180 KB', requiresNotarization: false },
+  { id: 'DOC-010', name: 'Amendment — Little Havana Barbershop', type: 'amendment', status: 'draft', merchant: 'Little Havana Barbershop', merchantId: 'M-1006', createdDate: '2026-04-16', agent: 'Marcus Johnson', pages: 4, size: '520 KB', requiresNotarization: false },
+  { id: 'DOC-012', name: 'Broker Compensation Disclosure — Brooklyn Vinyl', type: 'disclosure', status: 'draft', merchant: 'Brooklyn Vinyl Records', merchantId: 'M-1002', dealId: 'DL-2026-0415', createdDate: '2026-04-17', agent: 'Sarah Kim', pages: 3, size: '290 KB', requiresNotarization: false },
+];
+
+let _seedsLoaded = false;
+function ensureSeeds() {
+  if (_seedsLoaded) return;
+  _seedsLoaded = true;
+  if (state.tasks.length === 0) state.tasks = TASK_SEED;
+  if (state.threads.length === 0) state.threads = THREAD_SEED;
+  if (state.documents.length === 0) state.documents = DOCUMENT_SEED;
+}
+
+ensureSeeds();
+
+function nextId(prefix: string, used: Set<string>) {
+  let n = used.size + 1;
+  let id = `${prefix}-${String(n).padStart(3, '0')}`;
+  while (used.has(id)) id = `${prefix}-${String(++n).padStart(3, '0')}`;
+  return id;
+}
+
+export const taskActions = {
+  create(partial: Partial<CrmTask>): CrmTask {
+    const used = new Set(state.tasks.map(t => t.id));
+    const id = partial.id || nextId('T', used);
+    const task: CrmTask = {
+      id,
+      title: partial.title || 'Untitled task',
+      description: partial.description || '',
+      status: partial.status || 'todo',
+      priority: partial.priority || 'medium',
+      category: partial.category || 'internal',
+      assignee: partial.assignee || 'Unassigned',
+      merchant: partial.merchant,
+      merchantId: partial.merchantId,
+      dealId: partial.dealId,
+      dueDate: partial.dueDate || new Date().toISOString().slice(0, 10),
+      createdDate: new Date().toISOString().slice(0, 10),
+      createdBy: partial.createdBy || 'You',
+      tags: partial.tags || [],
+      overdue: false,
+    };
+    set({ tasks: [task, ...state.tasks] });
+    return task;
+  },
+  update(id: string, patch: Partial<CrmTask>) {
+    set({ tasks: state.tasks.map(t => (t.id === id ? { ...t, ...patch } : t)) });
+  },
+  setStatus(id: string, status: TaskStatus) {
+    taskActions.update(id, { status });
+  },
+  toggleDone(id: string) {
+    const t = state.tasks.find(x => x.id === id);
+    if (!t) return;
+    taskActions.update(id, { status: t.status === 'done' ? 'todo' : 'done' });
+  },
+  remove(id: string) {
+    set({ tasks: state.tasks.filter(t => t.id !== id) });
+  },
+};
+
+export const inboxActions = {
+  compose(input: { merchant?: string; merchantId?: string; contact?: string; to: string; channel: 'email' | 'sms'; subject?: string; body: string; agent?: string }): InboxThread {
+    const used = new Set(state.threads.map(t => t.id));
+    const id = nextId('th', used);
+    const ts = new Date().toISOString().replace('T', ' ').slice(0, 16);
+    const msg: InboxMessage = {
+      id: `m-${Date.now()}`,
+      direction: 'outbound',
+      channel: input.channel,
+      from: input.agent || 'You',
+      to: input.to,
+      subject: input.subject,
+      body: input.body,
+      timestamp: ts,
+    };
+    const thread: InboxThread = {
+      id,
+      merchant: input.merchant || input.to,
+      merchantId: input.merchantId || '—',
+      contact: input.contact || input.to,
+      contactEmail: input.channel === 'email' ? input.to : undefined,
+      contactPhone: input.channel === 'sms' ? input.to : undefined,
+      channel: input.channel,
+      status: 'replied',
+      starred: false,
+      lastMessage: input.body,
+      lastTimestamp: ts,
+      messageCount: 1,
+      agent: input.agent || 'You',
+      messages: [msg],
+    };
+    set({ threads: [thread, ...state.threads] });
+    return thread;
+  },
+  reply(threadId: string, body: string, agent?: string) {
+    if (!body.trim()) return;
+    const ts = new Date().toISOString().replace('T', ' ').slice(0, 16);
+    set({
+      threads: state.threads.map(t => {
+        if (t.id !== threadId) return t;
+        const msg: InboxMessage = {
+          id: `m-${Date.now()}`,
+          direction: 'outbound',
+          channel: t.channel === 'note' ? 'note' : t.channel,
+          from: agent || 'You',
+          to: t.contactEmail || t.contactPhone || t.contact,
+          body,
+          timestamp: ts,
+        };
+        return {
+          ...t,
+          status: 'replied' as InboxThreadStatus,
+          messages: [...t.messages, msg],
+          messageCount: t.messageCount + 1,
+          lastMessage: body,
+          lastTimestamp: ts,
+        };
+      }),
+    });
+  },
+  toggleStar(id: string) {
+    set({ threads: state.threads.map(t => (t.id === id ? { ...t, starred: !t.starred } : t)) });
+  },
+  setStatus(id: string, status: InboxThreadStatus) {
+    set({ threads: state.threads.map(t => (t.id === id ? { ...t, status } : t)) });
+  },
+  archive(id: string) {
+    inboxActions.setStatus(id, 'archived');
+  },
+  markRead(id: string) {
+    set({ threads: state.threads.map(t => (t.id === id && t.status === 'unread' ? { ...t, status: 'read' } : t)) });
+  },
+  remove(id: string) {
+    set({ threads: state.threads.filter(t => t.id !== id) });
+  },
+};
+
+export const documentActions = {
+  create(partial: Partial<CrmDocument>): CrmDocument {
+    const used = new Set(state.documents.map(d => d.id));
+    const id = partial.id || nextId('DOC', used);
+    const doc: CrmDocument = {
+      id,
+      name: partial.name || 'Untitled Document',
+      type: partial.type || 'mca_agreement',
+      status: partial.status || 'draft',
+      merchant: partial.merchant || 'Unassigned',
+      merchantId: partial.merchantId || '—',
+      dealId: partial.dealId,
+      createdDate: new Date().toISOString().slice(0, 10),
+      sentDate: partial.sentDate,
+      signedDate: partial.signedDate,
+      expiryDate: partial.expiryDate,
+      signer: partial.signer,
+      signerEmail: partial.signerEmail,
+      agent: partial.agent || 'You',
+      pages: partial.pages ?? 1,
+      size: partial.size || '— KB',
+      requiresNotarization: partial.requiresNotarization ?? false,
+      envelopeId: partial.envelopeId,
+    };
+    set({ documents: [doc, ...state.documents] });
+    return doc;
+  },
+  update(id: string, patch: Partial<CrmDocument>) {
+    set({ documents: state.documents.map(d => (d.id === id ? { ...d, ...patch } : d)) });
+  },
+  send(id: string) {
+    const today = new Date().toISOString().slice(0, 10);
+    const envelopeId = `ENV-${Math.floor(Math.random() * 9000) + 1000}`;
+    documentActions.update(id, { status: 'sent', sentDate: today, envelopeId });
+  },
+  remove(id: string) {
+    set({ documents: state.documents.filter(d => d.id !== id) });
+  },
+};
+
+export const disputeActions = {
+  uploadEvidence(disputeId: string, evidenceLabel: string) {
+    const cur = state.disputeState.uploaded[disputeId] || [];
+    if (cur.includes(evidenceLabel)) return;
+    set({
+      disputeState: {
+        ...state.disputeState,
+        uploaded: { ...state.disputeState.uploaded, [disputeId]: [...cur, evidenceLabel] },
+      },
+    });
+  },
+  removeEvidence(disputeId: string, evidenceLabel: string) {
+    const cur = state.disputeState.uploaded[disputeId] || [];
+    set({
+      disputeState: {
+        ...state.disputeState,
+        uploaded: { ...state.disputeState.uploaded, [disputeId]: cur.filter(e => e !== evidenceLabel) },
+      },
+    });
+  },
+  submitForReview(disputeId: string) {
+    set({
+      disputeState: {
+        ...state.disputeState,
+        submitted: { ...state.disputeState.submitted, [disputeId]: true },
+      },
+    });
+  },
+};
+
+export const complianceActions = {
+  toggleCompleted(itemId: string) {
+    const cur = state.complianceFlags.completed[itemId];
+    set({
+      complianceFlags: {
+        ...state.complianceFlags,
+        completed: { ...state.complianceFlags.completed, [itemId]: !cur },
+      },
+    });
+  },
+  setOverride(merchantId: string, controlKey: string, status: 'green' | 'yellow' | 'red' | 'gray') {
+    set({
+      complianceFlags: {
+        ...state.complianceFlags,
+        overrides: { ...state.complianceFlags.overrides, [`${merchantId}:${controlKey}`]: status },
+      },
+    });
   },
 };
