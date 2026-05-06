@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, TrendingDown, Edit, Plus, Download, FileText, FileCheck, File, Receipt, CalendarDays, CreditCard, Banknote, Globe, AlertCircle, Mail, MessageSquare, Monitor, Eye, MousePointerClick, ChevronDown, Send, PlusCircle, ToggleLeft, ToggleRight, CheckCircle, Settings, Clock, Percent, XCircle, ExternalLink, Gauge, Smartphone, Activity, Brain, Zap, Shield, BarChart3, Key, Package, Gift, Copy, Users, Truck, Link2, X, ShieldAlert, StickyNote, Flag, Calendar, Megaphone, Trash2 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import {
+  BUNDLE_PICKER_OPTIONS,
+  creditStatusCls,
+  type CreditStatus,
+} from '../../../lib/bundles';
 
 /* ─── Shared sub-components ─── */
 
@@ -92,18 +97,12 @@ function DocumentItem({ name, type, date }: { name: string; type: string; date: 
   );
 }
 
-/* ─── Bundles (kept compact) ─── */
-const BUNDLE_TIERS = [
-  { id: 'welcome', name: 'Welcome Bundle', amount: 500 },
-  { id: 'referrer', name: 'Referrer Reward', amount: 200 },
-  { id: 'retention-light', name: 'Retention - Light', amount: 200 },
-  { id: 'retention-medium', name: 'Retention - Medium', amount: 350 },
-  { id: 'retention-full', name: 'Retention - Full', amount: 500 },
-];
-type CreditStatus = 'Active' | 'Partially Used' | 'Fully Used' | 'Expired';
+/* ─── Bundles (read from shared catalog) ─── */
+// BUNDLE_TIERS used to be a local copy of the bundle list; it now reads
+// from the shared catalog so it stays aligned with Settings > Bundles.
+const BUNDLE_TIERS = BUNDLE_PICKER_OPTIONS;
 interface BundleCredit { id: string; tier: string; amount: number; used: number; status: CreditStatus; expiration: string; }
 const CARD_QTY_OPTIONS = [50, 100, 250, 500];
-function creditStatusCls(s: CreditStatus) { return s === 'Active' ? 'bg-emerald-50 text-emerald-700' : s === 'Partially Used' ? 'bg-amber-50 text-amber-700' : s === 'Fully Used' ? 'bg-gray-100 text-gray-500' : s === 'Expired' ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-500'; }
 
 function BundlesAndReferralsCard({ merchantName, merchantId }: { merchantName: string; merchantId: string }) {
   const [credits, setCredits] = useState<BundleCredit[]>([

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Package, Save, ChevronDown, X } from 'lucide-react';
+import { BUNDLE_CATALOG, type BundleDefinition } from '../../../lib/bundles';
 
-interface BundleRow {
-  id: string;
-  name: string;
+// BackendBundles is the editor for the canonical bundle catalog defined
+// in src/app/lib/bundles.ts. Other pages (Leads, Merchant Detail) read
+// from BUNDLE_CATALOG directly so they stay in sync with edits made here.
+interface BundleRow extends BundleDefinition {
   description: string;
-  amount: number;
   expiration: number;
   categories: string[];
   type: 'auto' | 'manual';
@@ -16,13 +17,17 @@ const categoryOptions = [
   'Fitness', 'Salon/Spa', 'Transportation', 'E-Commerce', 'Professional Services',
 ];
 
-const initialBundles: BundleRow[] = [
-  { id: 'welcome', name: 'Welcome Bundle', description: 'Issued to every new merchant', amount: 500, expiration: 30, categories: [], type: 'auto' },
-  { id: 'referrer', name: 'Referrer Reward', description: 'Auto-issued when a referral converts', amount: 200, expiration: 30, categories: [], type: 'auto' },
-  { id: 'retention-light', name: 'Retention — Light', description: 'Manual, from Save Playbook', amount: 200, expiration: 30, categories: [], type: 'manual' },
-  { id: 'retention-medium', name: 'Retention — Medium', description: 'Manual', amount: 350, expiration: 30, categories: [], type: 'manual' },
-  { id: 'retention-full', name: 'Retention — Full', description: 'Manual', amount: 500, expiration: 30, categories: [], type: 'manual' },
-];
+// Hydrate editable rows from the shared catalog. Categories are an
+// admin-only field that doesn't ship to other consumers, so it lives here.
+const initialBundles: BundleRow[] = BUNDLE_CATALOG.map(b => ({
+  id: b.id,
+  name: b.name,
+  amount: b.amount,
+  description: b.description ?? '',
+  expiration: b.expiration ?? 30,
+  categories: [],
+  type: b.type ?? 'manual',
+}));
 
 const fmt = (n: number) => `$${n.toLocaleString()}`;
 
