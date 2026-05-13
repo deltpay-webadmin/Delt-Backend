@@ -37,6 +37,7 @@ import { BackendSubscriptions } from './pages/BackendSubscriptions';
 import { BackendDocuments } from './pages/BackendDocuments';
 import { BackendPayments } from './pages/BackendPayments';
 import { BackendReports } from './pages/BackendReports';
+import { BackendSupport } from './pages/BackendSupport';
 import {
   LayoutDashboard,
   Users,
@@ -83,6 +84,7 @@ import {
   PenTool,
   Wallet,
   BarChart3,
+  LifeBuoy,
 } from 'lucide-react';
 
 // ── Types ──
@@ -164,6 +166,14 @@ const adminSections: NavSection[] = [
     ],
   },
   {
+    id: 'support',
+    label: 'Support',
+    icon: LifeBuoy,
+    children: [
+      { label: 'Support Hub', path: '/support' },
+    ],
+  },
+  {
     id: 'compliance',
     label: 'Compliance',
     icon: ShieldCheck,
@@ -205,6 +215,7 @@ function sectionForPath(path: string): string | null {
   if (path.startsWith('/outreach')) return 'outreach';
   if (path.startsWith('/agents') || path.startsWith('/employees') || path.startsWith('/payroll') || path.startsWith('/commissions')) return 'team';
   if (path.startsWith('/lens-ai') || path.startsWith('/financials') || path.startsWith('/reports')) return 'intelligence';
+  if (path.startsWith('/support')) return 'support';
   if (path.startsWith('/compliance')) return 'compliance';
   if (path.startsWith('/settings')) return 'settings';
   return null;
@@ -262,6 +273,7 @@ const allCommands: CommandItem[] = [
   { label: 'Financials', path: '/financials', group: 'Intelligence', icon: DollarSign, keywords: 'revenue profit' },
   { label: 'Reports', path: '/reports', group: 'Intelligence', icon: BarChart3, keywords: 'data visualization' },
   { label: 'Compliance Hub', path: '/compliance', group: 'Compliance', icon: ShieldCheck, keywords: 'compliance rules' },
+  { label: 'Support Hub', path: '/support', group: 'Support', icon: LifeBuoy, keywords: 'tickets help merchant issues service desk zendesk' },
   { label: 'Websites', path: '/websites', group: 'Products', icon: Globe, keywords: 'sites domain builder analytics' },
   { label: 'Subscriptions', path: '/subscriptions', group: 'Products', icon: CreditCard, keywords: 'billing plans MRR SaaS' },
   { label: 'Integration Health', path: '/settings/integrations', group: 'Settings', icon: Link2 },
@@ -423,6 +435,7 @@ export function DeltBackendLayout() {
       case '/disputes': return <BackendDisputes />;
       case '/outreach': return <BackendOutreach />;
       case '/compliance': return <BackendCompliance />;
+      case '/support': return <BackendSupport />;
       case '/activity-timeline': return <BackendActivityTimeline />;
       case '/tasks': return <BackendTasks />;
       case '/inbox': return <BackendInbox />;
