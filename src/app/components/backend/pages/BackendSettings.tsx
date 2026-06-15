@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Settings, ChevronDown, Link2, Shield, Users, ClipboardList,
   Plus, Check, X, Eye, EyeOff, Lock, Unlock, UserCircle,
@@ -256,7 +257,7 @@ export function BackendSettings() {
                         </div>
                       ))}
                       <div className="flex justify-end pt-4 mt-2 border-t border-gray-100">
-                        <button className="px-5 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
+                        <button onClick={() => toast.success(`${section.title} settings saved`)} className="px-5 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
                       </div>
                     </div>
                   )}
@@ -298,11 +299,11 @@ export function BackendSettings() {
                 <div className="flex gap-2 mt-1">
                   {int.status === 'connected' ? (
                     <>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-brand bg-brand/5 border border-brand/15 rounded-[6px] hover:bg-brand/10 transition-colors">Configure</button>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Disconnect</button>
+                      <button onClick={() => toast.info(`Configuring ${int.name} integration`)} className="px-3 py-1.5 text-[11px] font-medium text-brand bg-brand/5 border border-brand/15 rounded-[6px] hover:bg-brand/10 transition-colors">Configure</button>
+                      <button onClick={() => toast.success(`${int.name} disconnected`)} className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Disconnect</button>
                     </>
                   ) : (
-                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[6px] hover:bg-brand-hover transition-colors">Connect</button>
+                    <button onClick={() => toast.success(`${int.name} connected`)} className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[6px] hover:bg-brand-hover transition-colors">Connect</button>
                   )}
                 </div>
               </div>
@@ -318,7 +319,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Roles</h2>
                 <p className="text-sm text-gray-400 mt-0.5">System roles define baseline access. Permissions enforced across all modules.</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
+              <button onClick={() => toast.success('New custom role created — configure its permissions below')} className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Custom Role
               </button>
             </div>
@@ -399,7 +400,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Users & Access</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{USERS.length} users across {ROLES.length} roles</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
+              <button onClick={() => toast.success('Invitation sent — the user will receive an email to join')} className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Invite User
               </button>
             </div>
@@ -473,9 +474,9 @@ export function BackendSettings() {
                                   <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200">Actions</h4>
                                   <div className="flex flex-col gap-1.5">
                                     {['Edit Profile', 'Change Role', ...(user.role === 'agent' ? ['Edit Split', 'Reassign Portfolio'] : []), 'Reset Password'].map(a => (
-                                      <button key={a} className="text-left px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors">{a}</button>
+                                      <button key={a} onClick={() => toast.info(`${a} — ${user.name}`)} className="text-left px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors">{a}</button>
                                     ))}
-                                    <button className="text-left px-3 py-2 text-xs font-medium text-red-500 bg-white border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Deactivate</button>
+                                    <button onClick={() => toast.success(`${user.name} deactivated`)} className="text-left px-3 py-2 text-xs font-medium text-red-500 bg-white border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Deactivate</button>
                                   </div>
                                 </div>
                               </div>

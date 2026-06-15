@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { toast } from 'sonner@2.0.3';
 import { NavigationContext } from './NavigationContext';
 import { SyncIndicator } from './SyncIndicator';
 import { BackendDashboard } from './pages/BackendDashboard';
@@ -595,7 +596,12 @@ export function DeltBackendLayout() {
                       <p className="text-[13px] font-semibold text-gray-900">{user.name}</p>
                       <p className="text-[11px] text-gray-500">{user.email}</p>
                     </div>
-                    <button className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50">Profile Settings</button>
+                    <button
+                      onClick={() => { handleNavigate('/settings'); setIsUserMenuOpen(false); }}
+                      className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50"
+                    >
+                      Profile Settings
+                    </button>
                     <button
                       onClick={toggleRole}
                       className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -604,7 +610,16 @@ export function DeltBackendLayout() {
                       Switch to {userRole === 'admin' ? 'Agent' : 'Admin'} View
                     </button>
                     <div className="border-t border-gray-100 mt-1 pt-1">
-                      <button className="w-full px-4 py-2 text-left text-[13px] text-red-600 hover:bg-red-50">Log Out</button>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setCurrentPage('/');
+                          toast.success('You have been signed out.');
+                        }}
+                        className="w-full px-4 py-2 text-left text-[13px] text-red-600 hover:bg-red-50"
+                      >
+                        Log Out
+                      </button>
                     </div>
                   </div>
                 </>
@@ -672,7 +687,11 @@ export function DeltBackendLayout() {
                 </button>
 
                 {/* Notifications */}
-                <button className="relative p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
+                <button
+                  onClick={() => handleNavigate('/workspace')}
+                  title="View notifications"
+                  className="relative p-2 hover:bg-gray-100 rounded-[8px] transition-colors"
+                >
                   <Bell className="w-[18px] h-[18px] text-gray-500" />
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                 </button>

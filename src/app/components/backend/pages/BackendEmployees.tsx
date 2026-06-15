@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Plus,
   Search,
@@ -224,6 +225,16 @@ function StatCard({ label, value, icon, sub }: { label: string; value: string; i
 // ── Employee Detail Panel ──
 function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClose: () => void }) {
   const [detailTab, setDetailTab] = useState<'info' | 'documents' | 'notes' | 'reviews'>('info');
+  const [notes, setNotes] = useState(employee.notes);
+  const [noteText, setNoteText] = useState('');
+
+  const addNote = () => {
+    if (!noteText.trim()) { toast.error('Please enter a note'); return; }
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    setNotes(prev => [{ text: noteText.trim(), author: 'You', date: today }, ...prev]);
+    setNoteText('');
+    toast.success('Note added');
+  };
 
   return (
     <div className="fixed inset-0 z-50">
@@ -353,7 +364,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                       <span className="flex items-center gap-1 text-xs text-red-500 font-medium"><AlertCircle className="w-3.5 h-3.5" /> Missing</span>
                     )}
                     {doc.status === 'Complete' && (
-                      <button className="p-1.5 hover:bg-gray-100 rounded-[6px]"><Download className="w-4 h-4 text-gray-400" /></button>
+                      <button onClick={() => toast.success(`Downloading ${doc.name}`)} className="p-1.5 hover:bg-gray-100 rounded-[6px]"><Download className="w-4 h-4 text-gray-400" /></button>
                     )}
                   </div>
                 </div>
@@ -363,7 +374,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
 
           {detailTab === 'notes' && (
             <div className="space-y-4">
-              {employee.notes.map((note, i) => (
+              {notes.map((note, i) => (
                 <div key={i} className="bg-gray-50 rounded-[8px] p-4">
                   <p className="text-sm text-gray-800">{note.text}</p>
                   <div className="flex items-center gap-2 mt-2">
@@ -373,8 +384,8 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                   </div>
                 </div>
               ))}
-              <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
-              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Add Note</button>
+              <textarea value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
+              <button onClick={addNote} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Add Note</button>
             </div>
           )}
 
@@ -438,17 +449,17 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               </div>
 
-              <button className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Start New Review</button>
+              <button onClick={() => toast.info(`Starting new performance review for ${employee.name}…`)} className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Start New Review</button>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+          <button onClick={() => toast.info(`Editing ${employee.name}…`)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
             <Edit className="w-4 h-4" /> Edit Employee
           </button>
-          <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">
+          <button onClick={() => toast.info(`Managing leave for ${employee.name}…`)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">
             Manage Leave
           </button>
         </div>
@@ -484,7 +495,7 @@ export function BackendEmployees() {
             <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
             <p className="text-sm text-gray-600 mt-1">{totalEmployees} active employees across all departments</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button onClick={() => toast.info('Opening new employee form…')} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Employee
           </button>
         </div>
@@ -571,7 +582,7 @@ export function BackendEmployees() {
                         <button onClick={() => setSelectedEmployee(emp)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="View">
                           <Eye className="w-4 h-4 text-gray-500" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Edit">
+                        <button onClick={() => setSelectedEmployee(emp)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Edit">
                           <Edit className="w-4 h-4 text-gray-500" />
                         </button>
                       </div>

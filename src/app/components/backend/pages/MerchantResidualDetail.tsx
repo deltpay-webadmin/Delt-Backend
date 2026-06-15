@@ -1,4 +1,5 @@
 import React, { useState, useMemo, Fragment } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ArrowLeft, Download, Edit3, DollarSign, TrendingUp, TrendingDown,
   BarChart3, Activity, Shield, CheckCircle, AlertTriangle, Monitor,
@@ -245,6 +246,24 @@ export function MerchantResidualDetail() {
     { key: 'batches' as const, label: 'Batch History', icon: FileText },
   ];
 
+  const handleExportStatement = () => {
+    const header = ['Period', 'Volume', 'Txns', 'Gross Rev', 'Proc Fees', 'Net Rev', 'Agent Share', 'Delt Net', 'Eff Rate', 'Avg Ticket'];
+    const rows = residuals.map(r => [r.month, r.volume, r.txns, r.grossRev, r.procFees, r.netRev, r.agentShare, r.deltNet, r.effRate, r.avgTicket]);
+    const csv = [header, ...rows]
+      .map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${M.mid}-residual-statement.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Exported', { description: `${M.name} residual statement downloaded as CSV.` });
+  };
+
   return (
     <div className="h-full overflow-y-auto bg-canvas">
       <div className="max-w-[1440px] mx-auto px-6 py-6">
@@ -282,10 +301,13 @@ export function MerchantResidualDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
+            <button
+              onClick={() => toast.info('Edit merchant', { description: `Editing ${M.name} — merchant profile editor coming soon.` })}
+              className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors"
+            >
               <Edit3 className="w-4 h-4" /> Edit
             </button>
-            <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+            <button onClick={handleExportStatement} className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
               <Download className="w-4 h-4" /> Export Statement
             </button>
           </div>
@@ -1091,7 +1113,12 @@ export function MerchantResidualDetail() {
                             </div>
                             <span className={`text-sm ${e.attached ? 'text-gray-900' : 'text-gray-500'}`}>{e.doc}</span>
                           </div>
-                          <button className="text-xs text-brand font-medium hover:underline">{e.attached ? 'View' : 'Upload'}</button>
+                          <button
+                            onClick={() => e.attached
+                              ? toast.info('Opening document', { description: e.doc })
+                              : toast.success('Upload started', { description: `Attach "${e.doc}" to this dispute.` })}
+                            className="text-xs text-brand font-medium hover:underline"
+                          >{e.attached ? 'View' : 'Upload'}</button>
                         </div>
                       ))}
                     </div>
@@ -1120,7 +1147,7 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
+                  {cb.status !== 'Won' && <button onClick={() => { toast.success('Representment submitted', { description: `Dispute for ${fmt(cb.amount)} chargeback sent to issuer for review.` }); setDisputeModal({ open: false, chargeback: null }); }} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
                   <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
                 </div>
               </div>

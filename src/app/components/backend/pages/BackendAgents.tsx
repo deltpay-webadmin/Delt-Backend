@@ -33,6 +33,7 @@ import {
   Info,
   Check,
 } from 'lucide-react';
+import { toast } from 'sonner@2.0.3';
 
 // ── Types ──
 type AgentStatus = 'Active' | 'Inactive' | 'Probation';
@@ -160,6 +161,29 @@ const defaultPipeline: PipelineRow[] = [
 const fmt = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const fmtFull = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
 
+function downloadCSV(filename: string, rows: (string | number)[][]) {
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadCommissionStatement(agent: Agent, c: CommissionHistoryRow) {
+  downloadCSV(
+    `${agent.name.replace(/\s+/g, '-')}-${c.month.replace(/\s+/g, '-')}-statement.csv`,
+    [
+      ['Agent', 'Period', 'Deals', 'Earned', 'Status', 'Paid / Due Date'],
+      [agent.name, c.month, c.deals, c.earned, c.status, c.paidDate],
+    ],
+  );
+}
+
 function statusBadge(status: AgentStatus) {
   const map = {
     Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -238,7 +262,10 @@ export function BackendAgents() {
           <h1 className="text-2xl font-bold text-gray-900">Agents</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your sales team, Sub-ISOs, and agent performance.</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors shadow-sm">
+        <button
+          onClick={() => toast.info('Opening agent onboarding…')}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors shadow-sm"
+        >
           <Plus className="w-4 h-4" />
           Onboard Agent
         </button>
@@ -337,12 +364,14 @@ export function BackendAgents() {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
+                        onClick={() => setSelectedAgent(agent)}
                         className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
+                        onClick={() => toast.success(`${agent.name} deactivated`)}
                         className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors"
                         title="Deactivate"
                       >
@@ -625,7 +654,10 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[6px] hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => toast.info(`Editing ${agent.name}`)}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[6px] hover:bg-gray-50 transition-colors"
+              >
                 <Edit className="w-4 h-4" />
                 Edit
               </button>
@@ -636,7 +668,10 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                 <ArrowRightLeft className="w-4 h-4" />
                 Reassign Portfolio
               </button>
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-[6px] hover:bg-red-100 transition-colors">
+              <button
+                onClick={() => toast.success(`${agent.name} deactivated`)}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-[6px] hover:bg-red-100 transition-colors"
+              >
                 <UserX className="w-4 h-4" />
                 Deactivate
               </button>
@@ -853,7 +888,11 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{c.paidDate}</td>
                     <td className="px-4 py-3 text-center">
-                      <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
+                      <button
+                        onClick={() => downloadCommissionStatement(agent, c)}
+                        className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Download PDF"
+                      >
                         <Download className="w-4 h-4" />
                       </button>
                     </td>
@@ -1001,6 +1040,11 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
           </button>
           <button
             disabled={!targetAgent}
+            onClick={() => {
+              const target = availableAgents.find(a => a.id === targetAgent);
+              toast.success(`Reassigned ${agent.merchants} merchants from ${agent.name}${target ? ` to ${target.name}` : ''}`);
+              onClose();
+            }}
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-[6px] hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
           >
             Reassign Portfolio

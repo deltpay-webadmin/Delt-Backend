@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ShieldAlert,
   UserMinus,
@@ -375,7 +376,7 @@ export function BackendRetention() {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => addTask(m.id, 'Schedule Agent Call')}
+                          onClick={() => { addTask(m.id, 'Schedule Agent Call'); toast.success('Save task assigned', { description: `Schedule Agent Call created for ${m.merchantName} — assigned to ${m.agent}.` }); }}
                           className="p-1.5 hover:bg-amber-50 rounded-md text-gray-400 hover:text-amber-600 transition-colors"
                           title="Assign Save Task"
                         >

@@ -29,6 +29,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { toast } from 'sonner@2.0.3';
+import { useAppNavigate } from '../NavigationContext';
 
 type Tab = 'dashboard' | 'ask';
 
@@ -227,6 +229,43 @@ export function BackendLensAI() {
 // Dashboard Tab
 // ════════════════════════════════════════
 function DashboardTab() {
+  const { navigate } = useAppNavigate();
+  const [dismissed, setDismissed] = useState<Set<number>>(new Set());
+
+  const handleAlertAction = (action: string, index: number) => {
+    switch (action) {
+      case 'View Forecast':
+      case 'View Breakdown':
+        navigate('/financials');
+        break;
+      case 'Assign Outreach':
+        navigate('/outreach');
+        break;
+      case 'View Merchants':
+        navigate('/merchants');
+        break;
+      case 'Review Deals':
+        navigate('/analysis');
+        break;
+      case 'View Details':
+      case 'Generate Offers':
+        navigate('/residuals');
+        break;
+      case 'Adjust Reserves':
+        navigate('/capital');
+        break;
+      case 'Dismiss':
+      case 'Acknowledge':
+        setDismissed((prev) => new Set(prev).add(index));
+        toast.success(`Alert ${action.toLowerCase()}d`);
+        break;
+      default:
+        toast.info(action);
+    }
+  };
+
+  const visibleAlerts = alerts.map((a, i) => ({ ...a, index: i })).filter((a) => !dismissed.has(a.index));
+
   return (
     <div className="space-y-6">
       {/* Portfolio Health Cards */}
@@ -282,13 +321,13 @@ function DashboardTab() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Intelligent Alerts</h2>
-          <span className="text-xs text-gray-500">{alerts.length} active</span>
+          <span className="text-xs text-gray-500">{visibleAlerts.length} active</span>
         </div>
         <div className="space-y-3">
-          {alerts.map((alert, i) => {
+          {visibleAlerts.map((alert) => {
             const sev = sevConfig[alert.severity];
             return (
-              <div key={i} className={`${sev.bg} border rounded-[8px] p-4 sm:p-5 transition-all hover:shadow-sm`}>
+              <div key={alert.index} className={`${sev.bg} border rounded-[8px] p-4 sm:p-5 transition-all hover:shadow-sm`}>
                 <div className="flex gap-4">
                   <div className={`w-9 h-9 ${sev.iconBg} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     {alert.severity === 'critical' ? (
@@ -311,6 +350,7 @@ function DashboardTab() {
                       {alert.actions.map((action, j) => (
                         <button
                           key={j}
+                          onClick={() => handleAlertAction(action, alert.index)}
                           className={`px-3 py-1.5 text-xs font-medium rounded-[6px] transition-colors ${
                             j === 0
                               ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'

@@ -7,6 +7,7 @@ import {
   CheckCircle, X, Settings, Send,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { toast } from 'sonner@2.0.3';
 
 // ── Template library by product + channel ──
 type TemplateChannel = 'email' | 'text';
@@ -192,14 +193,14 @@ export function TemplateEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Undo">
+          <button onClick={() => toast.info('Nothing to undo')} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Undo">
             <Undo2 className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Redo">
+          <button onClick={() => toast.info('Nothing to redo')} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Redo">
             <Redo2 className="w-4 h-4" />
           </button>
           <div className="w-px h-6 bg-gray-200 mx-1" />
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Duplicate Template">
+          <button onClick={() => toast.success(`Duplicated "${selectedTemplate.name}"`)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Duplicate Template">
             <Copy className="w-4 h-4" />
           </button>
           <button
@@ -312,7 +313,7 @@ export function TemplateEditor() {
 
                 {/* Create New */}
                 <div className="px-3 py-3 border-t border-gray-100">
-                  <button className="w-full py-2 text-xs text-brand font-medium border border-dashed border-brand/30 rounded-[6px] hover:bg-brand/5 transition-colors flex items-center justify-center gap-1.5">
+                  <button onClick={() => { setEditSubject(''); setEditBody(''); setHasUnsavedChanges(true); toast.success('New template draft started'); }} className="w-full py-2 text-xs text-brand font-medium border border-dashed border-brand/30 rounded-[6px] hover:bg-brand/5 transition-colors flex items-center justify-center gap-1.5">
                     <Plus className="w-3.5 h-3.5" />
                     Create New Template
                   </button>

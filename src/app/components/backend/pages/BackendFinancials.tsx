@@ -29,6 +29,21 @@ import {
   Area,
   ReferenceLine,
 } from 'recharts';
+import { toast } from 'sonner@2.0.3';
+import { useAppNavigate } from '../NavigationContext';
+
+function downloadCSV(filename: string, rows: (string | number)[][]) {
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 type Period = 'month' | 'quarter' | 'year' | 'custom';
 
@@ -122,6 +137,7 @@ const fmtK = (n: number) => {
 };
 
 export function BackendFinancials() {
+  const { navigate } = useAppNavigate();
   const [period, setPeriod] = useState<Period>('month');
 
   const periods: { key: Period; label: string }[] = [
@@ -158,7 +174,19 @@ export function BackendFinancials() {
               </button>
             ))}
           </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => {
+              downloadCSV('financials-report.csv', [
+                ['Metric', 'Value', 'Trend'],
+                ...summaryCards.map(c => [c.label, c.value, c.trend]),
+                [],
+                ['Date', 'Description', 'Type', 'Amount', 'Category'],
+                ...transactions.map(t => [t.date, t.desc, t.type, t.amount, t.category]),
+              ]);
+              toast.success('Exported');
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+          >
             <Download className="w-4 h-4" />
             Export Report
           </button>
@@ -421,7 +449,7 @@ export function BackendFinancials() {
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
           <span>Showing 8 most recent</span>
-          <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">View All Transactions</button>
+          <button onClick={() => navigate('/capital')} className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">View All Transactions</button>
         </div>
       </div>
     </div>

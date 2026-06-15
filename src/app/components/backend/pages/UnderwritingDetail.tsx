@@ -342,7 +342,7 @@ export function UnderwritingDetail() {
               title="Plaid"
               status="success"
               lastPulled="Apr 9, 2026 at 10:23 AM"
-              onPullData={() => console.log('Pulling Plaid data...')}
+              onPullData={() => toast.success('Plaid data refreshed', { description: `${application.businessName} — bank & verification data re-pulled.` })}
             >
               <div className="grid grid-cols-2 gap-3">
                 <InfoField
@@ -389,7 +389,7 @@ export function UnderwritingDetail() {
               title="CRS Credit"
               status="success"
               lastPulled="Apr 9, 2026 at 10:24 AM"
-              onPullData={() => console.log('Pulling CRS data...')}
+              onPullData={() => toast.success('CRS Credit data refreshed', { description: `${application.businessName} — credit report re-pulled.` })}
             >
               <div className="grid grid-cols-2 gap-3">
                 <InfoField label="Business Credit Score" value="720" />
@@ -410,7 +410,7 @@ export function UnderwritingDetail() {
               title="DataMerch"
               status="success"
               lastPulled="Apr 9, 2026 at 10:24 AM"
-              onPullData={() => console.log('Pulling DataMerch data...')}
+              onPullData={() => toast.success('DataMerch data refreshed', { description: `${application.businessName} — stacking & position data re-pulled.` })}
             >
               <InfoField
                 label="Stacking Status"

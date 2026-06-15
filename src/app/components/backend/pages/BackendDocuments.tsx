@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   FileText, Search, Plus, Download, Eye, Send, CheckCircle,
   Clock, AlertTriangle, X, Upload, PenTool, Lock, Unlock,
@@ -68,8 +69,18 @@ const DOCUMENTS: Document[] = [
 ];
 
 // ── Upload Modal ──
-function UploadModal({ onClose }: { onClose: () => void }) {
+function UploadModal({ onClose, onUpload }: { onClose: () => void; onUpload: (data: { type: DocType; merchant: string; sendForSignature: boolean }) => void }) {
   const [dragOver, setDragOver] = useState(false);
+  const [docType, setDocType] = useState<DocType>(Object.keys(TYPE_LABELS)[0] as DocType);
+  const [merchant, setMerchant] = useState('');
+  const [sendForSignature, setSendForSignature] = useState(false);
+
+  const handleUpload = () => {
+    if (!merchant.trim()) { toast.error('Please enter a merchant'); return; }
+    onUpload({ type: docType, merchant: merchant.trim(), sendForSignature });
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-[8px] shadow-xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
@@ -80,13 +91,13 @@ function UploadModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 space-y-4">
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Document Type</label>
-            <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
+            <select value={docType} onChange={e => setDocType(e.target.value as DocType)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
               {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant</label>
-            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+            <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
           <div
             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -98,13 +109,13 @@ function UploadModal({ onClose }: { onClose: () => void }) {
             <p className="text-[10px] text-gray-400">PDF, DOCX, PNG, JPG up to 25 MB</p>
           </div>
           <div className="flex items-center gap-2">
-            <input type="checkbox" id="esign" className="rounded" />
+            <input type="checkbox" id="esign" className="rounded" checked={sendForSignature} onChange={e => setSendForSignature(e.target.checked)} />
             <label htmlFor="esign" className="text-xs text-gray-600">Send for e-signature after upload</label>
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Upload</button>
+          <button onClick={handleUpload} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Upload</button>
         </div>
       </div>
     </div>
@@ -117,9 +128,30 @@ export function BackendDocuments() {
   const [statusFilter, setStatusFilter] = useState<DocStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<DocType | 'all'>('all');
   const [showUpload, setShowUpload] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>(DOCUMENTS);
+
+  const handleUpload = ({ type, merchant, sendForSignature }: { type: DocType; merchant: string; sendForSignature: boolean }) => {
+    const today = new Date().toISOString().slice(0, 10);
+    const newDoc: Document = {
+      id: `DOC-${String(documents.length + 1).padStart(3, '0')}`,
+      name: `${TYPE_LABELS[type]} — ${merchant}`,
+      type,
+      status: sendForSignature ? 'sent' : 'draft',
+      merchant,
+      merchantId: '—',
+      createdDate: today,
+      sentDate: sendForSignature ? today : undefined,
+      agent: 'You',
+      pages: 1,
+      size: '—',
+      requiresNotarization: false,
+    };
+    setDocuments(prev => [newDoc, ...prev]);
+    toast.success(sendForSignature ? `Uploaded and sent ${newDoc.name} for signature` : `Uploaded ${newDoc.name}`);
+  };
 
   const filtered = useMemo(() => {
-    return DOCUMENTS.filter(d => {
+    return documents.filter(d => {
       if (statusFilter !== 'all' && d.status !== statusFilter) return false;
       if (typeFilter !== 'all' && d.type !== typeFilter) return false;
       if (search) {
@@ -128,13 +160,13 @@ export function BackendDocuments() {
       }
       return true;
     });
-  }, [search, statusFilter, typeFilter]);
+  }, [documents, search, statusFilter, typeFilter]);
 
   const statusCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    DOCUMENTS.forEach(d => { c[d.status] = (c[d.status] || 0) + 1; });
+    documents.forEach(d => { c[d.status] = (c[d.status] || 0) + 1; });
     return c;
-  }, []);
+  }, [documents]);
 
   const pendingCount = (statusCounts['pending_signature'] || 0) + (statusCounts['sent'] || 0);
   const signedCount = statusCounts['signed'] || 0;
@@ -157,7 +189,7 @@ export function BackendDocuments() {
           <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Upload className="w-3.5 h-3.5" /> Upload
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button onClick={() => toast.info('Starting new e-sign request…')} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <PenTool className="w-3.5 h-3.5" /> New E-Sign Request
           </button>
         </div>
@@ -242,9 +274,9 @@ export function BackendDocuments() {
                 <SIcon className="w-3 h-3" />{scfg.label}
               </span>
               <div className="w-16 shrink-0 flex items-center gap-1">
-                <button className="p-1 hover:bg-gray-100 rounded" title="View"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-gray-400" /></button>
-                {(doc.status === 'draft') && <button className="p-1 hover:bg-blue-50 rounded" title="Send for signature"><Send className="w-3.5 h-3.5 text-blue-500" /></button>}
+                <button onClick={() => toast.info(`Opening ${doc.name}…`)} className="p-1 hover:bg-gray-100 rounded" title="View"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
+                <button onClick={() => toast.success(`Downloading ${doc.name}`)} className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-gray-400" /></button>
+                {(doc.status === 'draft') && <button onClick={() => { setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, status: 'sent', sentDate: new Date().toISOString().slice(0, 10) } : d)); toast.success(`Sent ${doc.name} for signature`); }} className="p-1 hover:bg-blue-50 rounded" title="Send for signature"><Send className="w-3.5 h-3.5 text-blue-500" /></button>}
               </div>
             </div>
           );
@@ -257,7 +289,7 @@ export function BackendDocuments() {
         )}
       </div>
 
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} />}
+      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onUpload={handleUpload} />}
     </div>
   );
 }

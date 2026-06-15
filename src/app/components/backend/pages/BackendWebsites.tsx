@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Globe, Search, Plus, Eye, Edit3, ExternalLink, CheckCircle,
   Clock, AlertTriangle, X, BarChart3, TrendingUp, Users,
@@ -83,8 +84,8 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-[6px] border border-gray-200">
               <Globe className="w-4 h-4 text-gray-400 shrink-0" />
               <span className="text-xs text-gray-600 flex-1 truncate">{site.domain}</span>
-              <button className="p-1 hover:bg-gray-200 rounded"><Copy className="w-3 h-3 text-gray-400" /></button>
-              <button className="p-1 hover:bg-gray-200 rounded"><ExternalLink className="w-3 h-3 text-gray-400" /></button>
+              <button onClick={() => { navigator.clipboard?.writeText(site.domain); toast.success('URL copied to clipboard'); }} className="p-1 hover:bg-gray-200 rounded"><Copy className="w-3 h-3 text-gray-400" /></button>
+              <button onClick={() => { window.open(`https://${site.domain}`, '_blank'); toast.success('Opening site'); }} className="p-1 hover:bg-gray-200 rounded"><ExternalLink className="w-3 h-3 text-gray-400" /></button>
             </div>
             {site.customDomain && (
               <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-[6px] border border-emerald-200">
@@ -168,24 +169,24 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
         {/* Actions */}
         <div className="px-5 py-3 border-t border-gray-200 flex items-center gap-2">
           {site.status === 'live' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button onClick={() => toast.info(`Opening editor for ${site.merchant}…`)} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Edit3 className="w-3.5 h-3.5" /> Edit Site
             </button>
           )}
           {site.status === 'building' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button onClick={() => toast.info(`Resuming build for ${site.merchant}…`)} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Layers className="w-3.5 h-3.5" /> Continue Building
             </button>
           )}
           {site.status === 'draft' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button onClick={() => toast.info(`Starting build for ${site.merchant}…`)} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
               <Zap className="w-3.5 h-3.5" /> Start Build
             </button>
           )}
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button onClick={() => { window.open(`https://${site.domain}`, '_blank'); toast.success('Opening preview'); }} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Eye className="w-3.5 h-3.5" /> Preview
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button onClick={() => toast.info('Opening domain settings…')} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Settings className="w-3.5 h-3.5" /> Domain Settings
           </button>
         </div>
@@ -230,7 +231,7 @@ export function BackendWebsites() {
             <p className="text-sm text-gray-500">Manage merchant websites, domains, and analytics</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+        <button onClick={() => toast.info('Opening new site builder…')} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> New Site
         </button>
       </div>

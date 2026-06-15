@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Users,
   DollarSign,
@@ -393,13 +394,13 @@ export function BackendSubscriptions() {
                         <td className="px-4 py-3 text-xs text-gray-500">{sub.nextBilling}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-1">
-                            <button className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors" title="View">
+                            <button onClick={() => toast.info(`Viewing ${sub.merchantName}`)} className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors" title="View">
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Change Plan">
+                            <button onClick={() => toast.info(`Change plan for ${sub.merchantName}`)} className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Change Plan">
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Cancel">
+                            <button onClick={() => toast.success(`${sub.merchantName} subscription cancelled`)} className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Cancel">
                               <XCircle className="w-4 h-4" />
                             </button>
                           </div>
@@ -519,7 +520,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
           <h1 className="text-2xl font-bold text-gray-900">ISO Tenants</h1>
           <p className="text-sm text-gray-500 mt-1">Manage ISOs licensing the Delt platform</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">
+        <button onClick={() => toast.info('Opening ISO onboarding…')} className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">
           <Plus className="w-4 h-4" />
           Onboard ISO
         </button>
@@ -594,10 +595,10 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
                         <button onClick={() => onViewTenant(t)} className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors" title="View">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
+                        <button onClick={() => toast.info(`Edit ${t.name}`)} className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Suspend">
+                        <button onClick={() => toast.success(`${t.name} suspended`)} className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Suspend">
                           <ShieldAlert className="w-4 h-4" />
                         </button>
                       </div>
@@ -679,10 +680,10 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-[6px] text-gray-600 hover:bg-gray-50 transition-colors">
+            <button onClick={() => toast.info(`Edit ${tenant.name}`)} className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-[6px] text-gray-600 hover:bg-gray-50 transition-colors">
               Edit Tenant
             </button>
-            <button className="px-4 py-2 text-sm font-medium border border-red-200 rounded-[6px] text-red-600 hover:bg-red-50 transition-colors">
+            <button onClick={() => toast.success(`${tenant.name} suspended`)} className="px-4 py-2 text-sm font-medium border border-red-200 rounded-[6px] text-red-600 hover:bg-red-50 transition-colors">
               Suspend
             </button>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner@2.0.3';
 import { ArrowLeft, TrendingUp, TrendingDown, Edit, Plus, Download, FileText, FileCheck, File, Receipt, CalendarDays, CreditCard, Banknote, Globe, AlertCircle, Mail, MessageSquare, Monitor, Eye, MousePointerClick, ChevronDown, Send, PlusCircle, ToggleLeft, ToggleRight, CheckCircle, Settings, Clock, Percent, XCircle, ExternalLink, Gauge, Smartphone, Activity, Brain, Zap, Shield, BarChart3, Key, Package, Gift, Copy, Users, Truck, Link2, X, ShieldAlert, StickyNote, Flag, Calendar, Megaphone, Trash2 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
 
@@ -87,7 +88,7 @@ function DocumentItem({ name, type, date }: { name: string; type: string; date: 
           </div>
         </div>
       </div>
-      <button className="p-2 hover:bg-gray-100 rounded-md transition-colors"><Download className="w-4 h-4 text-gray-600" /></button>
+      <button onClick={() => toast.success(`Downloading ${name}`)} className="p-2 hover:bg-gray-100 rounded-md transition-colors"><Download className="w-4 h-4 text-gray-600" /></button>
     </div>
   );
 }
@@ -147,7 +148,7 @@ function OutreachTemplateCard({ name, desc, tplId, onPreview }: { name: string; 
       <div className="min-w-0 flex-1"><p className="text-sm font-medium text-gray-900">{name}</p><p className="text-xs text-gray-500 mt-0.5">{desc}</p></div>
       <div className="flex items-center gap-2 ml-3 shrink-0">
         <button onClick={() => onPreview(tplId)} className="text-xs text-brand hover:underline">Preview</button>
-        <button className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1"><Send className="w-3 h-3" />Send</button>
+        <button onClick={() => toast.success(`"${name}" sent`)} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1"><Send className="w-3 h-3" />Send</button>
       </div>
     </div>
   );
@@ -240,8 +241,8 @@ export function MerchantDetail() {
               <p className="text-sm text-gray-600">Assigned to: <span className="font-medium text-gray-900">Sarah Johnson</span></p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"><Edit className="w-4 h-4" />Edit</button>
-              <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-2"><Plus className="w-4 h-4" />New MCA Application</button>
+              <button onClick={() => toast.info('Edit merchant — opening editor')} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"><Edit className="w-4 h-4" />Edit</button>
+              <button onClick={() => navigate('/capital')} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-2"><Plus className="w-4 h-4" />New MCA Application</button>
             </div>
           </div>
         </div>
@@ -283,7 +284,7 @@ export function MerchantDetail() {
 
               {/* Document Vault */}
               <div className="bg-white rounded-lg border border-gray-200">
-                <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><div><h2 className="text-lg font-semibold text-gray-900">Document Vault</h2><p className="text-xs text-gray-500 mt-1">9 documents</p></div><button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">View All</button></div>
+                <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><div><h2 className="text-lg font-semibold text-gray-900">Document Vault</h2><p className="text-xs text-gray-500 mt-1">9 documents</p></div><button onClick={() => toast.info('Opening document vault')} className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">View All</button></div>
                 <div className="px-5 py-4">
                   <DocumentItem name="MCA Agreement - 2024-0847.pdf" type="Agreement" date="Jan 15, 2026" />
                   <DocumentItem name="Bank Statements - Oct 2025.pdf" type="Bank Statement" date="Nov 3, 2025" />
@@ -455,7 +456,7 @@ export function MerchantDetail() {
                     <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4"><Globe className="w-8 h-8 text-gray-300" /></div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">Website Not Active</h3>
                     <p className="text-sm text-gray-500 mb-5 max-w-sm">This merchant hasn't activated a website yet.</p>
-                    <button className="px-5 py-2.5 bg-info text-white text-sm font-medium rounded-[6px] hover:bg-info-hover transition-colors">Send Website Offer</button>
+                    <button onClick={() => toast.success('Website offer sent to merchant')} className="px-5 py-2.5 bg-info text-white text-sm font-medium rounded-[6px] hover:bg-info-hover transition-colors">Send Website Offer</button>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg border border-gray-200 px-5 py-4 flex items-center justify-between">
@@ -503,7 +504,7 @@ export function MerchantDetail() {
         {activeTab === 'lens' && (
           <div className="space-y-6">
             {merchantProducts.lens === 'inactive' ? (
-              <div className="bg-white rounded-lg border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><button className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">Activate Lens AI</button></div></div>
+              <div className="bg-white rounded-lg border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><button onClick={() => toast.success('Lens AI activation initiated')} className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">Activate Lens AI</button></div></div>
             ) : (
               <>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -519,7 +520,7 @@ export function MerchantDetail() {
                       <div className="px-5 py-4"><div className="flex items-end gap-1 h-32">{[320,410,380,520,470,390,610,580,430,510,620,540,490,680,420,530,470,560,640,510,450,580,620,490,530,610,550,480,570,630].map((v, i) => <div key={i} className="flex-1 bg-purple-200 hover:bg-purple-400 rounded-t transition-colors cursor-pointer" style={{ height: `${(v / 680) * 100}%` }} title={`Day ${i + 1}: ${v} calls`} />)}</div><div className="flex justify-between mt-2"><span className="text-[10px] text-gray-400">Mar 11</span><span className="text-[10px] text-gray-400">Mar 21</span><span className="text-[10px] text-gray-400">Mar 31</span><span className="text-[10px] text-gray-400">Apr 10</span></div></div>
                     </div>
                     <div className="bg-white rounded-lg border border-gray-200">
-                      <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><h2 className="text-sm font-semibold text-gray-900">Recent API Calls</h2><button className="text-xs text-brand font-medium hover:underline">View All</button></div>
+                      <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between"><h2 className="text-sm font-semibold text-gray-900">Recent API Calls</h2><button onClick={() => toast.info('Loading full API call log')} className="text-xs text-brand font-medium hover:underline">View All</button></div>
                       <div className="overflow-x-auto"><table className="w-full"><thead className="bg-gray-50 border-b border-gray-200"><tr><th className="px-5 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Timestamp</th><th className="px-5 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Endpoint</th><th className="px-5 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th><th className="px-5 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Latency</th></tr></thead><tbody className="divide-y divide-gray-100">{[{ time: 'Apr 10, 2:14 PM', endpoint: '/v1/insights/revenue', status: 200, latency: '128ms' },{ time: 'Apr 10, 2:12 PM', endpoint: '/v1/predict/churn', status: 200, latency: '156ms' },{ time: 'Apr 10, 1:58 PM', endpoint: '/v1/analyze/transactions', status: 200, latency: '203ms' },{ time: 'Apr 10, 1:30 PM', endpoint: '/v1/score/health', status: 500, latency: '2,104ms' }].map((r, i) => (<tr key={i} className="hover:bg-gray-50/50"><td className="px-5 py-2.5 text-sm text-gray-600">{r.time}</td><td className="px-5 py-2.5"><code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700 font-mono">{r.endpoint}</code></td><td className="px-5 py-2.5"><span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${r.status === 200 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>{r.status}</span></td><td className={`px-5 py-2.5 text-sm tabular-nums ${r.latency.includes('2,') ? 'text-red-600 font-medium' : 'text-gray-600'}`}>{r.latency}</td></tr>))}</tbody></table></div>
                     </div>
                   </div>
@@ -531,7 +532,7 @@ export function MerchantDetail() {
                     <div className="bg-white rounded-lg border border-gray-200">
                       <div className="px-5 py-4 border-b border-gray-200"><h2 className="text-sm font-semibold text-gray-900">API Configuration</h2></div>
                       <div className="px-5 py-4 space-y-4">
-                        <div><label className="text-xs text-gray-500 font-medium block mb-1">API Key</label><div className="flex items-center gap-2"><code className="flex-1 text-xs bg-gray-50 border border-gray-200 rounded-[6px] px-3 py-2 font-mono text-gray-600 truncate">sk-lens-****************************a7f2</code><button className="px-2.5 py-2 bg-gray-100 text-gray-600 rounded-[6px] hover:bg-gray-200 transition-colors"><Key className="w-3.5 h-3.5" /></button></div></div>
+                        <div><label className="text-xs text-gray-500 font-medium block mb-1">API Key</label><div className="flex items-center gap-2"><code className="flex-1 text-xs bg-gray-50 border border-gray-200 rounded-[6px] px-3 py-2 font-mono text-gray-600 truncate">sk-lens-****************************a7f2</code><button onClick={() => { navigator.clipboard.writeText('sk-lens-****************************a7f2').catch(() => {}); toast.success('API key copied'); }} className="px-2.5 py-2 bg-gray-100 text-gray-600 rounded-[6px] hover:bg-gray-200 transition-colors"><Key className="w-3.5 h-3.5" /></button></div></div>
                         <div><label className="text-xs text-gray-500 font-medium block mb-1">Webhook URL</label><code className="block text-xs bg-gray-50 border border-gray-200 rounded-[6px] px-3 py-2 font-mono text-gray-600 truncate">https://api.deltpay.com/webhooks/lens/mc-001</code></div>
                         <div className="grid grid-cols-2 gap-3"><div><label className="text-xs text-gray-500 font-medium block mb-1">Rate Limit</label><p className="text-sm font-medium text-gray-900">1,000/min</p></div><div><label className="text-xs text-gray-500 font-medium block mb-1">Plan Quota</label><p className="text-sm font-medium text-gray-900">50,000/mo</p></div></div>
                         <div><label className="text-xs text-gray-500 font-medium block mb-1">Usage This Month</label><div className="flex items-center gap-3"><div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-purple-500 rounded-full" style={{ width: '25.7%' }} /></div><span className="text-xs text-gray-600 font-medium">12,847 / 50,000</span></div></div>

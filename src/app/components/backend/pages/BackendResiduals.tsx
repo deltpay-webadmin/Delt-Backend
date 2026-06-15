@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
+import { toast } from 'sonner@2.0.3';
 import { useAppNavigate } from '../NavigationContext';
 import {
   Upload, FileSpreadsheet, CheckCircle2, Download, Search,
@@ -129,6 +130,25 @@ export function BackendResiduals() {
     setStep('idle');
     setFiles([]);
     setShowUpload(false);
+  };
+
+  const downloadHistory = (h: UploadHistory) => {
+    const headers = ['Merchant ID', 'Merchant Name', 'Monthly Volume', 'Transactions', 'Gross Revenue', 'Processor Fees', 'Net Revenue', 'Agent', 'Agent Share', 'Delt Net'];
+    const rows = mockResidualRows.map(r => [
+      r.merchantId, r.merchantName, r.monthlyVolume, r.transactionCount,
+      r.grossRevenue, r.processorFees, r.netRevenue, r.agent, r.agentShare, r.deltNet,
+    ]);
+    const csv = [headers, ...rows].map(line => line.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = h.fileName || `residuals-${h.period.replace(/\s+/g, '-').toLowerCase()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${h.period} residuals`);
   };
 
   const filtered = useMemo(() => {
@@ -454,7 +474,7 @@ export function BackendResiduals() {
                       </span>
                     </td>
                     <td className="px-3 py-3 pr-5 text-right">
-                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
+                      <button onClick={() => downloadHistory(h)} className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
                         <Download className="w-3.5 h-3.5" />
                         Download
                       </button>
@@ -505,6 +525,22 @@ export function AgentResiduals() {
   const myVolume = agentMerchants.reduce((s, r) => s + r.monthlyVolume, 0);
   const trend = myTotal - prevPeriodAgentTotal;
   const trendPct = ((trend / prevPeriodAgentTotal) * 100).toFixed(1);
+
+  const downloadStatement = (s: AgentStatement) => {
+    const headers = ['Period', 'Merchants', 'Volume', 'Commission'];
+    const row = [s.period, s.merchants, s.volume, s.commission];
+    const csv = [headers, row].map(line => line.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `commission-statement-${s.period.replace(/\s+/g, '-').toLowerCase()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${s.period} statement`);
+  };
 
   return (
     <div className="h-full overflow-y-auto">
@@ -596,7 +632,7 @@ export function AgentResiduals() {
                     <td className="px-3 py-3 text-sm text-gray-900 text-right tabular-nums">{fmtWhole(s.volume)}</td>
                     <td className="px-3 py-3 text-sm text-emerald-700 text-right font-medium tabular-nums">{fmt(s.commission)}</td>
                     <td className="px-3 py-3 pr-5 text-right">
-                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
+                      <button onClick={() => downloadStatement(s)} className="inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline underline-offset-2">
                         <Download className="w-3.5 h-3.5" />
                         PDF
                       </button>

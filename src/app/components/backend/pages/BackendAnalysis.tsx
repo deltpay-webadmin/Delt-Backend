@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Upload, FileText, Sparkles, Download, UserPlus, Clock,
   CheckCircle2, XCircle, Send, TrendingDown, DollarSign,
@@ -170,6 +171,54 @@ export function BackendAnalysis() {
     setFiles([]);
     setExtracted(null);
     setProposal(null);
+  };
+
+  const generateProposalPDF = () => {
+    if (!proposal) return;
+    const merchant = autoLeadName || files[0]?.name || 'Merchant';
+    const rows: [string, string][] = [
+      ['Merchant', merchant],
+      ['Current Effective Rate', `${proposal.currentRate}%`],
+      ['Delt Effective Rate', `${proposal.deltRate}%`],
+      ['Current Monthly Cost', fmt(proposal.currentMonthlyCost)],
+      ['Delt Monthly Cost', fmt(proposal.deltMonthlyCost)],
+      ['Current Annual Cost', fmtWhole(proposal.currentAnnualCost)],
+      ['Delt Annual Cost', fmtWhole(proposal.deltAnnualCost)],
+      ['Projected Annual Savings', fmtWhole(proposal.annualSavings)],
+      ['Savings %', `${proposal.savingsPercent}%`],
+    ];
+    const csv = ['Field,Value', ...rows.map(([k, v]) => `"${k}","${v}"`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `delt-savings-proposal-${merchant.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Proposal exported');
+  };
+
+  const handleCreateLead = () => {
+    const merchant = autoLeadName || (files[0]?.name || 'New Prospect');
+    setAutoLeadName(merchant);
+    setAutoLeadCreated(true);
+    setLeadBannerVisible(true);
+    setHistory(prev =>
+      prev.some(h => h.merchantName === merchant && h.status === 'Lead Created')
+        ? prev
+        : [{
+            id: `h-manual-${Date.now()}`,
+            merchantName: merchant,
+            dateAnalyzed: 'Apr 9, 2026',
+            currentRate: proposal?.currentRate ?? mockProposal.currentRate,
+            proposedRate: proposal?.deltRate ?? mockProposal.deltRate,
+            savings: proposal?.annualSavings ?? mockProposal.annualSavings,
+            status: 'Lead Created',
+          }, ...prev]
+    );
+    toast.success(`Lead "${merchant}" created`);
   };
 
   const statusBadge = (s: HistoryStatus) => {
@@ -449,7 +498,7 @@ export function BackendAnalysis() {
 
                       {/* CTA buttons */}
                       <div className="mt-auto pt-5 flex items-center gap-3">
-                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+                        <button onClick={generateProposalPDF} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
                           <Download className="w-4 h-4" />
                           Generate Proposal PDF
                         </button>
@@ -462,7 +511,7 @@ export function BackendAnalysis() {
                             Lead Created — View
                           </button>
                         ) : (
-                          <button className="flex-1 px-4 py-2.5 bg-white text-brand text-sm font-medium rounded-[6px] border border-brand hover:bg-brand/5 transition-colors flex items-center justify-center gap-2">
+                          <button onClick={handleCreateLead} className="flex-1 px-4 py-2.5 bg-white text-brand text-sm font-medium rounded-[6px] border border-brand hover:bg-brand/5 transition-colors flex items-center justify-center gap-2">
                             <UserPlus className="w-4 h-4" />
                             Create Lead
                           </button>

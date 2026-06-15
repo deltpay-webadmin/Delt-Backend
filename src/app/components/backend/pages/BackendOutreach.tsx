@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Send, Mail, MessageSquare, MousePointerClick, BarChart3, Zap,
   Search, Filter, ChevronDown, Plus, Eye, Clock, CheckCircle,
@@ -275,6 +276,7 @@ export function BackendOutreach() {
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const [editingDrip, setEditingDrip] = useState<string | null>(null);
+  const [triggerStatusOverrides, setTriggerStatusOverrides] = useState<Record<string, TriggerStatus>>({});
 
   // ── Aggregate metrics ──
   const metrics = useMemo(() => {
@@ -359,7 +361,7 @@ export function BackendOutreach() {
                 {AUTO_TRIGGERS.filter(t => t.status === 'active').length} automations live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button onClick={() => setActiveTab('bulk')} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Campaign
             </button>
           </div>
@@ -747,7 +749,7 @@ export function BackendOutreach() {
                   This is where the CRM starts working <strong>for</strong> you instead of you working the CRM.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+              <button onClick={() => toast.success('New automation rule created — configure its condition and action')} className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Rule
               </button>
             </div>
@@ -777,8 +779,9 @@ export function BackendOutreach() {
               {AUTO_TRIGGERS.map(trigger => {
                 const ch = channelIcon[trigger.channel];
                 const ChIcon = ch.icon;
-                const isActive = trigger.status === 'active';
-                const isPaused = trigger.status === 'paused';
+                const status = triggerStatusOverrides[trigger.id] ?? trigger.status;
+                const isActive = status === 'active';
+                const isPaused = status === 'paused';
                 return (
                   <div key={trigger.id} className={`bg-white rounded-[8px] border ${isActive ? 'border-gray-200' : isPaused ? 'border-red-200' : 'border-dashed border-gray-300'} p-5`}>
                     <div className="flex items-start justify-between">
@@ -789,7 +792,7 @@ export function BackendOutreach() {
                           <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
                             isActive ? 'bg-emerald-50 text-emerald-700' : isPaused ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-500'
                           }`}>
-                            {trigger.status.charAt(0).toUpperCase() + trigger.status.slice(1)}
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
                           </span>
                           <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold ${ch.bg} ${ch.text}`}>
                             <ChIcon className="w-3 h-3" />{ch.label}
@@ -819,7 +822,13 @@ export function BackendOutreach() {
                           </p>
                           <p className="text-[9px] text-gray-400">conversion</p>
                         </div>
-                        <button className={`p-2 rounded-[6px] border transition-colors ${
+                        <button
+                          onClick={() => {
+                            const next: TriggerStatus = isActive ? 'paused' : 'active';
+                            setTriggerStatusOverrides(prev => ({ ...prev, [trigger.id]: next }));
+                            toast.success(`${trigger.name} ${next === 'active' ? 'activated' : 'paused'}`);
+                          }}
+                          className={`p-2 rounded-[6px] border transition-colors ${
                           isActive ? 'border-gray-200 text-gray-500 hover:bg-gray-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
                         }`}>
                           {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -849,7 +858,7 @@ export function BackendOutreach() {
                   Create multi-step automated campaigns that nurture merchants over time. Each sequence is triggered by a condition and sends messages at defined intervals.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+              <button onClick={() => toast.success('New drip sequence created — add steps to configure it')} className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Sequence
               </button>
             </div>
@@ -937,7 +946,7 @@ export function BackendOutreach() {
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <button className="p-1 hover:bg-gray-200 rounded"><GripVertical className="w-3 h-3 text-gray-400" /></button>
-                                        <button className="p-1 hover:bg-red-50 rounded"><Trash2 className="w-3 h-3 text-gray-400 hover:text-red-500" /></button>
+                                        <button onClick={() => toast.success(`Step ${idx + 1} (${step.template}) removed from ${drip.name}`)} className="p-1 hover:bg-red-50 rounded"><Trash2 className="w-3 h-3 text-gray-400 hover:text-red-500" /></button>
                                       </div>
                                     </div>
                                     <div className="px-3 py-2.5">
@@ -956,7 +965,7 @@ export function BackendOutreach() {
                             );
                           })}
                         </div>
-                        <button className="mt-3 ml-13 text-sm text-brand hover:underline font-medium flex items-center gap-1.5">
+                        <button onClick={() => toast.success(`New step added to ${drip.name}`)} className="mt-3 ml-13 text-sm text-brand hover:underline font-medium flex items-center gap-1.5">
                           <Plus className="w-3.5 h-3.5" /> Add Step
                         </button>
                       </div>
@@ -1229,7 +1238,14 @@ export function BackendOutreach() {
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center justify-center gap-2">
+              <button onClick={() => {
+                const count = segments.find(s => s.label === bulkSegment)?.count || 0;
+                toast.success(`Campaign sent to ${count} merchants via ${channelIcon[bulkChannel].label} using ${bulkTemplate}`);
+                setShowBulkConfirm(false);
+                setBulkSegment('');
+                setBulkTemplate('');
+                setActiveTab('dashboard');
+              }} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center justify-center gap-2">
                 <Send className="w-4 h-4" /> Send Now
               </button>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   BarChart3, Download, FileText, Search, Calendar, Filter,
   TrendingUp, DollarSign, Users, Store, ChevronRight, Clock,
@@ -114,6 +115,22 @@ export function BackendReports() {
   const starredReports = filtered.filter(r => r.starred);
   const unstarredReports = filtered.filter(r => !r.starred);
 
+  const downloadReport = (report: Report, format: ReportFormat) => {
+    const header = ['Report ID', 'Name', 'Category', 'Schedule', 'Last Run', 'Estimated Rows'];
+    const row = [report.id, report.name, report.category, report.schedule || '', report.lastRun || '', String(report.estimatedRows ?? '')];
+    const csv = [header, row].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${report.id}-${report.name.replace(/[^a-z0-9]+/gi, '-')}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${report.name} (${FORMAT_LABELS[format].label})`);
+  };
+
   return (
     <div className="px-6 py-6 space-y-5">
       {/* Header */}
@@ -127,7 +144,7 @@ export function BackendReports() {
             <p className="text-sm text-gray-500">{REPORTS.length} reports &middot; {REPORTS.filter(r => r.schedule).length} scheduled</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+        <button onClick={() => toast.info('Opening custom report builder…')} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> Custom Report
         </button>
       </div>
@@ -199,7 +216,7 @@ export function BackendReports() {
                           {report.formats.map(f => {
                             const fcfg = FORMAT_LABELS[f];
                             return (
-                              <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
+                              <button key={f} onClick={() => downloadReport(report, f)} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
                                 <Download className="w-2.5 h-2.5" />{fcfg.label}
                               </button>
                             );
@@ -237,7 +254,7 @@ export function BackendReports() {
                       {report.schedule && <span className="text-[9px] text-gray-400 flex items-center gap-0.5 whitespace-nowrap"><Clock className="w-2.5 h-2.5" />{report.schedule}</span>}
                       <div className="flex items-center gap-1">
                         {report.formats.map(f => (
-                          <button key={f} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
+                          <button key={f} onClick={() => downloadReport(report, f)} className="px-2 py-1 bg-gray-50 hover:bg-brand/5 hover:text-brand border border-gray-200 rounded-[4px] text-[9px] font-semibold text-gray-500 transition-colors flex items-center gap-0.5">
                             <Download className="w-2.5 h-2.5" />{FORMAT_LABELS[f].label}
                           </button>
                         ))}
@@ -287,9 +304,9 @@ export function BackendReports() {
               <div className="w-20 shrink-0 flex items-center gap-1">
                 {exp.status === 'ready' && (
                   <>
-                    <button className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-brand" /></button>
-                    <button className="p-1 hover:bg-gray-100 rounded" title="Email"><Mail className="w-3.5 h-3.5 text-gray-400" /></button>
-                    <button className="p-1 hover:bg-gray-100 rounded" title="Preview"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
+                    <button onClick={() => toast.success(`Downloading ${exp.reportName} (${exp.format.toUpperCase()})`)} className="p-1 hover:bg-gray-100 rounded" title="Download"><Download className="w-3.5 h-3.5 text-brand" /></button>
+                    <button onClick={() => toast.success(`Emailing ${exp.reportName}…`)} className="p-1 hover:bg-gray-100 rounded" title="Email"><Mail className="w-3.5 h-3.5 text-gray-400" /></button>
+                    <button onClick={() => toast.info(`Opening preview of ${exp.reportName}…`)} className="p-1 hover:bg-gray-100 rounded" title="Preview"><Eye className="w-3.5 h-3.5 text-gray-400" /></button>
                   </>
                 )}
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ArrowLeft, DollarSign, Calendar, TrendingUp, TrendingDown, AlertTriangle,
   CheckCircle, Clock, FileText, ChevronRight, Shield, Building2, Percent,
@@ -105,6 +106,36 @@ export function DealDetail() {
 
   const payments = useMemo(() => generatePayments(deal), [deal.id]);
 
+  const handleExport = () => {
+    const rows: string[][] = [
+      ['Deal ID', deal.id],
+      ['Merchant', deal.merchant],
+      ['Type', deal.type],
+      ['Channel', deal.channel],
+      ['Funded Date', deal.funded],
+      ['Funded Amount', String(deal.fundedAmt)],
+      ['Factor', String(deal.factor)],
+      ['Total Owed', String(deal.totalOwed)],
+      ['Collected', String(deal.collected)],
+      ['Outstanding', String(outstanding)],
+      ['Status', deal.status],
+      [],
+      ['Payment Date', 'Expected', 'Actual', 'Balance', 'Status'],
+      ...payments.map(p => [p.date, String(p.expected), String(p.actual), String(p.balance), p.status]),
+    ];
+    const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deal.id}-deal-export.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Exported', { description: `${deal.id} deal data downloaded as CSV.` });
+  };
+
   const statusConfig: Record<DealStatus, { label: string; bg: string; text: string; dot: string }> = {
     active: { label: 'Active', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
     paid: { label: 'Paid Off', bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
@@ -164,10 +195,10 @@ export function DealDetail() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
+              <button onClick={handleExport} className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+              <button onClick={() => navigate('/residuals')} className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
                 <ExternalLink className="w-4 h-4" /> View Merchant
               </button>
             </div>

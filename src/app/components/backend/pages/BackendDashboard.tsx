@@ -4,6 +4,7 @@ import {
   Landmark, Info, Shield, BarChart3, Users, DollarSign, Activity,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { toast } from 'sonner@2.0.3';
 
 // ─── ALERTS / NOTIFICATIONS ─────────────────────────────────────
 const ALERTS = [
@@ -78,6 +79,31 @@ export function BackendDashboard() {
     return 'Good evening';
   })();
 
+  const handleAlertAction = (action: string, merchant: string | null) => {
+    switch (action) {
+      case 'View':
+      case 'Risk Profile':
+      case 'Lens Report':
+        navigate('/lens-ai');
+        break;
+      case 'Respond':
+        toast.success(`Chargeback response started${merchant ? ` for ${merchant}` : ''}`);
+        break;
+      case 'Verify':
+      case 'Flag North':
+        toast.success(`${action}${merchant ? ` — ${merchant}` : ''}`);
+        break;
+      case 'Collection Status':
+        navigate('/capital');
+        break;
+      case 'View Changes':
+        toast.info('Opening April 2026 IC schedule changes');
+        break;
+      default:
+        toast.info(action);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-[1440px] mx-auto px-6 py-6 space-y-5">
@@ -94,7 +120,10 @@ export function BackendDashboard() {
               <span className="text-gray-500 font-medium">{fmtK(MERCHANTS_DATA.totalVolume)} processed this period</span>
             </p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+          <button
+            onClick={() => toast.success('Dashboard data refreshed')}
+            className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-2 transition-colors"
+          >
             <RefreshCw className="w-4 h-4" /> Refresh Data
           </button>
         </div>
@@ -324,7 +353,7 @@ export function BackendDashboard() {
                           {a.actions.map((act, ai) => (
                             <button
                               key={ai}
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => { e.stopPropagation(); handleAlertAction(act, a.merchant); }}
                               className={`px-3 py-1.5 rounded-[6px] text-[11px] font-semibold transition-colors ${
                                 ai === 0
                                   ? 'bg-brand text-white hover:bg-brand-hover'

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Banknote, TrendingUp, CalendarClock, Plus, Search, Building2,
   ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, CheckCircle,
@@ -1158,7 +1159,14 @@ function CollectionModal({ dealId, DEALS, onClose }: { dealId: string; DEALS: Ca
           ))}
         </div>
         <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
+          <button
+            onClick={() => {
+              const next = stages.find(s => !s.done && !s.active) || stages[stages.length - 1];
+              toast.success(`Escalated ${deal.merchant} → ${next.name}`, { description: 'Collection workflow advanced to the next stage.' });
+              onClose();
+            }}
+            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors"
+          >Advance to Next Stage</button>
           <button onClick={onClose} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
         </div>
       </div>

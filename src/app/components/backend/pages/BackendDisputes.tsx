@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Shield, AlertTriangle, Clock, CheckCircle, XCircle, ChevronRight,
   Search, Filter, ArrowUpRight, ArrowDownRight, DollarSign, FileText,
@@ -268,6 +269,7 @@ export function BackendDisputes() {
   const [selectedDispute, setSelectedDispute] = useState<string | null>(null);
   const [evidenceModal, setEvidenceModal] = useState<string | null>(null);
   const [costCalcId, setCostCalcId] = useState<string | null>(null);
+  const [refundedAlerts, setRefundedAlerts] = useState<string[]>([]);
 
   // ── Active (non-resolved) disputes sorted by urgency ──
   const activeDisputes = useMemo(() =>
@@ -356,7 +358,7 @@ export function BackendDisputes() {
                 Live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button onClick={() => toast.success('New dispute draft created — fill in details to log it')} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> Log Dispute
             </button>
           </div>
@@ -952,7 +954,8 @@ export function BackendDisputes() {
                         refunded: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
                         expired: { bg: 'bg-gray-100', text: 'text-gray-500' },
                       };
-                      const sc = statusColors[a.status];
+                      const status = refundedAlerts.includes(a.id) ? 'refunded' : a.status;
+                      const sc = statusColors[status];
                       return (
                         <tr key={a.id} className={`border-b border-gray-50 hover:bg-gray-50/50 ${a.status === 'pending' && a.expiresIn <= 24 ? 'bg-amber-50/30' : ''}`}>
                           <td className="pl-5 py-2.5">
@@ -969,14 +972,14 @@ export function BackendDisputes() {
                           <td className="py-2.5 text-sm font-semibold tabular-nums text-gray-900">{fmt(a.amount)}</td>
                           <td className="py-2.5 text-xs font-mono text-gray-500">****{a.cardLast4}</td>
                           <td className="py-2.5">
-                            {a.status === 'pending' ? (
+                            {status === 'pending' ? (
                               <span className={`text-xs font-bold tabular-nums ${a.expiresIn <= 24 ? 'text-red-600' : 'text-amber-600'}`}>{a.expiresIn}h</span>
                             ) : <span className="text-xs text-gray-400">-</span>}
                           </td>
-                          <td className="py-2.5"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text}`}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span></td>
+                          <td className="py-2.5"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
                           <td className="pr-5 py-2.5">
-                            {a.status === 'pending' ? (
-                              <button className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">
+                            {status === 'pending' ? (
+                              <button onClick={() => { setRefundedAlerts(prev => [...prev, a.id]); toast.success(`Refund issued for ${a.merchant} — ${fmt(a.amount)}`); }} className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">
                                 Issue Refund
                               </button>
                             ) : <span className="text-xs text-gray-400">-</span>}
@@ -1449,15 +1452,15 @@ export function BackendDisputes() {
                         </div>
                         {!collected ? (
                           <div className="flex items-center gap-2">
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
+                            <button onClick={() => toast.success(`${ev} uploaded`)} className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
                               <Upload className="w-3 h-3" /> Upload
                             </button>
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
+                            <button onClick={() => toast.success(`${ev} attached from vault`)} className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
                               <GripVertical className="w-3 h-3" /> From Vault
                             </button>
                           </div>
                         ) : (
-                          <button className="px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-100 rounded-[4px] flex items-center gap-1">
+                          <button onClick={() => toast.info(`Viewing ${ev}`)} className="px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-100 rounded-[4px] flex items-center gap-1">
                             <Eye className="w-3 h-3" /> View
                           </button>
                         )}
@@ -1476,7 +1479,7 @@ export function BackendDisputes() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-2">
+                  <button onClick={() => { toast.success(`Evidence package for ${dispute.id} submitted for review`); setEvidenceModal(null); }} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-2">
                     <Send className="w-3.5 h-3.5" /> Submit for Review
                   </button>
                 </div>
@@ -1549,7 +1552,7 @@ export function BackendDisputes() {
               </div>
 
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3">
-                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
+                <button onClick={() => { toast.success(`Representment started for ${dispute.id} — ${dispute.merchant}`); setCostCalcId(null); }} className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
                 <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Close</button>
               </div>
             </div>

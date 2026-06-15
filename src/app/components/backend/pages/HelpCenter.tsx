@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Search,
   X,
@@ -126,7 +127,7 @@ function Card({ card }: { card: ArticleCard }) {
       </div>
       <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{card.title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed mb-4">{card.description}</p>
-      <button className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-hover transition-colors group/link">
+      <button onClick={() => toast.info(`Opening "${card.title}"…`)} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand-hover transition-colors group/link">
         Read
         <ArrowRight className="w-3.5 h-3.5 translate-x-0 group-hover/link:translate-x-0.5 transition-transform" />
       </button>
@@ -306,11 +307,11 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
                     Can't find what you're looking for? Our support team is available Monday–Friday, 9 AM–6 PM EST.
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+                    <button onClick={() => toast.success('Connecting you with support…')} className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />
                       Contact Support
                     </button>
-                    <button className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors flex items-center gap-2">
+                    <button onClick={() => toast.info('Opening ticket form…')} className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors flex items-center gap-2">
                       <Ticket className="w-4 h-4" />
                       Submit a Ticket
                     </button>

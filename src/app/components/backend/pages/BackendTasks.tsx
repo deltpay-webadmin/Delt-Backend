@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   CheckCircle, Circle, Clock, AlertTriangle, Plus, Search,
   Filter, ChevronDown, X, User, Store, Calendar, Flag,
@@ -72,13 +73,38 @@ const TASKS: Task[] = [
 ];
 
 // ── New Task Modal ──
-function NewTaskModal({ onClose }: { onClose: () => void }) {
+function NewTaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (task: Task) => void }) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [category, setCategory] = useState<TaskCategory>('sales');
   const [assignee, setAssignee] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
+
+  const handleCreate = () => {
+    if (!title.trim()) {
+      toast.error('Task title is required');
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const task: Task = {
+      id: `T-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+      title: title.trim(),
+      description: description.trim(),
+      status: 'todo',
+      priority,
+      category,
+      assignee: assignee || 'Unassigned',
+      dueDate: dueDate || today,
+      createdDate: today,
+      createdBy: 'You',
+      tags: [],
+      overdue: false,
+    };
+    onCreate(task);
+    toast.success('Task created');
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -144,7 +170,7 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Create Task</button>
+          <button onClick={handleCreate} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Create Task</button>
         </div>
       </div>
     </div>
@@ -373,7 +399,7 @@ export function BackendTasks() {
         </div>
       )}
 
-      {showModal && <NewTaskModal onClose={() => setShowModal(false)} />}
+      {showModal && <NewTaskModal onClose={() => setShowModal(false)} onCreate={(task) => setTasks(prev => [task, ...prev])} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   Calendar,
   DollarSign,
@@ -119,6 +120,7 @@ function StatCard({ label, value, icon, sub, highlight }: { label: string; value
 // ════════════════════════════════════════
 export function BackendPayroll() {
   const [tab, setTab] = useState<'upcoming' | 'history' | 'calendar'>('upcoming');
+  const [approved, setApproved] = useState(false);
 
   const employeeItems = upcomingItems.filter(i => i.category === 'Employee');
   const agentItems = upcomingItems.filter(i => i.category === 'Agent Commission');
@@ -140,7 +142,7 @@ export function BackendPayroll() {
             <h1 className="text-2xl font-bold text-gray-900">Payroll</h1>
             <p className="text-sm text-gray-600 mt-1">Manage employee and agent commission payouts</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button onClick={() => { setTab('upcoming'); toast.info('Review line items, then approve to run payroll'); }} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Banknote className="w-4 h-4" /> Run Payroll
           </button>
         </div>
@@ -290,8 +292,8 @@ export function BackendPayroll() {
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                   Review all line items before approving. Approved payroll is final.
                 </div>
-                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" /> Approve & Run
+                <button disabled={approved} onClick={() => { setApproved(true); toast.success(`Payroll approved — ${fmt(totalNet)} to ${upcomingItems.length} payees`); }} className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                  <CheckCircle className="w-4 h-4" /> {approved ? 'Payroll Approved' : 'Approve & Run'}
                 </button>
               </div>
             </div>
@@ -447,10 +449,10 @@ export function BackendPayroll() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="View Detail">
+                          <button onClick={() => toast.info(`Opening payroll run ${run.id} (${run.payDate})…`)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="View Detail">
                             <Eye className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Download Report">
+                          <button onClick={() => toast.success(`Downloading report for ${run.id}`)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Download Report">
                             <Download className="w-4 h-4 text-gray-500" />
                           </button>
                         </div>

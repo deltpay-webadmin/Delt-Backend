@@ -8,6 +8,7 @@ import {
   ChevronDown,
   FileText,
 } from 'lucide-react';
+import { toast } from 'sonner@2.0.3';
 
 interface CommissionLine {
   merchant: string;
@@ -52,6 +53,19 @@ const fmt = (n: number) =>
 const fmtFull = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
 
+function downloadCSV(filename: string, rows: (string | number)[][]) {
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function getTypeStyle(type: string) {
   switch (type) {
     case 'MCA': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
@@ -70,7 +84,17 @@ export function AgentCommissions() {
           <h1 className="text-2xl font-bold text-gray-900">Commissions</h1>
           <p className="text-sm text-gray-500 mt-1">Track your earnings and download statements.</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+        <button
+          onClick={() => {
+            downloadCSV('commissions-all.csv', [
+              ['Period', 'Earned', 'Deals', 'Status', 'Paid Date'],
+              [currentPeriod.month, currentPeriod.totalEarned, currentPeriod.dealsCount, currentPeriod.status, currentPeriod.paymentDate],
+              ...historicalStatements.map(s => [s.month, s.earned, s.deals, s.status, s.paidDate]),
+            ]);
+            toast.success('Exported');
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+        >
           <Download className="w-4 h-4" />
           Export All
         </button>
@@ -179,7 +203,17 @@ export function AgentCommissions() {
                     {s.status}
                   </span>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
+                <button
+                  onClick={() => {
+                    downloadCSV(`${s.month.replace(/\s+/g, '-')}-statement.csv`, [
+                      ['Period', 'Earned', 'Deals', 'Status', 'Paid Date'],
+                      [s.month, s.earned, s.deals, s.status, s.paidDate],
+                    ]);
+                    toast.success('Exported');
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Download PDF"
+                >
                   <Download className="w-4 h-4" />
                 </button>
               </div>

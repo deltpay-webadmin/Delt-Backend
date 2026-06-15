@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   DollarSign, Search, Filter, Download, Eye, RefreshCw,
   CheckCircle, XCircle, Clock, AlertTriangle, X, Plus,
@@ -116,6 +117,28 @@ export function BackendPayments() {
     });
   }, [search, collectionStatusFilter]);
 
+  const exportTransactions = () => {
+    const header = ['ID', 'Merchant', 'Merchant ID', 'Deal ID', 'Type', 'Method', 'Amount', 'Date', 'Status', 'Fail Reason'];
+    const rows = filteredPayments.map(p => [p.id, p.merchant, p.merchantId, p.dealId || '', p.type, p.method, String(p.amount), p.date, p.status, p.failReason || '']);
+    const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `payments-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${filteredPayments.length} transactions`);
+  };
+
+  const retryAllFailed = () => {
+    const count = PAYMENTS.filter(p => p.status === 'failed').length;
+    if (count === 0) { toast.info('No failed payments to retry'); return; }
+    toast.success(`Retrying ${count} failed payment${count === 1 ? '' : 's'}…`);
+  };
+
   const todayCollected = PAYMENTS.filter(p => p.date === '2026-04-17' && p.status === 'success' && p.type === 'collection').reduce((s, p) => s + p.amount, 0);
   const todayFailed = PAYMENTS.filter(p => p.date === '2026-04-17' && p.status === 'failed').length;
   const totalOutstanding = COLLECTIONS.reduce((s, c) => s + (c.totalOwed - c.totalCollected), 0);
@@ -135,10 +158,10 @@ export function BackendPayments() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button onClick={exportTransactions} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button onClick={retryAllFailed} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
           </button>
         </div>
@@ -231,7 +254,7 @@ export function BackendPayments() {
                   </span>
                   <div className="w-12 shrink-0 flex items-center">
                     {pmt.status === 'failed' && (
-                      <button className="p-1 hover:bg-blue-50 rounded" title="Retry"><RefreshCw className="w-3.5 h-3.5 text-blue-500" /></button>
+                      <button onClick={() => toast.success(`Retrying ${pmt.id} — ${pmt.merchant}`)} className="p-1 hover:bg-blue-50 rounded" title="Retry"><RefreshCw className="w-3.5 h-3.5 text-blue-500" /></button>
                     )}
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { toast } from 'sonner@2.0.3';
 import {
   ShieldCheck, ShieldAlert, FileText, Search, BookOpen,
   ChevronDown, ChevronRight, CheckCircle, XCircle, MinusCircle,
@@ -107,7 +108,7 @@ function ControlDetail({ controlKey, state, onClose }: {
       </div>
       <div className="mt-3 pt-2 border-t border-gray-200/50 flex items-center justify-between">
         <span className="text-[10px] text-gray-400">Last completed: {state.lastCompleted}</span>
-        <button className="text-[10px] font-semibold text-brand hover:underline flex items-center gap-1">View full history <ArrowRight className="w-3 h-3" /></button>
+        <button onClick={() => toast.info(`Opening full history for ${ctrl.label}`)} className="text-[10px] font-semibold text-brand hover:underline flex items-center gap-1">View full history <ArrowRight className="w-3 h-3" /></button>
       </div>
     </div>
   );
@@ -665,7 +666,7 @@ export function BackendCompliance() {
                             <span>{deal.date}</span>
                           </div>
                         </div>
-                        <button className="text-xs text-brand font-medium hover:underline flex items-center gap-1">
+                        <button onClick={() => toast.info(`Opening deal ${deal.id} — ${deal.merchant}`)} className="text-xs text-brand font-medium hover:underline flex items-center gap-1">
                           View deal <ArrowRight className="w-3 h-3" />
                         </button>
                       </div>
@@ -809,7 +810,19 @@ export function BackendCompliance() {
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ctrl ? statusColors[MERCHANTS.find(m => m.name === e.merchant)?.controls[e.control]?.status || 'gray'].dot : 'bg-gray-300'}`} />
                         <span className="text-xs font-medium text-gray-700 flex-1">{e.type}</span>
                         <span className="text-[10px] text-gray-400 truncate max-w-[200px]">{e.detail}</span>
-                        {e.exportable && <button className="p-1 hover:bg-white rounded"><Download className="w-3 h-3 text-gray-400" /></button>}
+                        {e.exportable && <button onClick={() => {
+                          const header = ['Timestamp', 'Merchant', 'Deal ID', 'Control', 'Type', 'Detail'];
+                          const row = [e.date, e.merchant, e.dealId || '', e.control, e.type, e.detail];
+                          const csv = [header, row].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+                          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${e.id}-${e.type.replace(/\s+/g, '-')}.csv`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          toast.success('Exported');
+                        }} className="p-1 hover:bg-white rounded"><Download className="w-3 h-3 text-gray-400" /></button>}
                       </div>
                     );
                   })}
@@ -957,7 +970,23 @@ export function BackendCompliance() {
                     </button>
                   ))}
                 </div>
-                <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => {
+                    const header = ['Timestamp', 'Merchant', 'Deal ID', 'Control', 'Type', 'Detail'];
+                    const rows = filteredEvidence.map(e => [e.date, e.merchant, e.dealId || '', e.control, e.type, e.detail]);
+                    const csv = [header, ...rows]
+                      .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
+                      .join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `compliance-evidence-${new Date().toISOString().slice(0, 10)}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    toast.success('Exported');
+                  }}
+                  className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                   <Download className="w-3 h-3" /> Export All
                 </button>
               </div>
@@ -983,7 +1012,19 @@ export function BackendCompliance() {
                       <span className="w-16 shrink-0"><span className="text-[9px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{ctrl?.shortLabel}</span></span>
                       <span className="text-xs text-gray-700 w-40 truncate shrink-0">{e.type}</span>
                       <span className="text-[11px] text-gray-500 flex-1 truncate">{e.detail}</span>
-                      {e.exportable && <button className="p-1 hover:bg-gray-100 rounded w-8 flex justify-center shrink-0"><Download className="w-3 h-3 text-gray-400" /></button>}
+                      {e.exportable && <button onClick={() => {
+                        const header = ['Timestamp', 'Merchant', 'Deal ID', 'Control', 'Type', 'Detail'];
+                        const row = [e.date, e.merchant, e.dealId || '', e.control, e.type, e.detail];
+                        const csv = [header, row].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${e.id}-${e.type.replace(/\s+/g, '-')}.csv`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        toast.success('Exported');
+                      }} className="p-1 hover:bg-gray-100 rounded w-8 flex justify-center shrink-0"><Download className="w-3 h-3 text-gray-400" /></button>}
                     </div>
                   );
                 })}
@@ -1008,8 +1049,8 @@ export function BackendCompliance() {
                               <FileText className="w-3 h-3 text-gray-400 shrink-0" />
                               <span className="text-xs text-gray-700 flex-1">{d}</span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button className="p-1 hover:bg-gray-100 rounded"><Eye className="w-3 h-3 text-gray-400" /></button>
-                                <button className="p-1 hover:bg-gray-100 rounded"><Download className="w-3 h-3 text-gray-400" /></button>
+                                <button onClick={() => toast.info(`Opening ${d}`)} className="p-1 hover:bg-gray-100 rounded"><Eye className="w-3 h-3 text-gray-400" /></button>
+                                <button onClick={() => toast.info('Preparing export…')} className="p-1 hover:bg-gray-100 rounded"><Download className="w-3 h-3 text-gray-400" /></button>
                               </div>
                             </div>
                           ))}
