@@ -7,7 +7,7 @@ import {
 import { useAppNavigate } from '../NavigationContext';
 import { NewCapitalDealFlow } from '../flows/NewCapitalDealFlow';
 import { AchImportFlow } from '../flows/AchImportFlow';
-import { useCapital, type CapitalDeal, type CapitalDealStatus, type CapitalChannel } from '../capitalStore';
+import { useCapital, capitalActions, type CapitalDeal, type CapitalDealStatus, type CapitalChannel, type LoanPaymentCategory } from '../capitalStore';
 import { useAchActivity, type AchDailyActivity } from '../achStore';
 
 // ══════════════════════════════════════════
@@ -42,6 +42,54 @@ const achLabels: Record<string, string> = {
 
 type TabKey = 'portfolio' | 'activity' | 'risk' | 'collections' | 'renewals' | 'concentration';
 
+const PAYMENT_CATEGORIES: { key: LoanPaymentCategory; label: string }[] = [
+  { key: 'debit', label: 'ACH Debit' },
+  { key: 'lump', label: 'Lump Sum' },
+  { key: 'personal_zelle', label: 'Personal / Zelle' },
+  { key: 'reversal', label: 'Reversal' },
+  { key: 'bounce', label: 'Bounce / NSF' },
+  { key: 'adjustment', label: 'Adjustment' },
+];
+const categoryBadge: Record<LoanPaymentCategory, string> = {
+  debit: 'bg-indigo-50 text-indigo-600',
+  lump: 'bg-emerald-50 text-emerald-600',
+  personal_zelle: 'bg-blue-50 text-blue-600',
+  reversal: 'bg-red-50 text-red-600',
+  bounce: 'bg-amber-50 text-amber-600',
+  adjustment: 'bg-gray-100 text-gray-600',
+};
+const categoryLabel = (c: LoanPaymentCategory) => PAYMENT_CATEGORIES.find(x => x.key === c)?.label ?? c;
+
+/**
+ * Profit waterfall for a self-funded deal (approximate, "so far"):
+ *   gross  = max(collected − funded, 0)
+ *   borrow = funded × borrowingCostPct% × monthsElapsed   (capital carrying cost)
+ *   net    = gross − borrow
+ *   then split net per anshu/patrick/delt retained percentages.
+ */
+function computeProfitSplit(m: CapitalDeal) {
+  const monthsElapsed = Math.max(0, daysBetween(m.funded, today) / 30);
+  const costPct = (m.borrowingCostPct ?? 2.0) / 100;
+  const gross = Math.max(m.collected - m.fundedAmt, 0);
+  const borrow = m.fundedAmt * costPct * monthsElapsed;
+  const net = gross - borrow;
+  const anshuPct = m.anshuPct ?? 0;
+  const patrickPct = m.patrickPct ?? 0;
+  const deltPct = m.deltRetainedPct ?? 0;
+  return {
+    monthsElapsed,
+    gross,
+    borrow,
+    net,
+    anshu: net * (anshuPct / 100),
+    patrick: net * (patrickPct / 100),
+    delt: net * (deltPct / 100),
+    anshuPct,
+    patrickPct,
+    deltPct,
+  };
+}
+
 // ══════════════════════════════════════════
 // MAIN
 // ══════════════════════════════════════════
@@ -57,6 +105,7 @@ export function BackendCapital() {
   const [collectionModal, setCollectionModal] = useState<string | null>(null);
   const [newDealOpen, setNewDealOpen] = useState(false);
   const [achImportOpen, setAchImportOpen] = useState(false);
+  const [addPaymentFor, setAddPaymentFor] = useState<CapitalDeal | null>(null);
 
   const filtered = useMemo(() => DEALS.filter(m => {
     if (filter !== 'all' && m.status !== filter) return false;
@@ -94,6 +143,19 @@ export function BackendCapital() {
     const totalRevenue = selfNet + refCommTotal;
     const totalVolume = selfDeployed + refFunded;
 
+    // ── Ledger-aware portfolio summary ──
+    const totalFunded = DEALS.reduce((s, m) => s + m.fundedAmt, 0);
+    const totalCollected = DEALS.reduce((s, m) => s + m.collected, 0);
+    const totalOutstanding = DEALS.reduce((s, m) => s + Math.max(m.totalOwed - m.collected, 0), 0);
+    const countActive = DEALS.filter(m => m.status === 'active').length;
+    const countSlow = DEALS.filter(m => m.status === 'slow').length;
+    const countPaid = DEALS.filter(m => m.status === 'paid').length;
+    const behindDeals = DEALS.filter(m => (m.weeksBehind ?? 0) > 0);
+    const avgWeeksBehind = behindDeals.length > 0
+      ? behindDeals.reduce((s, m) => s + (m.weeksBehind ?? 0), 0) / behindDeals.length
+      : 0;
+    const totalBounces = DEALS.reduce((s, m) => s + (m.bounceCount ?? 0), 0);
+
     // Vintages
     const vintages: Record<string, { count: number; selfCount: number; refCount: number; deployed: number; refFunded: number; collected: number; owed: number; defaults: number; commissions: number }> = {};
     DEALS.forEach(m => {
@@ -122,6 +184,8 @@ export function BackendCapital() {
       totalDeals, renewals, stacked, defaultRate, totalRevenue, totalVolume,
       vintages, activeDeployed, byMerchant, byVertical, channelSplit,
       selfCount: self.length, refCount: ref.length,
+      totalFunded, totalCollected, totalOutstanding, countActive, countSlow, countPaid,
+      avgWeeksBehind, totalBounces,
     };
   }, [DEALS]);
 
@@ -244,6 +308,25 @@ export function BackendCapital() {
                   <KpiCard label="Renewal Pipeline" value={M.renewals.toString()} sub="≥50% collected" accent="violet" />
                 </div>
 
+                {/* Ledger Portfolio Summary */}
+                <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Banknote className="w-4 h-4 text-brand" />
+                    <span className="text-sm font-semibold text-gray-900">Portfolio Summary</span>
+                    <span className="text-xs text-gray-400">Reconciled from loan_payments ledger</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                    <MiniKpi label="Total Funded" value={fmt(M.totalFunded)} />
+                    <MiniKpi label="Total Collected" value={fmt(M.totalCollected)} accent="emerald" />
+                    <MiniKpi label="Outstanding" value={fmt(M.totalOutstanding)} accent={M.totalOutstanding > 0 ? 'amber' : 'emerald'} />
+                    <MiniKpi label="Active" value={String(M.countActive)} />
+                    <MiniKpi label="Slow" value={String(M.countSlow)} accent={M.countSlow > 0 ? 'amber' : undefined} />
+                    <MiniKpi label="Paid" value={String(M.countPaid)} accent="emerald" />
+                    <MiniKpi label="Avg Weeks Behind" value={M.avgWeeksBehind.toFixed(1)} accent={M.avgWeeksBehind > 0 ? 'red' : 'emerald'} />
+                    <MiniKpi label="Total Bounces" value={String(M.totalBounces)} accent={M.totalBounces > 0 ? 'red' : 'emerald'} />
+                  </div>
+                </div>
+
                 {/* Filters + Search */}
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -306,7 +389,9 @@ export function BackendCapital() {
                         <Th>Factor</Th>
                         <Th className="min-w-[160px]">Collection</Th>
                         <Th>Daily</Th>
-                        <Th>Velocity</Th>
+                        <Th>Wks Behind</Th>
+                        <Th>Bounces</Th>
+                        <Th>Last Pmt</Th>
                         <Th>Stack</Th>
                         <Th>ACH</Th>
                         <Th className="pr-5">Status</Th>
@@ -363,7 +448,23 @@ export function BackendCapital() {
                                 </div>
                               </td>
                               <td className="py-3 text-sm font-semibold tabular-nums text-gray-900">{m.dailyDebit > 0 ? fmt(m.dailyDebit) : '-'}</td>
-                              <td className="py-3"><VelocityArrow avg7d={m.avg7d} avg30d={m.avg30d} /></td>
+                              <td className="py-3">
+                                {(m.weeksBehind ?? 0) > 0 ? (
+                                  <span className="inline-flex items-center gap-1 text-xs font-bold text-red-600">
+                                    <Clock className="w-3 h-3" /> {m.weeksBehind}w
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">On time</span>
+                                )}
+                              </td>
+                              <td className="py-3">
+                                {(m.bounceCount ?? 0) > 0 ? (
+                                  <span className="text-xs font-bold text-amber-600 tabular-nums">{m.bounceCount}</span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">0</span>
+                                )}
+                              </td>
+                              <td className="py-3 text-[11px] text-gray-500 tabular-nums">{fmtDate(m.lastPayment)}</td>
                               <td className="py-3">
                                 {m.stackCount === 0 ? (
                                   <span className="text-xs text-gray-400">Clean</span>
@@ -388,7 +489,7 @@ export function BackendCapital() {
 
                             {isExp && (
                               <tr>
-                                <td colSpan={10} className="bg-gray-50 border-b border-gray-200 px-5 py-4">
+                                <td colSpan={12} className="bg-gray-50 border-b border-gray-200 px-5 py-4">
                                   {isSelf ? (
                                     <>
                                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
@@ -417,7 +518,17 @@ export function BackendCapital() {
                                       </div>
                                     </>
                                   )}
-                                  <div className="mt-4 pt-3 border-t border-gray-200 flex justify-end">
+                                  {isSelf && <ProfitSplitPanel m={m} />}
+
+                                  <PaymentLedger m={m} />
+
+                                  <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); setAddPaymentFor(m); }}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-brand text-white hover:bg-brand-hover rounded-[6px] transition-colors"
+                                    >
+                                      <Plus className="w-3.5 h-3.5" /> Add Payment
+                                    </button>
                                     <button
                                       onClick={(e) => { e.stopPropagation(); navigate(`/deals/${m.id}`); }}
                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/5 rounded-[6px] transition-colors"
@@ -433,7 +544,7 @@ export function BackendCapital() {
                       })}
                       {filtered.length === 0 && (
                         <tr>
-                          <td colSpan={10} className="py-16 text-center text-sm text-gray-400">No deals match the current filters.</td>
+                          <td colSpan={12} className="py-16 text-center text-sm text-gray-400">No deals match the current filters.</td>
                         </tr>
                       )}
                     </tbody>
@@ -472,6 +583,180 @@ export function BackendCapital() {
 
       <NewCapitalDealFlow open={newDealOpen} onClose={() => setNewDealOpen(false)} />
       <AchImportFlow open={achImportOpen} onClose={() => setAchImportOpen(false)} />
+      {addPaymentFor && (
+        <AddPaymentModal deal={addPaymentFor} onClose={() => setAddPaymentFor(null)} />
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// PROFIT SPLIT PANEL
+// ══════════════════════════════════════════
+function ProfitSplitPanel({ m }: { m: CapitalDeal }) {
+  const ps = computeProfitSplit(m);
+  const sources = m.fundingSources ? Object.entries(m.fundingSources) : [];
+  return (
+    <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-brand" />
+          <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Profit Split Waterfall</span>
+          <span className="text-[11px] text-gray-400">~{ps.monthsElapsed.toFixed(1)} mo elapsed @ {(m.borrowingCostPct ?? 2).toFixed(1)}%/mo</span>
+        </div>
+        {sources.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wide">Funding</span>
+            {sources.map(([name, pct]) => (
+              <span key={name} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-50 text-violet-700 capitalize">
+                {name} {pct}%
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <ExpandedKpi label="Gross Profit (so far)" value={fmt(ps.gross)} sub="collected − funded" />
+        <ExpandedKpi label="Borrowing Cost" value={fmt(ps.borrow)} sub="carry on capital" accent="amber" />
+        <ExpandedKpi label="Net Profit" value={fmt(ps.net)} sub={ps.net >= 0 ? 'distributable' : 'underwater'} accent={ps.net >= 0 ? 'emerald' : 'red'} />
+        <ExpandedKpi label={`Anshu / Patrick (${ps.anshuPct}/${ps.patrickPct}%)`} value={`${fmt(ps.anshu)} / ${fmt(ps.patrick)}`} sub="partner splits" />
+        <ExpandedKpi label={`Delt Retained (${ps.deltPct}%)`} value={fmt(ps.delt)} sub="house" accent="indigo" />
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// PAYMENT LEDGER
+// ══════════════════════════════════════════
+function PaymentLedger({ m }: { m: CapitalDeal }) {
+  const payments = m.payments || [];
+  const total = payments.reduce((s, p) => s + p.amount, 0);
+  return (
+    <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="flex items-center gap-2 mb-2">
+        <Activity className="w-4 h-4 text-brand" />
+        <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Payment Ledger</span>
+        <span className="text-[11px] text-gray-400">{payments.length} entries</span>
+      </div>
+      {payments.length === 0 ? (
+        <p className="text-xs text-gray-400 py-3">No payments recorded yet for this deal.</p>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-[6px] overflow-hidden max-h-72 overflow-y-auto">
+          <table className="w-full text-xs">
+            <thead className="sticky top-0">
+              <tr className="bg-gray-50 border-b border-gray-200 text-left text-[10px] uppercase tracking-wide text-gray-400">
+                <th className="px-3 py-2 font-semibold">Date</th>
+                <th className="px-3 py-2 font-semibold text-right">Amount</th>
+                <th className="px-3 py-2 font-semibold">Category</th>
+                <th className="px-3 py-2 font-semibold">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payments.map(p => (
+                <tr key={p.id} className="border-b border-gray-50 last:border-0">
+                  <td className="px-3 py-1.5 tabular-nums text-gray-600">{fmtDateFull(p.payment_date)}</td>
+                  <td className={`px-3 py-1.5 text-right tabular-nums font-semibold ${p.amount < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                    {p.amount < 0 ? `(${fmt(Math.abs(p.amount))})` : fmt(p.amount)}
+                  </td>
+                  <td className="px-3 py-1.5">
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${categoryBadge[p.category]}`}>{categoryLabel(p.category)}</span>
+                  </td>
+                  <td className="px-3 py-1.5 text-gray-500">{p.notes || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-50 border-t border-gray-200">
+                <td className="px-3 py-2 font-semibold text-gray-700">Total Collected</td>
+                <td className="px-3 py-2 text-right tabular-nums font-bold text-gray-900">{fmt(total)}</td>
+                <td colSpan={2} className="px-3 py-2 text-[11px] text-gray-400">
+                  {Math.abs(total - m.collected) < 1 ? 'Reconciles with deal collected ✓' : `Deal field: ${fmt(m.collected)}`}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// ADD PAYMENT MODAL
+// ══════════════════════════════════════════
+function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => void }) {
+  const [date, setDate] = useState(today);
+  const [sign, setSign] = useState<'+' | '-'>('+');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState<LoanPaymentCategory>('debit');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const numeric = parseFloat(amount);
+  const valid = Number.isFinite(numeric) && numeric > 0 && !!date;
+
+  const submit = () => {
+    if (!valid || saving) return;
+    setSaving(true);
+    const signed = sign === '-' ? -Math.abs(numeric) : Math.abs(numeric);
+    capitalActions.addPayment(deal.id, {
+      payment_date: date,
+      amount: signed,
+      category,
+      notes: notes.trim() || null,
+    });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="bg-white rounded-[10px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="px-5 py-4 border-b border-gray-200">
+          <h3 className="text-base font-semibold text-gray-900">Add Payment</h3>
+          <p className="text-xs text-gray-500 mt-0.5">{deal.merchant} · {deal.id}</p>
+        </div>
+        <div className="px-5 py-4 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Payment Date</label>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Amount</label>
+            <div className="flex items-center gap-2">
+              <div className="flex rounded-[6px] border border-gray-200 overflow-hidden">
+                <button type="button" onClick={() => setSign('+')}
+                  className={`px-3 py-2 text-sm font-bold ${sign === '+' ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500'}`}>+</button>
+                <button type="button" onClick={() => setSign('-')}
+                  className={`px-3 py-2 text-sm font-bold ${sign === '-' ? 'bg-red-500 text-white' : 'bg-white text-gray-500'}`}>−</button>
+              </div>
+              <input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-[6px] text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">Use − for reversals / bounces.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+            <select value={category} onChange={e => setCategory(e.target.value as LoanPaymentCategory)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
+              {PAYMENT_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Optional"
+              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+          </div>
+        </div>
+        <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[6px]">Cancel</button>
+          <button onClick={submit} disabled={!valid || saving}
+            className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
+            {saving ? 'Saving…' : 'Record Payment'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
