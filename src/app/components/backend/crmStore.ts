@@ -22,6 +22,15 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import {
+  evaluateApplication,
+  defaultScoreInputs,
+  stressTest,
+  type PlaidInputs,
+  type CrsInputs,
+  type DataMerchInputs,
+} from './underwritingScore';
+import { capitalActions } from './capitalStore';
 
 // ══════════════════════════════════════════════════════════════
 // Types (unchanged — pages depend on this exact shape)
@@ -279,6 +288,8 @@ export type UWStage =
 
 export type ProductType = 'MCA' | 'Term Loan' | 'Line of Credit' | 'Revenue Based';
 
+export type UWTier = 'Tier 1' | 'Tier 2' | 'Tier 3' | 'Tier 4' | 'Decline';
+
 export interface UWApplication {
   id: string;
   applicationId: string;
@@ -308,6 +319,20 @@ export interface UWApplication {
   missingDocs?: string[];
   notes?: string;
   source: string;
+  // ── Rubric / scoring engine snapshot ──
+  plaidInputs?: PlaidInputs;
+  crsInputs?: CrsInputs;
+  dataMerchInputs?: DataMerchInputs;
+  plaidScore?: number;
+  crsScore?: number;
+  dataMerchScore?: number;
+  compositeScore?: number;
+  tier?: UWTier;
+  disqualifiers?: string[];
+  stressTest?: { passes: boolean; notes: string[] };
+  approvedDealId?: string;
+  declineReason?: string;
+  assignedTo?: string;
 }
 
 // ── Merchants ──
@@ -589,36 +614,76 @@ function toDbOnb(o: Partial<OnboardingApp>): Record<string, any> {
   return out;
 }
 
+// ── Stage mapping ──
+// The kanban UI (BackendUnderwriting) uses rich stage labels, but the migrated
+// `underwriting_apps.stage` column has a CHECK constraint on a compact set.
+// Map both directions so the UI keeps working against the new schema.
+type UWDbStage = 'intake' | 'plaid' | 'crs' | 'datamerch' | 'review' | 'approved' | 'declined' | 'funded';
+
+const UW_STAGE_TO_DB: Record<UWStage, UWDbStage> = {
+  Received: 'intake',
+  'Doc Collection': 'plaid',
+  'Bank Review': 'crs',
+  'Credit Analysis': 'datamerch',
+  Committee: 'review',
+  Approved: 'approved',
+  Declined: 'declined',
+};
+
+const UW_DB_TO_STAGE: Record<UWDbStage, UWStage> = {
+  intake: 'Received',
+  plaid: 'Doc Collection',
+  crs: 'Bank Review',
+  datamerch: 'Credit Analysis',
+  review: 'Committee',
+  approved: 'Approved',
+  funded: 'Approved',
+  declined: 'Declined',
+};
+
 function fromDbUw(r: any): UWApplication {
+  const composite = r.composite_score != null ? Number(r.composite_score) : undefined;
   return {
     id: r.id,
     applicationId: r.application_id,
-    businessName: r.business_name,
-    dba: r.dba ?? undefined,
-    industry: r.industry ?? '',
-    state: r.state ?? '',
-    productType: r.product_type,
+    businessName: r.merchant_name ?? '',
+    industry: r.business_type ?? '',
+    state: '',
+    productType: 'MCA',
     requestedAmount: Number(r.requested_amount ?? 0),
-    monthlyRevenue: Number(r.monthly_revenue ?? 0),
-    avgDailyBalance: Number(r.avg_daily_balance ?? 0),
-    monthsInBusiness: Number(r.months_in_business ?? 0),
-    creditScore: Number(r.credit_score ?? 0),
-    existingPositions: Number(r.existing_positions ?? 0),
-    submissionDate: r.submission_date ?? '',
-    reviewer: r.reviewer ?? '',
-    reviewerInitials: r.reviewer_initials ?? '',
-    riskScore: Number(r.risk_score ?? 0),
-    stage: r.stage,
-    daysInStage: Number(r.days_in_stage ?? 0),
-    slaThreshold: Number(r.sla_threshold ?? 3),
-    factorRate: r.factor_rate != null ? Number(r.factor_rate) : undefined,
-    proposedPayback: r.proposed_payback != null ? Number(r.proposed_payback) : undefined,
-    dailyPayment: r.daily_payment != null ? Number(r.daily_payment) : undefined,
-    holdbackPct: r.holdback_pct != null ? Number(r.holdback_pct) : undefined,
-    disclosureState: r.disclosure_state ?? undefined,
-    missingDocs: r.missing_docs ?? undefined,
+    monthlyRevenue: Number(r.plaid_inputs?.monthlyRevenue ?? 0),
+    avgDailyBalance: Number(r.plaid_inputs?.avgDailyBalance ?? 0),
+    monthsInBusiness: 0,
+    creditScore: Number(r.crs_inputs?.fico ?? 0),
+    existingPositions: Number(r.datamerch_inputs?.currentOpenPositions ?? 0),
+    submissionDate: r.created_at ? String(r.created_at).slice(0, 10) : '',
+    reviewer: r.assigned_to ?? '',
+    reviewerInitials: (r.assigned_to ?? '')
+      .split(' ')
+      .map((p: string) => p[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase(),
+    riskScore: composite ?? 0,
+    stage: UW_DB_TO_STAGE[(r.stage as UWDbStage)] ?? 'Received',
+    daysInStage: 0,
+    slaThreshold: 2,
+    disclosureState: undefined,
     notes: r.notes ?? undefined,
-    source: r.source ?? '',
+    source: 'Manual',
+    plaidInputs: r.plaid_inputs ?? undefined,
+    crsInputs: r.crs_inputs ?? undefined,
+    dataMerchInputs: r.datamerch_inputs ?? undefined,
+    plaidScore: r.plaid_score != null ? Number(r.plaid_score) : undefined,
+    crsScore: r.crs_score != null ? Number(r.crs_score) : undefined,
+    dataMerchScore: r.datamerch_score != null ? Number(r.datamerch_score) : undefined,
+    compositeScore: composite,
+    tier: (r.tier as UWTier) ?? undefined,
+    disqualifiers: r.disqualifiers ?? undefined,
+    stressTest: r.stress_test ?? undefined,
+    approvedDealId: r.approved_deal_id ?? undefined,
+    declineReason: r.decline_reason ?? undefined,
+    assignedTo: r.assigned_to ?? undefined,
   };
 }
 
@@ -626,32 +691,24 @@ function toDbUw(a: Partial<UWApplication>): Record<string, any> {
   const out: Record<string, any> = {};
   if (a.id !== undefined) out.id = a.id;
   if (a.applicationId !== undefined) out.application_id = a.applicationId;
-  if (a.businessName !== undefined) out.business_name = a.businessName;
-  if (a.dba !== undefined) out.dba = a.dba;
-  if (a.industry !== undefined) out.industry = a.industry;
-  if (a.state !== undefined) out.state = a.state;
-  if (a.productType !== undefined) out.product_type = a.productType;
+  if (a.businessName !== undefined) out.merchant_name = a.businessName;
+  if (a.industry !== undefined) out.business_type = a.industry;
   if (a.requestedAmount !== undefined) out.requested_amount = a.requestedAmount;
-  if (a.monthlyRevenue !== undefined) out.monthly_revenue = a.monthlyRevenue;
-  if (a.avgDailyBalance !== undefined) out.avg_daily_balance = a.avgDailyBalance;
-  if (a.monthsInBusiness !== undefined) out.months_in_business = a.monthsInBusiness;
-  if (a.creditScore !== undefined) out.credit_score = a.creditScore;
-  if (a.existingPositions !== undefined) out.existing_positions = a.existingPositions;
-  if (a.submissionDate !== undefined) out.submission_date = a.submissionDate;
-  if (a.reviewer !== undefined) out.reviewer = a.reviewer;
-  if (a.reviewerInitials !== undefined) out.reviewer_initials = a.reviewerInitials;
-  if (a.riskScore !== undefined) out.risk_score = a.riskScore;
-  if (a.stage !== undefined) out.stage = a.stage;
-  if (a.daysInStage !== undefined) out.days_in_stage = a.daysInStage;
-  if (a.slaThreshold !== undefined) out.sla_threshold = a.slaThreshold;
-  if (a.factorRate !== undefined) out.factor_rate = a.factorRate;
-  if (a.proposedPayback !== undefined) out.proposed_payback = a.proposedPayback;
-  if (a.dailyPayment !== undefined) out.daily_payment = a.dailyPayment;
-  if (a.holdbackPct !== undefined) out.holdback_pct = a.holdbackPct;
-  if (a.disclosureState !== undefined) out.disclosure_state = a.disclosureState;
-  if (a.missingDocs !== undefined) out.missing_docs = a.missingDocs;
-  if (a.notes !== undefined) out.notes = a.notes;
-  if (a.source !== undefined) out.source = a.source;
+  if (a.stage !== undefined) out.stage = UW_STAGE_TO_DB[a.stage];
+  if (a.notes !== undefined) out.notes = a.notes ?? null;
+  if (a.plaidInputs !== undefined) out.plaid_inputs = a.plaidInputs ?? null;
+  if (a.crsInputs !== undefined) out.crs_inputs = a.crsInputs ?? null;
+  if (a.dataMerchInputs !== undefined) out.datamerch_inputs = a.dataMerchInputs ?? null;
+  if (a.plaidScore !== undefined) out.plaid_score = a.plaidScore ?? null;
+  if (a.crsScore !== undefined) out.crs_score = a.crsScore ?? null;
+  if (a.dataMerchScore !== undefined) out.datamerch_score = a.dataMerchScore ?? null;
+  if (a.compositeScore !== undefined) out.composite_score = a.compositeScore ?? null;
+  if (a.tier !== undefined) out.tier = a.tier ?? null;
+  if (a.disqualifiers !== undefined) out.disqualifiers = a.disqualifiers ?? null;
+  if (a.stressTest !== undefined) out.stress_test = a.stressTest ?? null;
+  if (a.approvedDealId !== undefined) out.approved_deal_id = a.approvedDealId ?? null;
+  if (a.declineReason !== undefined) out.decline_reason = a.declineReason ?? null;
+  if (a.assignedTo !== undefined) out.assigned_to = a.assignedTo ?? null;
   return out;
 }
 
@@ -1142,6 +1199,64 @@ export const onboardingActions = {
 };
 
 // ── Underwriting actions ──
+// Map a scoring-engine RiskTier (1-4 | 'decline') to the UWTier label stored in DB.
+function tierLabel(tier: 1 | 2 | 3 | 4 | 'decline'): UWTier {
+  return tier === 'decline' ? 'Decline' : (`Tier ${tier}` as UWTier);
+}
+
+/**
+ * Run the pure scoring engine over an application's inputs and return the
+ * derived rubric patch (sub-scores, composite, tier, disqualifiers, stress test).
+ * Falls back to engine defaults for any missing input block.
+ */
+function deriveScores(app: UWApplication): Partial<UWApplication> {
+  const seed = defaultScoreInputs({
+    monthlyRevenue: app.monthlyRevenue || undefined,
+    avgDailyBalance: app.avgDailyBalance || undefined,
+    fico: app.creditScore || undefined,
+    existingPositions: app.existingPositions || undefined,
+  });
+  const inputs = {
+    plaid: app.plaidInputs ?? seed.plaid,
+    crs: app.crsInputs ?? seed.crs,
+    dataMerch: app.dataMerchInputs ?? seed.dataMerch,
+  };
+  const result = evaluateApplication(inputs);
+
+  // Stress test against the requested amount at the tier's mid factor / 252-day term.
+  const factor =
+    result.terms.factorMin > 0
+      ? (result.terms.factorMin + result.terms.factorMax) / 2
+      : 1.4;
+  const termDays = 252;
+  const avgDailyRevenue = (inputs.plaid.monthlyRevenue || 0) / 21;
+  const st =
+    app.requestedAmount > 0
+      ? stressTest({
+          advanceAmount: app.requestedAmount,
+          factorRate: factor,
+          termDays,
+          avgDailyRevenue,
+          avgDailyBalance: inputs.plaid.avgDailyBalance,
+          tier: result.terms.tier,
+        })
+      : null;
+
+  return {
+    plaidInputs: inputs.plaid,
+    crsInputs: inputs.crs,
+    dataMerchInputs: inputs.dataMerch,
+    plaidScore: result.plaidScore.total,
+    crsScore: result.crsScore.total,
+    dataMerchScore: result.dataMerchScore.total,
+    compositeScore: result.composite,
+    riskScore: result.composite,
+    tier: tierLabel(result.terms.tier),
+    disqualifiers: result.disqualifiers.map(d => d.reason),
+    stressTest: st ? { passes: st.passes, notes: st.flags } : undefined,
+  };
+}
+
 export const underwritingActions = {
   create(partial: Partial<UWApplication>): UWApplication {
     const used = new Set(state.underwriting.map(a => a.id));
@@ -1149,29 +1264,30 @@ export const underwritingActions = {
     let id = `app-${String(n).padStart(3, '0')}`;
     while (used.has(id)) id = `app-${String(++n).padStart(3, '0')}`;
     const appId = `UW-2026-${String(200 + n).padStart(4, '0')}`;
-    const reviewer = partial.reviewer || 'Sarah Mitchell';
-    const app: UWApplication = {
+    const base: UWApplication = {
       id,
       applicationId: appId,
       businessName: partial.businessName || 'New Applicant',
       industry: partial.industry || 'General',
-      state: partial.state || 'NY',
+      state: partial.state || '',
       productType: (partial.productType as ProductType) || 'MCA',
       requestedAmount: partial.requestedAmount ?? 50000,
       monthlyRevenue: partial.monthlyRevenue ?? 30000,
       avgDailyBalance: partial.avgDailyBalance ?? 5000,
-      monthsInBusiness: partial.monthsInBusiness ?? 24,
+      monthsInBusiness: partial.monthsInBusiness ?? 0,
       creditScore: partial.creditScore ?? 650,
       existingPositions: partial.existingPositions ?? 0,
-      submissionDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      reviewer,
-      reviewerInitials: reviewer.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase(),
-      riskScore: partial.riskScore ?? 70,
+      submissionDate: new Date().toISOString().slice(0, 10),
+      reviewer: partial.reviewer || '',
+      reviewerInitials: '',
+      riskScore: 0,
       stage: 'Received',
       daysInStage: 0,
       slaThreshold: 2,
       source: partial.source || 'Manual',
+      assignedTo: partial.assignedTo || partial.reviewer || undefined,
     };
+    const app: UWApplication = { ...base, ...deriveScores(base) };
     const prev = state.underwriting;
     persist(
       'underwriting app',
@@ -1195,18 +1311,148 @@ export const underwritingActions = {
     );
   },
 
+  /**
+   * Merge new rubric inputs, recompute all scores via the pure engine, and
+   * persist the inputs + derived scores/tier/disqualifiers/stress test together.
+   */
+  updateInputs(
+    id: string,
+    partial: { plaidInputs?: PlaidInputs; crsInputs?: CrsInputs; dataMerchInputs?: DataMerchInputs; requestedAmount?: number },
+  ) {
+    const current = state.underwriting.find(a => a.id === id);
+    if (!current) return;
+    const merged: UWApplication = {
+      ...current,
+      plaidInputs: partial.plaidInputs ?? current.plaidInputs,
+      crsInputs: partial.crsInputs ?? current.crsInputs,
+      dataMerchInputs: partial.dataMerchInputs ?? current.dataMerchInputs,
+      requestedAmount: partial.requestedAmount ?? current.requestedAmount,
+    };
+    // Mirror key scalars so the kanban summary stays in sync with the inputs.
+    if (merged.plaidInputs) {
+      merged.monthlyRevenue = merged.plaidInputs.monthlyRevenue;
+      merged.avgDailyBalance = merged.plaidInputs.avgDailyBalance;
+    }
+    if (merged.crsInputs) merged.creditScore = merged.crsInputs.fico;
+    if (merged.dataMerchInputs) merged.existingPositions = merged.dataMerchInputs.currentOpenPositions;
+
+    const scored = deriveScores(merged);
+    underwritingActions.update(id, {
+      plaidInputs: merged.plaidInputs,
+      crsInputs: merged.crsInputs,
+      dataMerchInputs: merged.dataMerchInputs,
+      requestedAmount: merged.requestedAmount,
+      monthlyRevenue: merged.monthlyRevenue,
+      avgDailyBalance: merged.avgDailyBalance,
+      creditScore: merged.creditScore,
+      existingPositions: merged.existingPositions,
+      ...scored,
+    });
+  },
+
   setStage(id: string, stage: UWStage) {
     underwritingActions.update(id, { stage, daysInStage: 0 });
   },
 
-  approve(id: string) {
-    underwritingActions.update(id, { stage: 'Approved', daysInStage: 0 });
+  /**
+   * Atomic Approve → Capital handoff:
+   *   1. mark app approved
+   *   2. INSERT a new capital_deals row from the rubric snapshot
+   *   3. link approved_deal_id back on the app + mark funded
+   *   4. reload both stores so the new deal shows in Capital immediately
+   * Returns the new Capital deal id, or null on failure.
+   */
+  async approve(id: string): Promise<string | null> {
+    const app = state.underwriting.find(a => a.id === id);
+    if (!app) return null;
+
+    const scored = app.compositeScore != null ? app : { ...app, ...deriveScores(app) };
+    const result = evaluateApplication({
+      plaid: scored.plaidInputs ?? defaultScoreInputs().plaid,
+      crs: scored.crsInputs ?? defaultScoreInputs().crs,
+      dataMerch: scored.dataMerchInputs ?? defaultScoreInputs().dataMerch,
+    });
+    const terms = result.terms;
+    const factor = terms.factorMin > 0 ? +((terms.factorMin + terms.factorMax) / 2).toFixed(4) : 1.4;
+    const holdback = terms.holdbackMinPct > 0 ? Math.round((terms.holdbackMinPct + terms.holdbackMaxPct) / 2) : 12;
+    const fundedAmt = app.requestedAmount || 0;
+    const totalOwed = Math.round(fundedAmt * factor);
+    const dealId = nextCapitalDealId();
+    const today = new Date().toISOString().slice(0, 10);
+    const notesSnapshot = [
+      `Underwriting ${app.applicationId} (${scored.tier ?? tierLabel(terms.tier)})`,
+      `Composite ${scored.compositeScore ?? result.composite}/100`,
+      `Plaid ${scored.plaidScore ?? result.plaidScore.total} · CRS ${scored.crsScore ?? result.crsScore.total} · DataMerch ${scored.dataMerchScore ?? result.dataMerchScore.total}`,
+    ].join(' | ');
+
+    // 1. mark approved
+    underwritingActions.update(id, { stage: 'Approved', tier: scored.tier ?? tierLabel(terms.tier) });
+
+    // 2. insert capital deal (capitalActions handles its own Supabase write)
+    capitalActions.create({
+      id: dealId,
+      merchant: app.businessName,
+      type: 'Capital',
+      channel: 'self',
+      funded: today,
+      fundedAmt,
+      factor,
+      totalOwed,
+      collected: 0,
+      holdback,
+      status: 'active',
+      notes: notesSnapshot,
+    });
+
+    // 3. link the deal back + mark funded
+    const prev = state.underwriting;
+    await persist(
+      'underwriting app',
+      () =>
+        set({
+          underwriting: state.underwriting.map(a =>
+            a.id === id ? { ...a, approvedDealId: dealId, stage: 'Approved' } : a,
+          ),
+        }),
+      () => set({ underwriting: prev }),
+      () =>
+        supabase!
+          .from('underwriting_apps')
+          .update({ approved_deal_id: dealId, stage: 'funded' })
+          .eq('id', id)
+          .then(r => ({ error: r.error })),
+    );
+
+    // 4. refresh capital store so the new deal renders immediately
+    void capitalActions.refresh();
+    return dealId;
   },
 
-  decline(id: string) {
-    underwritingActions.update(id, { stage: 'Declined', daysInStage: 0 });
+  decline(id: string, reason?: string) {
+    underwritingActions.update(id, {
+      stage: 'Declined',
+      daysInStage: 0,
+      declineReason: reason || undefined,
+    });
   },
 };
+
+/**
+ * Compute the next `DELT-YYYY-NNN` capital deal id from the live capital store,
+ * falling back to a year-prefixed counter. Kept here (not capitalStore) because
+ * the underwriting approve flow owns the DELT- naming convention.
+ */
+function nextCapitalDealId(): string {
+  const year = new Date().getFullYear();
+  const prefix = `DELT-${year}-`;
+  const existing = capitalActions.allIds().filter(id => id.startsWith(prefix));
+  let max = 0;
+  for (const id of existing) {
+    const n = parseInt(id.slice(prefix.length), 10);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return `${prefix}${String(max + 1).padStart(3, '0')}`;
+}
 
 // ── Referral actions ──
 export const referralActions = {
