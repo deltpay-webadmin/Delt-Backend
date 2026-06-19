@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import {
   Banknote, TrendingUp, CalendarClock, Plus, Search, Building2,
   ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, CheckCircle,
-  Shield, RefreshCw, Clock, ChevronRight, Upload,
+  Shield, RefreshCw, Clock, ChevronRight, Upload, Flame,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
 import { NewCapitalDealFlow } from '../flows/NewCapitalDealFlow';
 import { AchImportFlow } from '../flows/AchImportFlow';
 import { useCapital, capitalActions, type CapitalDeal, type CapitalDealStatus, type CapitalChannel, type LoanPaymentCategory } from '../capitalStore';
+import { PortfolioCharts } from './CapitalCharts';
 import { useAchActivity, type AchDailyActivity } from '../achStore';
 
 // ══════════════════════════════════════════
@@ -178,6 +179,95 @@ export function BackendCapital() {
     const byVertical = Object.entries(vertMap).map(([k, v]) => ({ label: k, value: v })).sort((a, b) => b.value - a.value);
     const channelSplit = [{ label: 'Self-Funded', value: selfDeployed }, { label: 'Fundomate Referred', value: refFunded }];
 
+    // ── Risk Pulse ─────────────────────────────────────────────────────
+    // Capital at risk = outstanding principal on slow + default (self only)
+    const capitalAtRisk = self
+      .filter(m => m.status === 'default' || m.status === 'slow')
+      .reduce((s, m) => s + Math.max(m.totalOwed - m.collected, 0), 0);
+    const defaultedOutstanding = self
+      .filter(m => m.status === 'default')
+      .reduce((s, m) => s + Math.max(m.totalOwed - m.collected, 0), 0);
+
+    // NSF / bounce ledger pass
+    const allPayments = DEALS.flatMap(m => (m.payments || []).map(p => ({ ...p, channel: m.channel })));
+    const debitLike = allPayments.filter(p => p.category === 'debit' || p.category === 'bounce');
+    const bounceCount = allPayments.filter(p => p.category === 'bounce').length;
+    const nsfRate = debitLike.length > 0 ? bounceCount / debitLike.length : 0;
+
+    const last7 = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    const last30 = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const recent7 = allPayments.filter(p => p.payment_date >= last7);
+    const recent30 = allPayments.filter(p => p.payment_date >= last30);
+    const nsf7 = recent7.filter(p => p.category === 'bounce').length;
+    const nsf30 = recent30.filter(p => p.category === 'bounce').length;
+    const debit7 = recent7.filter(p => p.category === 'debit' || p.category === 'bounce').length;
+    const debit30 = recent30.filter(p => p.category === 'debit' || p.category === 'bounce').length;
+    const nsfRate7 = debit7 > 0 ? nsf7 / debit7 : 0;
+    const nsfRate30 = debit30 > 0 ? nsf30 / debit30 : 0;
+
+    // Average days-past-due across slow + default
+    const overdueDeals = DEALS.filter(m => m.status === 'slow' || m.status === 'default');
+    const avgDPD = overdueDeals.length > 0
+      ? overdueDeals.reduce((s, m) => s + (m.daysInDefault || 0), 0) / overdueDeals.length
+      : 0;
+
+    // Time-cost-of-money daily burn rate (carrying cost across the active book)
+    const dailyBorrowBurn = selfActive.reduce((s, m) => {
+      const pct = (m.borrowingCostPct ?? 2.0) / 100;
+      const outstanding = Math.max(m.fundedAmt - m.collected, 0);
+      return s + (outstanding * pct) / 30;
+    }, 0);
+
+    // ── Chart series (zero-safe) ───────────────────────────────────────
+    // 30-day collections trend from payments ledger
+    const trendDays: { date: string; collected: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      const collected = allPayments
+        .filter(p => p.payment_date === d && p.amount > 0)
+        .reduce((s, p) => s + p.amount, 0);
+      trendDays.push({ date: d.slice(5), collected });
+    }
+
+    // Default-rate trend by vintage month
+    const vintageTrend = Object.entries(vintages)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([mo, v]) => ({
+        month: mo.slice(2),
+        defaultRate: v.count > 0 ? (v.defaults / v.count) * 100 : 0,
+        deployed: v.deployed,
+      }));
+
+    // Aging buckets across active+slow+default by daysInDefault
+    const agingBuckets = [
+      { label: 'Current', count: 0, outstanding: 0 },
+      { label: '1-7d', count: 0, outstanding: 0 },
+      { label: '8-30d', count: 0, outstanding: 0 },
+      { label: '30d+', count: 0, outstanding: 0 },
+    ];
+    DEALS.filter(m => m.status !== 'paid').forEach(m => {
+      const dpd = m.daysInDefault || 0;
+      const out = Math.max(m.totalOwed - m.collected, 0);
+      const idx = dpd === 0 ? 0 : dpd <= 7 ? 1 : dpd <= 30 ? 2 : 3;
+      agingBuckets[idx].count++;
+      agingBuckets[idx].outstanding += out;
+    });
+
+    // NSF / bounces by ISO-week for the last 8 weeks
+    const nsfWeeks: { week: string; bounces: number; debits: number }[] = [];
+    for (let i = 7; i >= 0; i--) {
+      const end = new Date(Date.now() - i * 7 * 86400000);
+      const start = new Date(end.getTime() - 6 * 86400000);
+      const startStr = start.toISOString().slice(0, 10);
+      const endStr = end.toISOString().slice(0, 10);
+      const slice = allPayments.filter(p => p.payment_date >= startStr && p.payment_date <= endStr);
+      nsfWeeks.push({
+        week: endStr.slice(5),
+        bounces: slice.filter(p => p.category === 'bounce').length,
+        debits: slice.filter(p => p.category === 'debit').length,
+      });
+    }
+
     return {
       selfDeployed, selfCollected, selfCOC, selfOutstanding, selfGross, selfNet, selfRTR, selfWAF, selfDaily,
       refFunded, refCommTotal, refCommPaid, refCommPending, refAvgRate,
@@ -186,6 +276,10 @@ export function BackendCapital() {
       selfCount: self.length, refCount: ref.length,
       totalFunded, totalCollected, totalOutstanding, countActive, countSlow, countPaid,
       avgWeeksBehind, totalBounces,
+      // Risk Pulse
+      capitalAtRisk, defaultedOutstanding, nsfRate, nsfRate7, nsfRate30, avgDPD, dailyBorrowBurn,
+      // Chart series
+      trendDays, vintageTrend, agingBuckets, nsfWeeks,
     };
   }, [DEALS]);
 
@@ -211,6 +305,9 @@ export function BackendCapital() {
   };
 
   // ── Empty state when no deals yet ──
+  // Note: we no longer hide the dashboard. The full Capital UI is rendered at
+  // all times so the layout is reviewable in Local mode — KPIs, charts, and
+  // the deal table degrade gracefully to $0 / 0 / 0.0% when DEALS = [].
   const isEmpty = !isLoading && DEALS.length === 0;
 
   return (
@@ -235,10 +332,10 @@ export function BackendCapital() {
           </div>
         </div>
 
-        {/* ── Empty state ── */}
-        {isEmpty && <EmptyState onAdd={() => setNewDealOpen(true)} />}
+        {/* ── Inline empty-portfolio banner (non-blocking) ── */}
+        {isEmpty && <EmptyBanner onAdd={() => setNewDealOpen(true)} />}
 
-        {!isEmpty && (
+        {(
           <>
             {/* ── View Tabs ── */}
             <div className="border-b border-gray-200">
@@ -326,6 +423,56 @@ export function BackendCapital() {
                     <MiniKpi label="Total Bounces" value={String(M.totalBounces)} accent={M.totalBounces > 0 ? 'red' : 'emerald'} />
                   </div>
                 </div>
+
+                {/* Risk Pulse */}
+                <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Flame className="w-4 h-4 text-red-500" />
+                    <span className="text-sm font-semibold text-gray-900">Risk Pulse</span>
+                    <span className="text-xs text-gray-400">NSF, DPD, capital-at-risk, time-cost burn</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <MiniKpi
+                      label="Capital at Risk"
+                      value={fmt(M.capitalAtRisk)}
+                      sub={`Default: ${fmt(M.defaultedOutstanding)}`}
+                      accent={M.capitalAtRisk > 0 ? 'red' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Default Rate"
+                      value={fmtPct(M.defaultRate)}
+                      sub={`${DEALS.filter(m => m.status === 'default').length} of ${M.totalDeals}`}
+                      accent={M.defaultRate > 0.1 ? 'red' : M.defaultRate > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="NSF Rate (30d)"
+                      value={fmtPct(M.nsfRate30)}
+                      sub={`7d: ${fmtPct(M.nsfRate7)} · LTD: ${fmtPct(M.nsfRate)}`}
+                      accent={M.nsfRate30 > 0.05 ? 'red' : M.nsfRate30 > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Avg DPD"
+                      value={M.avgDPD > 0 ? `${M.avgDPD.toFixed(1)}d` : '0d'}
+                      sub="On slow + default"
+                      accent={M.avgDPD > 14 ? 'red' : M.avgDPD > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="TCM Burn /day"
+                      value={fmt(M.dailyBorrowBurn)}
+                      sub="Borrow cost on outstanding"
+                      accent={M.dailyBorrowBurn > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Stacked / Behind"
+                      value={`${M.stacked} / ${DEALS.filter(m => (m.weeksBehind ?? 0) > 0).length}`}
+                      sub={`Avg ${M.avgWeeksBehind.toFixed(1)}w behind`}
+                      accent={M.stacked > 0 || M.avgWeeksBehind > 0 ? 'amber' : 'emerald'}
+                    />
+                  </div>
+                </div>
+
+                {/* Charts strip */}
+                <PortfolioCharts M={M} />
 
                 {/* Filters + Search */}
                 <div className="flex items-center justify-between flex-wrap gap-3">
@@ -544,7 +691,21 @@ export function BackendCapital() {
                       })}
                       {filtered.length === 0 && (
                         <tr>
-                          <td colSpan={12} className="py-16 text-center text-sm text-gray-400">No deals match the current filters.</td>
+                          <td colSpan={12} className="py-16 text-center">
+                            {DEALS.length === 0 ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <span className="text-sm text-gray-500">No capital deals yet — your portfolio table will populate here.</span>
+                                <button
+                                  onClick={() => setNewDealOpen(true)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-brand text-white rounded-[6px] hover:bg-brand-hover"
+                                >
+                                  <Plus className="w-3.5 h-3.5" /> Add your first deal
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">No deals match the current filters.</span>
+                            )}
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -762,36 +923,28 @@ function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => 
 }
 
 // ══════════════════════════════════════════
-// EMPTY STATE
+// EMPTY BANNER (inline, non-blocking)
 // ══════════════════════════════════════════
-function EmptyState({ onAdd }: { onAdd: () => void }) {
+function EmptyBanner({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="bg-white border-2 border-dashed border-gray-200 rounded-[12px] p-12 text-center">
-      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-brand/5 flex items-center justify-center">
-        <Banknote className="w-7 h-7 text-brand" />
+    <div className="bg-gradient-to-r from-indigo-50 via-white to-orange-50 border border-indigo-100 rounded-[10px] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-white border border-indigo-100 flex items-center justify-center shadow-sm">
+          <Banknote className="w-5 h-5 text-brand" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-gray-900">Portfolio is empty — preview mode active</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Every KPI, chart, and tab below renders with $0. Add a deal to populate the portfolio. ACH.com / DataMerch / FiCoSo / Fundomate automation wires in later.
+          </p>
+        </div>
       </div>
-      <h2 className="text-lg font-bold text-gray-900 mb-1.5">No capital deals yet</h2>
-      <p className="text-sm text-gray-500 max-w-md mx-auto mb-5">
-        Add deals manually to build your portfolio. Once automation (ACH.com, DataMerch, FiCoSo, Fundomate) is wired up, new deals will flow in automatically.
-      </p>
       <button
         onClick={onAdd}
-        className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2"
+        className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2 shrink-0"
       >
         <Plus className="w-4 h-4" /> Add your first deal
       </button>
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
-        {[
-          { title: 'Self-Funded', body: 'Family office capital deployed at 2%/mo. Tracks RTR, WAF, daily ACH, and net P&L after cost of capital.' },
-          { title: 'Fundomate Referrals', body: 'Zero-risk referrals. Tracks commission earned and pending. No capital exposure.' },
-          { title: 'Risk + Renewals', body: 'Stacking, NSF, defaults, UCC, and renewal scoring kick in as soon as you have deals.' },
-        ].map((c, i) => (
-          <div key={i} className="bg-gray-50 rounded-[8px] p-3 border border-gray-100">
-            <p className="text-xs font-bold text-gray-900 mb-1">{c.title}</p>
-            <p className="text-[11px] text-gray-500 leading-relaxed">{c.body}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
