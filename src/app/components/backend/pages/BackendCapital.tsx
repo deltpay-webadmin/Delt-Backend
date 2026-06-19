@@ -41,7 +41,7 @@ const achLabels: Record<string, string> = {
   current: 'Current', completed: 'Completed', 'nsf-retry': 'NSF Retry', suspended: 'Suspended',
 };
 
-type TabKey = 'portfolio' | 'activity' | 'risk' | 'collections' | 'renewals' | 'concentration';
+type TabKey = 'portfolio' | 'activity' | 'riskcoll' | 'renewals' | 'analytics';
 
 const PAYMENT_CATEGORIES: { key: LoanPaymentCategory; label: string }[] = [
   { key: 'debit', label: 'ACH Debit' },
@@ -341,12 +341,11 @@ export function BackendCapital() {
             <div className="border-b border-gray-200">
               <div className="flex gap-1">
                 {([
-                  { key: 'portfolio' as TabKey, label: 'Portfolio Overview' },
-                  { key: 'activity' as TabKey, label: 'ACH Activity' },
-                  { key: 'risk' as TabKey, label: 'Risk & Fraud' },
-                  { key: 'collections' as TabKey, label: 'Collections' },
+                  { key: 'portfolio' as TabKey, label: 'Portfolio' },
+                  { key: 'activity' as TabKey, label: 'Activity' },
+                  { key: 'riskcoll' as TabKey, label: 'Risk & Collections' },
                   { key: 'renewals' as TabKey, label: 'Renewals' },
-                  { key: 'concentration' as TabKey, label: 'Concentration & Vintage' },
+                  { key: 'analytics' as TabKey, label: 'Analytics' },
                 ]).map(t => (
                   <button
                     key={t.key}
@@ -470,9 +469,6 @@ export function BackendCapital() {
                     />
                   </div>
                 </div>
-
-                {/* Charts strip */}
-                <PortfolioCharts M={M} />
 
                 {/* Filters + Search */}
                 <div className="flex items-center justify-between flex-wrap gap-3">
@@ -725,16 +721,16 @@ export function BackendCapital() {
             {activeTab === 'activity' && <ActivityTab onImport={() => setAchImportOpen(true)} />}
 
             {/* ═══ RISK & FRAUD TAB (consolidated: Risk Signals + Fraud + Stacking & UCC) ═══ */}
-            {activeTab === 'risk' && <RiskTab DEALS={DEALS} />}
+            {activeTab === 'riskcoll' && <RiskCollectionsTab DEALS={DEALS} onEscalate={setCollectionModal} />}
 
             {/* ═══ COLLECTIONS TAB ═══ */}
-            {activeTab === 'collections' && <CollectionsTab DEALS={DEALS} onEscalate={setCollectionModal} />}
+
 
             {/* ═══ RENEWALS TAB ═══ */}
             {activeTab === 'renewals' && <RenewalsTab DEALS={DEALS} />}
 
             {/* ═══ CONCENTRATION TAB ═══ */}
-            {activeTab === 'concentration' && <ConcentrationTab M={M} />}
+            {activeTab === 'analytics' && <AnalyticsTab M={M} />}
           </>
         )}
       </div>
@@ -1221,7 +1217,132 @@ function ActivityTab({ onImport }: { onImport: () => void }) {
 // ══════════════════════════════════════════
 // RISK & FRAUD TAB (merged)
 // ══════════════════════════════════════════
-function RiskTab({ DEALS }: { DEALS: CapitalDeal[] }) {
+function RiskCollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
+  const active = DEALS.filter(m => m.status !== 'paid');
+  const tiers = {
+    low: active.filter(m => m.achStatus === 'current' && m.stackCount === 0 && (m.avg30d === 0 || m.avg7d >= m.avg30d * 0.9)),
+    moderate: active.filter(m => m.achStatus === 'current' && (m.stackCount > 0 || (m.avg30d > 0 && m.avg7d < m.avg30d * 0.9))),
+    elevated: active.filter(m => m.achStatus === 'nsf-retry'),
+    critical: active.filter(m => m.achStatus === 'suspended' || m.status === 'default'),
+  };
+  const fraudRules = [
+    { rule: 'Multiple MCAs across business names', flagged: DEALS.filter(m => m.stackCount >= 2), severity: 'high' as const, detail: 'Owner may have MCAs under multiple DBAs', source: 'DataMerch' },
+    { rule: 'Stopped processing after MCA funded', flagged: DEALS.filter(m => m.avg7d === 0 && m.status !== 'paid' && m.status !== 'default'), severity: 'critical' as const, detail: 'MCA underwritten on volume, but processing has ceased', source: 'ACH.com' },
+    { rule: 'Single additional stack position', flagged: DEALS.filter(m => m.stackCount === 1), severity: 'medium' as const, detail: 'One overlapping MCA detected', source: 'DataMerch' },
+    { rule: 'UCC expiring in <12 months', flagged: DEALS.filter(m => m.uccExpires && daysBetween(today, m.uccExpires) < 365 && daysBetween(today, m.uccExpires) > 0), severity: 'medium' as const, detail: 'Lien position needs renewal', source: 'FiCoSo' },
+  ];
+  const totalFlags = fraudRules.reduce((s, r) => s + r.flagged.length, 0);
+  const delinquent = DEALS.filter(m => m.status === 'slow' || m.status === 'default');
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Low Risk', count: tiers.low.length, bal: tiers.low.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'emerald' },
+          { label: 'Moderate', count: tiers.moderate.length, bal: tiers.moderate.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'amber' },
+          { label: 'Elevated', count: tiers.elevated.length, bal: tiers.elevated.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'orange' },
+          { label: 'Critical', count: tiers.critical.length, bal: tiers.critical.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'red' },
+        ].map(t => <KpiCard key={t.label} label={t.label} value={t.count.toString()} sub={`${fmt(t.bal)} outstanding`} accent={t.accent} />)}
+      </div>
+
+      <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-red-500" />
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Risk & Fraud Signals</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Auto-flagged patterns across portfolio · DataMerch, ACH.com, FiCoSo (when wired)</p>
+            </div>
+          </div>
+          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${totalFlags > 0 ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
+            {totalFlags > 0 ? `${totalFlags} flags` : 'All clear'}
+          </span>
+        </div>
+        <div className="px-5 py-4 space-y-3">
+          {fraudRules.map((flag, i) => {
+            const sevColors = { critical: 'bg-red-100 text-red-800 border-red-200', high: 'bg-red-50 text-red-700 border-red-100', medium: 'bg-amber-50 text-amber-700 border-amber-100' };
+            return (
+              <div key={i} className={`rounded-[6px] border p-3 ${flag.flagged.length > 0 ? sevColors[flag.severity] : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {flag.flagged.length > 0 ? <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" /> : <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                      <p className="text-sm font-semibold">{flag.rule}</p>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/80 text-gray-500 border border-gray-200">{flag.source}</span>
+                    </div>
+                    <p className="text-xs opacity-80 ml-[22px]">{flag.detail}</p>
+                    {flag.flagged.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2 ml-[22px]">
+                        {flag.flagged.map(m => (
+                          <span key={m.id} className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/60 border border-gray-300">{m.merchant} ({m.id})</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${flag.flagged.length > 0 ? 'bg-white/50' : 'bg-emerald-100 text-emerald-700'}`}>
+                    {flag.flagged.length > 0 ? `${flag.flagged.length} flagged` : 'Clear'}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <KpiCard label="Delinquent" value={delinquent.length.toString()} sub={`${DEALS.filter(m => m.status === 'default').length} defaulted`} accent={DEALS.filter(m => m.status === 'default').length > 0 ? 'red' : 'emerald'} />
+        <KpiCard label="NSF/Retry" value={DEALS.filter(m => m.achStatus === 'nsf-retry').length.toString()} sub="ACH failures pending" accent="amber" />
+        <KpiCard label="Suspended" value={DEALS.filter(m => m.achStatus === 'suspended').length.toString()} sub="ACH debits halted" accent="red" />
+        <KpiCard label="Daily ACH Active" value={fmt(DEALS.filter(m => m.achStatus === 'current').reduce((s, m) => s + m.dailyDebit, 0))} sub={`${DEALS.filter(m => m.achStatus === 'current').length} merchants`} accent="emerald" />
+        <KpiCard label="At Risk Balance" value={fmt(delinquent.reduce((s, m) => s + (m.totalOwed - m.collected), 0))} sub="Outstanding on delinquent" accent="red" />
+      </div>
+
+      <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-amber-500" />
+          <div><h3 className="text-sm font-semibold text-gray-900">Collection Escalation Workflow</h3><p className="text-xs text-gray-500 mt-0.5">Automated escalation stages for delinquent accounts</p></div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full"><thead><tr className="border-b border-gray-100 bg-gray-50">
+            <Th className="pl-5">Merchant</Th><Th>Status</Th><Th>Current Stage</Th><Th>Days Overdue</Th><Th>Stage Timeline</Th><Th>Next Action</Th>
+          </tr></thead>
+            <tbody>{delinquent.map(m => {
+              const stages = [
+                { name: 'ACH Retry', icon: '↻', daysIn: 0, active: m.achStatus === 'nsf-retry', done: m.daysInDefault > 3 },
+                { name: 'Email Notice', icon: '✉', daysIn: 3, active: m.daysInDefault >= 3 && m.daysInDefault < 7, done: m.daysInDefault >= 7 },
+                { name: 'Agent Call', icon: '☎', daysIn: 7, active: m.daysInDefault >= 7 && m.daysInDefault < 14, done: m.daysInDefault >= 14 },
+                { name: 'Demand Letter', icon: '⚠', daysIn: 14, active: m.daysInDefault >= 14 && m.daysInDefault < 30, done: m.daysInDefault >= 30 },
+                { name: 'Legal', icon: '⚖', daysIn: 30, active: m.daysInDefault >= 30, done: false },
+              ];
+              const currentStage = [...stages].reverse().find(s => s.active || s.done) || stages[0];
+              const nextStage = stages.find(s => !s.active && !s.done) || stages[stages.length - 1];
+              return (<tr key={m.id} className="border-b border-gray-50 hover:bg-amber-50/20">
+                <td className="pl-5 py-3"><p className="text-sm font-semibold text-gray-900">{m.merchant}</p><p className="text-[10px] text-gray-400 font-mono">{m.id}</p></td>
+                <td className="py-3"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusConfig[m.status].bg} ${statusConfig[m.status].text}`}><span className={`w-1.5 h-1.5 rounded-full ${statusConfig[m.status].dot}`} />{statusConfig[m.status].label}</span></td>
+                <td className="py-3"><span className="text-sm font-semibold text-gray-900">{currentStage.icon} {currentStage.name}</span></td>
+                <td className="py-3"><span className={`text-sm font-bold tabular-nums ${m.daysInDefault >= 14 ? 'text-red-600' : m.daysInDefault >= 7 ? 'text-amber-600' : 'text-gray-700'}`}>{m.daysInDefault}d</span></td>
+                <td className="py-3">
+                  <div className="flex items-center gap-1">{stages.map((s, i) => (
+                    <div key={i} className="flex items-center gap-0.5">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-brand text-white ring-2 ring-brand/20' : 'bg-gray-100 text-gray-400'}`} title={s.name}>{s.done ? '✓' : s.icon}</div>
+                      {i < stages.length - 1 && <div className={`w-3 h-0.5 ${s.done ? 'bg-emerald-300' : 'bg-gray-200'}`} />}
+                    </div>
+                  ))}</div>
+                </td>
+                <td className="py-3"><button onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button></td>
+              </tr>);
+            })}{delinquent.length === 0 && (
+              <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">No delinquent accounts — all collections current</td></tr>
+            )}</tbody></table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function RiskTab_unused({ DEALS }: { DEALS: CapitalDeal[] }) {
+
   const active = DEALS.filter(m => m.status !== 'paid');
   const tiers = {
     low: active.filter(m => m.achStatus === 'current' && m.stackCount === 0 && (m.avg30d === 0 || m.avg7d >= m.avg30d * 0.9)),
@@ -1351,7 +1472,8 @@ function RiskTab({ DEALS }: { DEALS: CapitalDeal[] }) {
 // ══════════════════════════════════════════
 // COLLECTIONS TAB
 // ══════════════════════════════════════════
-function CollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function CollectionsTab_unused({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -1470,9 +1592,12 @@ function RenewalsTab({ DEALS }: { DEALS: CapitalDeal[] }) {
 // ══════════════════════════════════════════
 // CONCENTRATION TAB
 // ══════════════════════════════════════════
-function ConcentrationTab({ M }: { M: any }) {
+function AnalyticsTab({ M }: { M: any }) {
   return (
     <div className="space-y-6">
+      {/* Performance charts strip (moved from Portfolio Overview) */}
+      <PortfolioCharts M={M} />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ConcentrationCard
           title="Channel Split"
