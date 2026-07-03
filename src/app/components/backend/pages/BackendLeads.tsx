@@ -2,6 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { NewLeadFlow } from '../flows/NewLeadFlow';
 import {
+  BUNDLE_PICKER_OPTIONS,
+  BUNDLE_STATUSES,
+  bundleStatusCls,
+  type BundleStatus,
+} from '../../../lib/bundles';
+import {
   Plus,
   Search,
   Phone,
@@ -97,27 +103,9 @@ function isQualifiedOrLater(stage: StageName): boolean {
   return ALL_STAGES.indexOf(stage) >= 2; // Qualified or later
 }
 
-// ── Bundle types from Settings ──
-const BUNDLE_OPTIONS = [
-  { id: 'welcome', name: 'Welcome Bundle', amount: 500 },
-  { id: 'referrer', name: 'Referrer Reward', amount: 200 },
-  { id: 'retention-light', name: 'Retention — Light', amount: 200 },
-  { id: 'retention-medium', name: 'Retention — Medium', amount: 350 },
-  { id: 'retention-full', name: 'Retention — Full', amount: 500 },
-];
-
-type BundleStatus = 'Not Assigned' | 'Credit Issued' | 'Order Placed' | 'Shipped' | 'Delivered';
-const BUNDLE_STATUSES: BundleStatus[] = ['Not Assigned', 'Credit Issued', 'Order Placed', 'Shipped', 'Delivered'];
-
-function bundleStatusCls(status: BundleStatus) {
-  switch (status) {
-    case 'Not Assigned': return 'bg-gray-100 text-gray-600';
-    case 'Credit Issued': return 'bg-blue-50 text-blue-700';
-    case 'Order Placed': return 'bg-amber-50 text-amber-700';
-    case 'Shipped': return 'bg-violet-50 text-violet-700';
-    case 'Delivered': return 'bg-emerald-50 text-emerald-700';
-  }
-}
+// Bundle picker reads from the shared catalog so any edits made in
+// Settings > Bundles flow through here automatically.
+const BUNDLE_OPTIONS = BUNDLE_PICKER_OPTIONS;
 
 // ── Welcome Bundle Section ──
 function WelcomeBundleSection({ lead }: { lead: Lead }) {
