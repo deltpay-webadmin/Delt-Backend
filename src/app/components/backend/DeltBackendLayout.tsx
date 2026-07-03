@@ -246,6 +246,9 @@ interface CommandItem {
 const allCommands: CommandItem[] = [
   { label: 'Dashboard', path: '/', group: 'Navigation', icon: Home },
   { label: 'Workspace', path: '/workspace', group: 'Navigation', icon: Inbox, keywords: 'inbox email sms call messages tasks activity timeline' },
+  { label: 'Inbox', path: '/workspace/inbox', group: 'Navigation', icon: Inbox, keywords: 'workspace email sms messages' },
+  { label: 'Activity Timeline', path: '/workspace/activity', group: 'Navigation', icon: Inbox, keywords: 'workspace history audit log' },
+  { label: 'Tasks', path: '/workspace/tasks', group: 'Navigation', icon: Inbox, keywords: 'workspace todo to-do' },
   { label: 'Leads', path: '/leads', group: 'Pipeline', icon: Users, keywords: 'sales pipeline' },
   { label: 'Underwriting', path: '/underwriting', group: 'Pipeline', icon: ClipboardCheck },
   { label: 'Analysis', path: '/analysis', group: 'Pipeline', icon: FileText, keywords: 'deal analysis review cost calculator' },
@@ -400,6 +403,12 @@ export function DeltBackendLayout() {
     if (currentPage.startsWith('/underwriting/')) return <UnderwritingDetail />;
     if (currentPage.startsWith('/deals/')) return <DealDetail />;
     if (currentPage.startsWith('/residuals/')) return <MerchantResidualDetail />;
+    // Workspace tabs (consolidated Inbox + Activity Timeline + Tasks)
+    if (currentPage.startsWith('/workspace')) return <BackendWorkspace />;
+    // Legacy paths redirect into Workspace tabs
+    if (currentPage === '/inbox' || currentPage === '/activity-timeline' || currentPage === '/tasks') {
+      return <BackendWorkspace />;
+    }
     switch (currentPage) {
       case '/': return <BackendDashboard />;
       case '/leads': return <BackendLeads />;
@@ -423,10 +432,6 @@ export function DeltBackendLayout() {
       case '/disputes': return <BackendDisputes />;
       case '/outreach': return <BackendOutreach />;
       case '/compliance': return <BackendCompliance />;
-      case '/activity-timeline': return <BackendActivityTimeline />;
-      case '/tasks': return <BackendTasks />;
-      case '/inbox': return <BackendInbox />;
-      case '/workspace': return <BackendWorkspace />;
       case '/websites': return <BackendWebsites />;
       case '/subscriptions': return <BackendSubscriptions />;
       case '/documents': return <BackendDocuments />;
