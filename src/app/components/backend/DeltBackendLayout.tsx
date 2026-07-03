@@ -101,10 +101,13 @@ const adminSections: NavSection[] = [
     id: 'pipeline',
     label: 'Pipeline',
     icon: GitBranch,
+    // Ordered to mirror the funnel: Lead -> Analysis -> Underwriting ->
+    // Onboarding. Cost Calculator is reached from inside Analysis.
     children: [
       { label: 'Leads', path: '/leads' },
-      { label: 'Underwriting', path: '/underwriting' },
       { label: 'Analysis', path: '/analysis' },
+      { label: 'Underwriting', path: '/underwriting' },
+      { label: 'Onboarding', path: '/onboarding' },
     ],
   },
   {
@@ -247,8 +250,10 @@ const allCommands: CommandItem[] = [
   { label: 'Dashboard', path: '/', group: 'Navigation', icon: Home },
   { label: 'Workspace', path: '/workspace', group: 'Navigation', icon: Inbox, keywords: 'inbox email sms call messages tasks activity timeline' },
   { label: 'Leads', path: '/leads', group: 'Pipeline', icon: Users, keywords: 'sales pipeline' },
-  { label: 'Underwriting', path: '/underwriting', group: 'Pipeline', icon: ClipboardCheck },
   { label: 'Analysis', path: '/analysis', group: 'Pipeline', icon: FileText, keywords: 'deal analysis review cost calculator' },
+  { label: 'Underwriting', path: '/underwriting', group: 'Pipeline', icon: ClipboardCheck },
+  { label: 'Onboarding', path: '/onboarding', group: 'Pipeline', icon: ClipboardCheck, keywords: 'kickoff post-approval setup' },
+  { label: 'Cost Calculator', path: '/analysis', group: 'Pipeline', icon: FileText, keywords: 'pricing rate sheet calculator' },
   { label: 'All Merchants', path: '/merchants', group: 'Merchants', icon: Store },
   { label: 'Residuals', path: '/residuals', group: 'Merchants', icon: Receipt },
   { label: 'Capital', path: '/capital', group: 'Merchants', icon: Banknote },
