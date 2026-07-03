@@ -103,6 +103,7 @@ const adminSections: NavSection[] = [
     icon: GitBranch,
     children: [
       { label: 'Leads', path: '/leads' },
+      { label: 'Onboarding', path: '/onboarding' },
       { label: 'Underwriting', path: '/underwriting' },
       { label: 'Analysis', path: '/analysis' },
     ],
@@ -247,6 +248,7 @@ const allCommands: CommandItem[] = [
   { label: 'Dashboard', path: '/', group: 'Navigation', icon: Home },
   { label: 'Workspace', path: '/workspace', group: 'Navigation', icon: Inbox, keywords: 'inbox email sms call messages tasks activity timeline' },
   { label: 'Leads', path: '/leads', group: 'Pipeline', icon: Users, keywords: 'sales pipeline' },
+  { label: 'Onboarding', path: '/onboarding', group: 'Pipeline', icon: ClipboardCheck, keywords: 'onboarding tracker SLA application' },
   { label: 'Underwriting', path: '/underwriting', group: 'Pipeline', icon: ClipboardCheck },
   { label: 'Analysis', path: '/analysis', group: 'Pipeline', icon: FileText, keywords: 'deal analysis review cost calculator' },
   { label: 'All Merchants', path: '/merchants', group: 'Merchants', icon: Store },
@@ -905,23 +907,3 @@ export function DeltBackendLayout() {
   );
 }
 
-// ── Placeholder page for new sections ──
-function PlaceholderPage({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="px-6 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-      </div>
-      <div className="bg-white rounded-[8px] border border-gray-200 p-12 flex flex-col items-center justify-center text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-          <Settings className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Coming Soon</h3>
-        <p className="text-sm text-gray-500 max-w-sm">
-          This section is under development. You'll be able to manage {title.toLowerCase()} here.
-        </p>
-      </div>
-    </div>
-  );
-}

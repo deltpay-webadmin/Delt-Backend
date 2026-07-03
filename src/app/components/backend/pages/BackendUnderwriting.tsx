@@ -10,6 +10,7 @@ import {
 import { useAppNavigate } from '../NavigationContext';
 import { useUnderwriting, underwritingActions, type UWStage, type ProductType, type UWApplication as Application } from '../crmStore';
 import { NewApplicationFlow } from '../flows/NewApplicationFlow';
+import { PageHeader, KpiCard } from '../shared';
 
 const STAGES: UWStage[] = ['Received', 'Doc Collection', 'Bank Review', 'Credit Analysis', 'Committee', 'Approved', 'Declined'];
 
@@ -236,57 +237,46 @@ export function BackendUnderwriting() {
   const kanbanStages = STAGES.filter(s => s !== 'Declined');
 
   return (
-    <div className="px-6 py-6 space-y-5">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-brand to-brand-light flex items-center justify-center shadow-sm">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Underwriting Queue</h1>
-            <p className="text-sm text-gray-500">{inQueueCount} applications in pipeline &middot; {overSLACount > 0 ? <span className="text-red-600 font-medium">{overSLACount} over SLA</span> : 'All within SLA'}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 rounded-[6px] p-0.5">
-            <button onClick={() => setViewMode('kanban')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
-              <LayoutGrid className="w-4 h-4" />
+    <div className="px-6 py-6 space-y-5 bg-canvas min-h-full">
+      <PageHeader
+        title="Underwriting Queue"
+        icon={Shield}
+        subtitle={
+          <>
+            {inQueueCount} applications in pipeline
+            {' · '}
+            {overSLACount > 0
+              ? <span className="text-red-600 font-medium">{overSLACount} over SLA</span>
+              : <span className="text-emerald-600 font-medium">All within SLA</span>}
+          </>
+        }
+        actions={
+          <>
+            <div className="flex items-center bg-gray-100 rounded-[6px] p-0.5">
+              <button onClick={() => setViewMode('kanban')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`} title="Kanban view">
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`} title="Table view">
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+            <button
+              onClick={() => setNewAppOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors"
+            >
+              <Plus className="w-4 h-4" /> New Application
             </button>
-            <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
-              <List className="w-4 h-4" />
-            </button>
-          </div>
-          <button
-            onClick={() => setNewAppOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover"
-          >
-            <Plus className="w-3.5 h-3.5" /> New Application
-          </button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* KPI Row */}
-      <div className="grid grid-cols-5 gap-3">
-        {[
-          { label: 'In Pipeline', value: inQueueCount, sub: `${APPLICATIONS.length} total`, color: 'border-t-brand', icon: FileText },
-          { label: 'Avg Decision Time', value: `${avgDaysToDecision}d`, sub: 'SLA: 5 business days', color: 'border-t-blue-500', icon: Clock },
-          { label: 'Approval Rate', value: `${approvalRate}%`, sub: `${approvedCount} of ${totalDecided} decided`, color: 'border-t-emerald-500', icon: CheckCircle },
-          { label: 'Pipeline Value', value: `$${(pipelineValue / 1000).toFixed(0)}K`, sub: `${APPLICATIONS.filter(a => a.stage !== 'Declined').length} active deals`, color: 'border-t-amber-500', icon: DollarSign },
-          { label: 'Over SLA', value: overSLACount, sub: overSLACount > 0 ? 'Needs attention' : 'All on track', color: overSLACount > 0 ? 'border-t-red-500' : 'border-t-gray-300', icon: AlertTriangle },
-        ].map((kpi, i) => {
-          const Icon = kpi.icon;
-          return (
-            <div key={i} className={`bg-white rounded-[8px] border border-gray-200 border-t-[3px] ${kpi.color} px-4 py-3`}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <Icon className="w-3.5 h-3.5 text-gray-400" />
-                <span className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold">{kpi.label}</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <KpiCard label="In Pipeline" value={inQueueCount} sub={`${APPLICATIONS.length} total`} icon={FileText} tone="brand" />
+        <KpiCard label="Avg Decision Time" value={`${avgDaysToDecision}d`} sub="SLA: 5 business days" icon={Clock} tone="blue" />
+        <KpiCard label="Approval Rate" value={`${approvalRate}%`} sub={`${approvedCount} of ${totalDecided} decided`} icon={CheckCircle} tone="emerald" />
+        <KpiCard label="Pipeline Value" value={`$${(pipelineValue / 1000).toFixed(0)}K`} sub={`${APPLICATIONS.filter(a => a.stage !== 'Declined').length} active deals`} icon={DollarSign} tone="amber" />
+        <KpiCard label="Over SLA" value={overSLACount} sub={overSLACount > 0 ? 'Needs attention' : 'All on track'} icon={AlertTriangle} tone={overSLACount > 0 ? 'red' : 'default'} />
       </div>
 
       {/* Filters */}

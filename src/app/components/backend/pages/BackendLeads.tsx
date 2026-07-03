@@ -47,6 +47,7 @@ import {
   programActions,
   type Lead as StoreLead,
 } from '../crmStore';
+import { PageHeader, KpiCard } from '../shared';
 
 // ── Full pipeline stages ──
 const ALL_STAGES = [
@@ -242,35 +243,6 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
   );
 }
 
-// ── Stat Card ──
-interface StatCardProps {
-  label: string;
-  value: string;
-  trend?: { value: string; isPositive: boolean };
-  icon?: React.ReactNode;
-  variant?: 'default' | 'red';
-}
-
-function StatCard({ label, value, trend, icon, variant = 'default' }: StatCardProps) {
-  const isRed = variant === 'red';
-  return (
-    <div className={`bg-white rounded-[8px] border p-5 ${isRed ? 'border-red-200' : 'border-gray-200'}`}>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-gray-600">{label}</p>
-        {icon && <div className={isRed ? 'text-red-400' : 'text-gray-400'}>{icon}</div>}
-      </div>
-      <div className="flex items-baseline gap-2">
-        <p className={`text-2xl font-bold ${isRed ? 'text-red-600' : 'text-gray-900'}`}>{value}</p>
-        {trend && (
-          <span className={`flex items-center text-sm font-medium ${trend.isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
-            {trend.isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : null}
-            {trend.value}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ── Stage Progress (updated for full journey) ──
 function StageProgress({ stage, stepDetails }: { stage: StageName; stepDetails?: StepDetail[] }) {
@@ -959,30 +931,31 @@ export function BackendLeads() {
     <div className="h-full flex flex-col bg-canvas">
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Sales Leads</h1>
-            <p className="text-sm text-gray-600 mt-1">{totalLeads} total leads in pipeline</p>
-          </div>
-          <button
-            onClick={() => setNewLeadOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            New Lead
-          </button>
-        </div>
+        <PageHeader
+          title="Leads"
+          icon={Users}
+          subtitle={`${totalLeads} total leads in pipeline · ${conversionRate}% conversion`}
+          actions={
+            <button
+              onClick={() => setNewLeadOpen(true)}
+              className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              New Lead
+            </button>
+          }
+        />
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary KPIs */}
       <div className="px-6 pt-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          <StatCard label="Total Leads" value={totalLeads.toString()} icon={<Users className="w-5 h-5" />} />
-          <StatCard label="New" value={newLeads.toString()} trend={{ value: '+2 this week', isPositive: true }} icon={<Star className="w-5 h-5" />} />
-          <StatCard label="In Progress" value={inProgressLeads.toString()} icon={<Clock className="w-5 h-5" />} />
-          <StatCard label="Won" value={wonLeads.toString()} trend={{ value: '+1 this week', isPositive: true }} icon={<CheckCircle className="w-5 h-5" />} />
-          <StatCard label="Conversion Rate" value={`${conversionRate}%`} icon={<TrendingUp className="w-5 h-5" />} />
-          <StatCard label="Avg Time to Funded" value={`${avgTimeToFunded} days`} icon={<Calendar className="w-5 h-5" />} />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+          <KpiCard label="Total Leads" value={totalLeads} icon={Users} tone="brand" />
+          <KpiCard label="New" value={newLeads} trend={{ value: '+2 this week', isPositive: true }} icon={Star} tone="blue" />
+          <KpiCard label="In Progress" value={inProgressLeads} icon={Clock} tone="amber" />
+          <KpiCard label="Won" value={wonLeads} trend={{ value: '+1 this week', isPositive: true }} icon={CheckCircle} tone="emerald" />
+          <KpiCard label="Conversion Rate" value={`${conversionRate}%`} icon={TrendingUp} />
+          <KpiCard label="Avg Time to Funded" value={`${avgTimeToFunded}d`} sub="From new to funded" icon={Calendar} />
         </div>
 
         {/* Tabs: Leads / Referrals */}
@@ -990,7 +963,7 @@ export function BackendLeads() {
           <button
             onClick={() => setMainTab('leads')}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'leads' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+              mainTab === 'leads' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             Leads Pipeline
@@ -998,7 +971,7 @@ export function BackendLeads() {
           <button
             onClick={() => setMainTab('referrals')}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'referrals' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+              mainTab === 'referrals' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             Referrals
