@@ -213,6 +213,26 @@ export interface KybIntake {
   };
 }
 
+/**
+ * Products a lead is interested in. A lead can want more than one (e.g.
+ * Payments + Capital), so leads carry a `products` array. `type` is kept as the
+ * single primary product for legacy views (badges, filters) and mirrors
+ * `products[0]`. Legacy values (MCA/Residual/Processing) remain valid so old
+ * leads keep rendering.
+ */
+export type LeadProduct =
+  | 'Payments'
+  | 'Capital'
+  | 'Website'
+  | 'Ai'
+  | 'Leasing'
+  // legacy
+  | 'MCA'
+  | 'Residual'
+  | 'Processing';
+
+export const LEAD_PRODUCTS: LeadProduct[] = ['Payments', 'Capital', 'Website', 'Ai', 'Leasing'];
+
 export interface Lead {
   id: string;
   businessName: string;
@@ -220,7 +240,9 @@ export interface Lead {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  type: 'MCA' | 'Residual' | 'Processing' | 'Leasing';
+  type: LeadProduct;
+  /** All products the lead is interested in (multi-select). */
+  products: LeadProduct[];
   source: string;
   monthlySales: string;
   amountRequested: string;
@@ -435,6 +457,7 @@ const fallbackSeed: CrmState = {
       contactEmail: 'robert@greenvalleyauto.com',
       contactPhone: '(555) 123-4567',
       type: 'MCA',
+      products: ['MCA'],
       source: 'Website Inquiry',
       monthlySales: '$45,000',
       amountRequested: '$75,000',
@@ -525,6 +548,7 @@ function fromDbLead(r: any): Lead {
     contactEmail: r.contact_email ?? '',
     contactPhone: r.contact_phone ?? '',
     type: r.type,
+    products: r.products ?? (r.type ? [r.type] : []),
     source: r.source ?? '',
     monthlySales: r.monthly_sales ?? '',
     amountRequested: r.amount_requested ?? '',
@@ -555,6 +579,7 @@ function toDbLead(l: Partial<Lead>): Record<string, any> {
   if (l.contactEmail !== undefined) out.contact_email = l.contactEmail;
   if (l.contactPhone !== undefined) out.contact_phone = l.contactPhone;
   if (l.type !== undefined) out.type = l.type;
+  if (l.products !== undefined) out.products = l.products;
   if (l.source !== undefined) out.source = l.source;
   if (l.monthlySales !== undefined) out.monthly_sales = l.monthlySales;
   if (l.amountRequested !== undefined) out.amount_requested = l.amountRequested;
@@ -1006,7 +1031,12 @@ export const leadActions = {
       contactName: lead.contactName || '',
       contactEmail: lead.contactEmail || '',
       contactPhone: lead.contactPhone || '',
-      type: (lead.type as any) || 'MCA',
+      type: (lead.products?.[0] as LeadProduct) || (lead.type as LeadProduct) || 'Payments',
+      products: lead.products && lead.products.length
+        ? lead.products
+        : lead.type
+        ? [lead.type]
+        : ['Payments'],
       source: lead.source || 'Manual',
       monthlySales: lead.monthlySales || '$0',
       amountRequested: lead.amountRequested || '$0',

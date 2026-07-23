@@ -11,18 +11,39 @@
  * moves forward from the lead detail panel.
  */
 
-import React, { useState } from 'react';
-import { X, Plus, CreditCard, HandCoins, Store } from 'lucide-react';
+import React, { useMemo, useRef, useState } from 'react';
+import {
+  X,
+  Plus,
+  Search,
+  Check,
+  ChevronDown,
+  CreditCard,
+  HandCoins,
+  Globe,
+  Sparkles,
+  Store,
+} from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
-import { leadActions, type Lead } from '../crmStore';
+import { leadActions, LEAD_PRODUCTS, type Lead, type LeadProduct } from '../crmStore';
+import { MCC_CODES, mccLabel } from './mccCodes';
 
-const AGENTS = ['Sarah Johnson', 'Michael Chen', 'James Miller', 'Unassigned'];
+// Owners are a single-item list today, but the menu is data-driven so more can
+// be added here (or wired to a users table) without touching the UI.
+const OWNERS = ['David Hazday'];
+const DEFAULT_OWNER = OWNERS[0];
 
-const TYPES: { value: Lead['type']; label: string; icon: React.ReactNode }[] = [
-  { value: 'Processing', label: 'Processing', icon: <CreditCard className="w-4 h-4" /> },
-  { value: 'MCA', label: 'MCA', icon: <HandCoins className="w-4 h-4" /> },
-  { value: 'Leasing', label: 'Leasing', icon: <Store className="w-4 h-4" /> },
-];
+const PRODUCT_ICONS: Record<LeadProduct, React.ReactNode> = {
+  Payments: <CreditCard className="w-4 h-4" />,
+  Capital: <HandCoins className="w-4 h-4" />,
+  Website: <Globe className="w-4 h-4" />,
+  Ai: <Sparkles className="w-4 h-4" />,
+  Leasing: <Store className="w-4 h-4" />,
+  // legacy values never rendered here
+  MCA: <HandCoins className="w-4 h-4" />,
+  Residual: <CreditCard className="w-4 h-4" />,
+  Processing: <CreditCard className="w-4 h-4" />,
+};
 
 // Light score heuristic — bigger monthly volume, warmer lead. Full scoring
 // happens in underwriting; this is just a starting signal for the pipeline.
@@ -36,40 +57,136 @@ function quickScore(monthlyVolume: string): number {
 
 const money = (v: string) => (v.trim() ? `$${v.trim()}` : '');
 
+// ─── MCC business-type picker (searchable, full ISO list) ──────────────
+function BusinessTypePicker({
+  value,
+  onChange,
+}: {
+  value: string; // selected MCC code, '' when none
+  onChange: (code: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selected = useMemo(() => MCC_CODES.find(m => m.code === value) || null, [value]);
+
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return MCC_CODES.slice(0, 50);
+    const out = [];
+    for (const m of MCC_CODES) {
+      if (m.code.includes(q) || m.description.toLowerCase().includes(q)) {
+        out.push(m);
+        if (out.length >= 50) break;
+      }
+    }
+    return out;
+  }, [query]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(o => !o);
+          setTimeout(() => inputRef.current?.focus(), 0);
+        }}
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+      >
+        <span className={selected ? 'text-gray-900 truncate' : 'text-gray-400'}>
+          {selected ? mccLabel(selected) : 'Search business type (MCC)…'}
+        </span>
+        <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-[8px] shadow-lg overflow-hidden">
+            <div className="p-2 border-b border-gray-100">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="Search 981 MCC codes…"
+                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+            <div className="max-h-56 overflow-y-auto py-1">
+              {matches.length === 0 ? (
+                <p className="px-3 py-4 text-xs text-gray-400 text-center">No MCC codes match "{query}"</p>
+              ) : (
+                matches.map(m => {
+                  const isSel = m.code === value;
+                  return (
+                    <button
+                      key={m.code}
+                      type="button"
+                      onClick={() => {
+                        onChange(m.code);
+                        setOpen(false);
+                        setQuery('');
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 ${
+                        isSel ? 'bg-indigo-50' : ''
+                      }`}
+                    >
+                      <span className="font-mono text-xs text-gray-500 w-10 shrink-0">{m.code}</span>
+                      <span className="text-gray-800 flex-1 truncate">{m.description}</span>
+                      {isSel && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
+                    </button>
+                  );
+                })
+              )}
+              {query.trim() === '' && (
+                <p className="px-3 py-2 text-[11px] text-gray-400">
+                  Showing first 50 — type to search all 981 codes.
+                </p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export interface NewLeadFlowProps {
   open: boolean;
   onClose: () => void;
   onCreated?: (lead: Lead) => void;
 }
 
+const BLANK = {
+  businessName: '',
+  contactName: '',
+  contactEmail: '',
+  contactPhone: '',
+  products: ['Payments'] as LeadProduct[],
+  mccCode: '',
+  monthlyVolume: '',
+  owner: DEFAULT_OWNER,
+  priority: 'Medium' as Lead['priority'],
+  notes: '',
+};
+
 export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
-  const [form, setForm] = useState({
-    businessName: '',
-    contactName: '',
-    contactEmail: '',
-    contactPhone: '',
-    type: 'Processing' as Lead['type'],
-    monthlyVolume: '',
-    assignedAgent: 'Sarah Johnson',
-    priority: 'Medium' as Lead['priority'],
-    notes: '',
-  });
+  const [form, setForm] = useState({ ...BLANK });
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm(f => ({ ...f, [k]: v }));
 
-  const reset = () =>
-    setForm({
-      businessName: '',
-      contactName: '',
-      contactEmail: '',
-      contactPhone: '',
-      type: 'Processing',
-      monthlyVolume: '',
-      assignedAgent: 'Sarah Johnson',
-      priority: 'Medium',
-      notes: '',
-    });
+  const toggleProduct = (p: LeadProduct) =>
+    setForm(f => ({
+      ...f,
+      products: f.products.includes(p) ? f.products.filter(x => x !== p) : [...f.products, p],
+    }));
+
+  const reset = () => setForm({ ...BLANK });
 
   const handleClose = () => {
     reset();
@@ -81,16 +198,23 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
       toast.error('Business name is required');
       return;
     }
+    if (form.products.length === 0) {
+      toast.error('Select at least one product');
+      return;
+    }
+    const mcc = MCC_CODES.find(m => m.code === form.mccCode);
     const created = leadActions.create({
       businessName: form.businessName.trim(),
+      industry: mcc ? mccLabel(mcc) : 'General',
       contactName: form.contactName.trim(),
       contactEmail: form.contactEmail.trim(),
       contactPhone: form.contactPhone.trim(),
-      type: form.type,
+      products: form.products,
+      type: form.products[0],
       source: 'Manual',
       monthlySales: money(form.monthlyVolume),
       score: quickScore(form.monthlyVolume),
-      assignedAgent: form.assignedAgent,
+      assignedAgent: form.owner,
       priority: form.priority,
       notes: form.notes.trim(),
     });
@@ -122,7 +246,7 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
         </div>
 
         {/* Body */}
-        <div className="px-5 py-4 space-y-3.5 max-h-[70vh] overflow-y-auto">
+        <div className="px-5 py-4 space-y-3.5 max-h-[72vh] overflow-y-auto">
           <div>
             <label className={labelCls}>Business name</label>
             <input
@@ -133,6 +257,11 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
               placeholder="Acme Bakery"
               className={inputCls}
             />
+          </div>
+
+          <div>
+            <label className={labelCls}>Business type</label>
+            <BusinessTypePicker value={form.mccCode} onChange={c => update('mccCode', c)} />
           </div>
 
           <div>
@@ -170,23 +299,25 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
           </div>
 
           <div>
-            <label className={labelCls}>Product interest</label>
+            <label className={labelCls}>
+              Products <span className="text-gray-400 font-normal">· select all that apply</span>
+            </label>
             <div className="grid grid-cols-3 gap-2">
-              {TYPES.map(t => {
-                const active = form.type === t.value;
+              {LEAD_PRODUCTS.map(p => {
+                const active = form.products.includes(p);
                 return (
                   <button
-                    key={t.value}
+                    key={p}
                     type="button"
-                    onClick={() => update('type', t.value)}
+                    onClick={() => toggleProduct(p)}
                     className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-[8px] border text-xs font-medium transition-colors ${
                       active
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
                         : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
                     }`}
                   >
-                    {t.icon}
-                    {t.label}
+                    {PRODUCT_ICONS[p]}
+                    {p}
                   </button>
                 );
               })}
@@ -224,11 +355,11 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
           <div>
             <label className={labelCls}>Owner</label>
             <select
-              value={form.assignedAgent}
-              onChange={e => update('assignedAgent', e.target.value)}
+              value={form.owner}
+              onChange={e => update('owner', e.target.value)}
               className={inputCls}
             >
-              {AGENTS.map(a => (
+              {OWNERS.map(a => (
                 <option key={a}>{a}</option>
               ))}
             </select>

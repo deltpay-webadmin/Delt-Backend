@@ -881,9 +881,14 @@ export function BackendLeads() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
+      case 'Payments': return 'bg-indigo-50 text-indigo-700';
+      case 'Capital': return 'bg-amber-50 text-amber-700';
+      case 'Website': return 'bg-sky-50 text-sky-700';
+      case 'Ai': return 'bg-violet-50 text-violet-700';
+      case 'Leasing': return 'bg-emerald-50 text-emerald-700';
+      // legacy
       case 'MCA': return 'bg-indigo-50 text-indigo-700';
       case 'Residual': return 'bg-purple-50 text-purple-700';
-      case 'Leasing': return 'bg-emerald-50 text-emerald-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -914,7 +919,7 @@ export function BackendLeads() {
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
       if (statusFilter !== 'All' && l.status !== statusFilter) return false;
-      if (typeFilter !== 'All' && l.type !== typeFilter) return false;
+      if (typeFilter !== 'All' && !(l.products || [l.type]).includes(typeFilter as Lead['type'])) return false;
       if (stageFilter !== 'All' && l.stage !== stageFilter) return false;
       if (agentFilter !== 'All' && l.assignedAgent !== agentFilter) return false;
       if (searchQuery.trim()) {
@@ -1041,9 +1046,11 @@ export function BackendLeads() {
                 onChange={e => setTypeFilter(e.target.value)}
                 className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
-                <option value="All">All Types</option>
-                <option value="MCA">MCA</option>
-                <option value="Residual">Residual</option>
+                <option value="All">All Products</option>
+                <option value="Payments">Payments</option>
+                <option value="Capital">Capital</option>
+                <option value="Website">Website</option>
+                <option value="Ai">Ai</option>
                 <option value="Leasing">Leasing</option>
               </select>
               <select
@@ -1101,8 +1108,10 @@ export function BackendLeads() {
                               <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${getScoreColor(lead.score)}`}>{lead.score}</span>
                             </div>
                             <p className="text-xs text-gray-500 mb-2">{lead.contactName}</p>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${getTypeColor(lead.type)}`}>{lead.type}</span>
+                            <div className="flex items-center gap-1 flex-wrap">
+                              {(lead.products || [lead.type]).map(p => (
+                                <span key={p} className={`px-2 py-0.5 rounded text-[10px] font-medium ${getTypeColor(p)}`}>{p}</span>
+                              ))}
                             </div>
                             {lead.blocker && (
                               <p className="text-[10px] text-red-600 mt-2 line-clamp-1">{lead.blocker}</p>
@@ -1163,7 +1172,11 @@ export function BackendLeads() {
                           <p className="text-xs text-gray-500">{lead.contactPhone}</p>
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getTypeColor(lead.type)}`}>{lead.type}</span>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {(lead.products || [lead.type]).map(p => (
+                              <span key={p} className={`px-2.5 py-1 rounded-full text-xs font-medium ${getTypeColor(p)}`}>{p}</span>
+                            ))}
+                          </div>
                         </td>
                         <td className="px-5 py-4">
                           <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${stageBadgeCls(lead.stage)}`}>
