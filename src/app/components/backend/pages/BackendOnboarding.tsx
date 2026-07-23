@@ -16,7 +16,7 @@ import {
   Smartphone,
   ArrowRight,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 import { useOnboarding, onboardingActions, type OnboardingApp, type SLAStatus, type OnbStep } from '../crmStore';
 
 // ── Local aliases (kept to minimize diff) ──

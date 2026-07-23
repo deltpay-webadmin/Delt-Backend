@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Package, Save, ChevronDown, X } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 interface BundleRow {
   id: string;

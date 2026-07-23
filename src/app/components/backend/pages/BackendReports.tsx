@@ -7,7 +7,7 @@ import {
   Printer, Share2, Star, StarOff, Zap, Settings, FolderOpen,
   Shield, Wallet, Globe, CreditCard, AlertTriangle,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 // ── Types ──
 type ReportCategory = 'financial' | 'portfolio' | 'compliance' | 'operations' | 'products';

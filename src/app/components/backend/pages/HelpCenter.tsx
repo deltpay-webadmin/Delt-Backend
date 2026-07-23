@@ -19,7 +19,7 @@ import {
   ClipboardList,
   Landmark,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 // ── Types ──
 interface ArticleCard {

@@ -21,7 +21,7 @@ import {
   Megaphone,
   ExternalLink,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 import { useAppNavigate } from '../NavigationContext';
 
 // ── Types ──

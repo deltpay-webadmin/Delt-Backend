@@ -18,7 +18,7 @@ import {
   Filter,
   BarChart3,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 import { useAppNavigate } from '../NavigationContext';
 
 type DealStatus = 'Current' | 'Delinquent' | 'Default' | 'Paid Off' | 'Workout';

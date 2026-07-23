@@ -6,7 +6,7 @@ import {
   ArrowUpRight, ArrowDownRight, ChevronRight, Copy, Link2,
   Settings, Trash2, MoreHorizontal, Store, ChevronDown,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 // ── Types ──
 type SiteStatus = 'live' | 'building' | 'draft' | 'suspended';

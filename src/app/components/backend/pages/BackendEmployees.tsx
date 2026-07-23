@@ -21,6 +21,7 @@ import {
   Building2,
   TrendingUp,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type EmploymentType = 'Full-Time' | 'Part-Time' | 'Contractor';
@@ -253,19 +254,17 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 px-6 flex gap-1">
-          {(['info', 'documents', 'notes', 'reviews'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setDetailTab(tab)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors capitalize ${
-                detailTab === tab ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {tab === 'info' ? 'Details' : tab === 'reviews' ? 'Reviews' : tab}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          active={detailTab}
+          onChange={setDetailTab}
+          className="px-6"
+          tabs={[
+            { id: 'info', label: 'Details' },
+            { id: 'documents', label: 'Documents' },
+            { id: 'notes', label: 'Notes' },
+            { id: 'reviews', label: 'Reviews' },
+          ]}
+        />
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
@@ -374,7 +373,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               ))}
               <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
-              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Add Note</button>
+              <Button>Add Note</Button>
             </div>
           )}
 
@@ -438,19 +437,15 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               </div>
 
-              <button className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Start New Review</button>
+              <Button block>Start New Review</Button>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
-            <Edit className="w-4 h-4" /> Edit Employee
-          </button>
-          <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">
-            Manage Leave
-          </button>
+          <Button icon={<Edit />} className="flex-1">Edit Employee</Button>
+          <Button variant="secondary">Manage Leave</Button>
         </div>
       </div>
     </div>
@@ -484,9 +479,7 @@ export function BackendEmployees() {
             <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
             <p className="text-sm text-gray-600 mt-1">{totalEmployees} active employees across all departments</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Employee
-          </button>
+          <Button icon={<Plus />}>Add Employee</Button>
         </div>
       </div>
 

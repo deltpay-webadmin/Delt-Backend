@@ -16,7 +16,7 @@ import {
   ScanLine, FileWarning, Server, Shield,
   Activity, Users, DollarSign, Store,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 /* ═══════════════════════════════════════════════════
    CONTROL STATUS RIBBON — universal visual language

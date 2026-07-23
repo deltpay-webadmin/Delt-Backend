@@ -6,7 +6,7 @@ import {
   Send, Edit3, Plus, X, ChevronDown, Activity, Eye,
   Banknote, RefreshCw, GitBranch, Heart, Calendar,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 // ── Types ──
 type ActivityType = 'call' | 'email' | 'sms' | 'note' | 'status_change' | 'deal' | 'payment' | 'task' | 'document' | 'alert' | 'system';

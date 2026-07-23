@@ -7,7 +7,7 @@ import {
   Banknote, ArrowRight, Phone, Mail, MoreHorizontal,
   Wallet, ArrowLeftRight, ShieldAlert, Zap, ChevronDown,
 } from 'lucide-react';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 // ── Types ──
 type PaymentStatus = 'success' | 'failed' | 'pending' | 'returned' | 'scheduled';

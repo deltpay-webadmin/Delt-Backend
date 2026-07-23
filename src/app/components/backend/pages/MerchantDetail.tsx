@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, TrendingDown, Edit, Plus, Download, FileText, FileCheck, File, Receipt, CalendarDays, CreditCard, Banknote, Globe, AlertCircle, Mail, MessageSquare, Monitor, Eye, MousePointerClick, ChevronDown, Send, PlusCircle, ToggleLeft, ToggleRight, CheckCircle, Settings, Clock, Percent, XCircle, ExternalLink, Gauge, Smartphone, Activity, Brain, Zap, Shield, BarChart3, Key, Package, Gift, Copy, Users, Truck, Link2, X, ShieldAlert, StickyNote, Flag, Calendar, Megaphone, Trash2 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
-import { Button, Tabs } from '../ui';
+import { Button } from '../ui';
 
 /* ─── Shared sub-components ─── */
 
