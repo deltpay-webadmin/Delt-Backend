@@ -828,9 +828,7 @@ export function BackendOutreach() {
                   Create multi-step automated campaigns that nurture merchants over time. Each sequence is triggered by a condition and sends messages at defined intervals.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
-                <Plus className="w-3.5 h-3.5" /> New Sequence
-              </button>
+              <Button size="sm" icon={<Plus />} className="ml-auto shrink-0">New Sequence</Button>
             </div>
 
             {/* Drip KPIs */}
@@ -1180,7 +1178,7 @@ export function BackendOutreach() {
             </div>
             <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 rounded-b-[8px] flex items-center justify-between">
               <p className="text-[10px] text-gray-400">Merge fields (e.g. {'{{merchant_name}}'}) auto-populated per recipient</p>
-              <button onClick={() => setPreviewTemplate(null)} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Close</button>
+              <Button size="sm" onClick={() => setPreviewTemplate(null)}>Close</Button>
             </div>
           </div>
         </div>
@@ -1207,10 +1205,8 @@ export function BackendOutreach() {
               <div className="flex justify-between"><span className="text-gray-500">Recipients:</span><span className="font-bold text-brand">{segments.find(s => s.label === bulkSegment)?.count || 0} merchants</span></div>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Cancel</button>
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover flex items-center justify-center gap-2">
-                <Send className="w-4 h-4" /> Send Now
-              </button>
+              <Button variant="secondary" onClick={() => setShowBulkConfirm(false)} className="flex-1">Cancel</Button>
+              <Button onClick={() => setShowBulkConfirm(false)} icon={<Send />} className="flex-1">Send Now</Button>
             </div>
           </div>
         </div>

@@ -158,13 +158,7 @@ export function BackendResiduals() {
             <h1 className="text-2xl font-bold text-gray-900">Residual Reports</h1>
             <p className="text-sm text-gray-500 mt-0.5">Upload processor residual reports and distribute agent commissions.</p>
           </div>
-          <button
-            onClick={() => { setShowUpload(true); setStep('idle'); setFiles([]); }}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-          >
-            <Upload className="w-4 h-4" />
-            Upload Report
-          </button>
+          <Button icon={<Upload />} onClick={() => { setShowUpload(true); setStep('idle'); setFiles([]); }}>Upload Report</Button>
         </div>
 
         {/* ── Upload Section ── */}
@@ -225,13 +219,7 @@ export function BackendResiduals() {
                           </button>
                         </div>
                       ))}
-                      <button
-                        onClick={startMapping}
-                        className="mt-3 px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-                      >
-                        <ArrowUpDown className="w-4 h-4" />
-                        Detect & Map Columns
-                      </button>
+                      <Button size="lg" className="mt-3" icon={<ArrowUpDown />} onClick={startMapping}>Detect & Map Columns</Button>
                     </div>
                   )}
                 </>
@@ -288,19 +276,8 @@ export function BackendResiduals() {
                   </div>
 
                   <div className="flex items-center gap-3 mt-4">
-                    <button
-                      onClick={processReport}
-                      className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      Process Report
-                    </button>
-                    <button
-                      onClick={() => setStep('uploaded')}
-                      className="px-4 py-2.5 bg-white text-gray-600 text-sm font-medium rounded-[8px] border border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      Back
-                    </button>
+                    <Button size="lg" icon={<RefreshCw />} onClick={processReport}>Process Report</Button>
+                    <Button variant="secondary" size="lg" onClick={() => setStep('uploaded')}>Back</Button>
                   </div>
                 </div>
               )}

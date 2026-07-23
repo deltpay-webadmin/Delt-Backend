@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
 import { BackendCostCalculator } from './BackendCostCalculator';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type AnalysisStatus = 'idle' | 'uploading' | 'analyzing' | 'done';
@@ -192,26 +193,14 @@ export function BackendAnalysis() {
         </div>
 
         {/* ── View Tabs ── */}
-        <div className="border-b border-gray-200">
-          <div className="flex gap-1">
-            {([
-              { key: 'cost-calculator' as const, label: 'Cost Calculator' },
-              { key: 'statement-analyzer' as const, label: 'Statement Analyzer' },
-            ]).map(t => (
-              <button
-                key={t.key}
-                onClick={() => setActiveView(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] ${
-                  activeView === t.key
-                    ? 'text-brand border-brand'
-                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          active={activeView}
+          onChange={setActiveView}
+          tabs={[
+            { id: 'cost-calculator', label: 'Cost Calculator' },
+            { id: 'statement-analyzer', label: 'Statement Analyzer' },
+          ]}
+        />
 
         {activeView === 'cost-calculator' && (
           <BackendCostCalculator />
