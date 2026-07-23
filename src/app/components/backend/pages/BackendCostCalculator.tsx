@@ -5,6 +5,7 @@ import {
   Building2, ShoppingCart, Wrench, Scissors, Heart, Briefcase,
   Package, BarChart3, ArrowRight,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ─── PRICING MATRICES ───
 const CASH_DISCOUNT_MATRIX: Record<string, Record<string, { serviceFee: number; monthlyFee: number }>> = {
@@ -232,9 +233,7 @@ export function BackendCostCalculator() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Cost Calculator</h2>
           </div>
-          <button onClick={reset} className="px-3.5 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-500 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
-            <RotateCcw className="w-3.5 h-3.5" /> Start Over
-          </button>
+          <Button variant="secondary" icon={<RotateCcw />} onClick={reset}>Start Over</Button>
         </div>
 
         {/* Step Indicator */}
@@ -417,9 +416,7 @@ export function BackendCostCalculator() {
 
             {canAdvanceTo2 && (
               <div className="flex justify-end pt-5 border-t border-gray-100 mt-6">
-                <button onClick={() => setStep(2)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
-                  Continue to Pricing <ArrowRight className="w-4 h-4" />
-                </button>
+                <Button size="lg" trailingIcon={<ArrowRight />} onClick={() => setStep(2)}>Continue to Pricing</Button>
               </div>
             )}
           </div>
@@ -549,10 +546,8 @@ export function BackendCostCalculator() {
             </div>
 
             <div className="flex justify-between pt-5 border-t border-gray-100">
-              <button onClick={() => setStep(1)} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-500 bg-white hover:bg-gray-50 font-medium">← Back</button>
-              <button onClick={() => setStep(3)} className="px-6 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2">
-                View Playbook <ArrowRight className="w-4 h-4" />
-              </button>
+              <Button variant="secondary" onClick={() => setStep(1)}>← Back</Button>
+              <Button size="lg" trailingIcon={<ArrowRight />} onClick={() => setStep(3)}>View Playbook</Button>
             </div>
           </div>
         )}
@@ -681,7 +676,7 @@ export function BackendCostCalculator() {
             )}
 
             <div className="flex justify-start pt-5 border-t border-gray-100">
-              <button onClick={() => setStep(2)} className="px-4 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-500 bg-white hover:bg-gray-50 font-medium">← Back to Pricing</button>
+              <Button variant="secondary" onClick={() => setStep(2)}>← Back to Pricing</Button>
             </div>
           </div>
         )}

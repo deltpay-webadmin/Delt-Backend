@@ -18,6 +18,7 @@ import {
   Filter,
   BarChart3,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 import { useAppNavigate } from '../NavigationContext';
 
 type DealStatus = 'Current' | 'Delinquent' | 'Default' | 'Paid Off' | 'Workout';
@@ -231,17 +232,8 @@ export function BackendDeals() {
           <p className="text-sm text-gray-500 mt-1">Capital deployment and deal management across all merchants.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[8px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4" />
-            Export Portfolio
-          </button>
-          <button
-            onClick={() => setNewDealOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white rounded-[8px] text-sm hover:bg-brand-hover transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Deal
-          </button>
+          <Button variant="secondary" icon={<Download />}>Export Portfolio</Button>
+          <Button icon={<Plus />} onClick={() => setNewDealOpen(true)}>New Deal</Button>
         </div>
       </div>
 

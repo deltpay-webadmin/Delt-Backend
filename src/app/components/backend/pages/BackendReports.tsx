@@ -7,6 +7,7 @@ import {
   Printer, Share2, Star, StarOff, Zap, Settings, FolderOpen,
   Shield, Wallet, Globe, CreditCard, AlertTriangle,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type ReportCategory = 'financial' | 'portfolio' | 'compliance' | 'operations' | 'products';
@@ -127,9 +128,7 @@ export function BackendReports() {
             <p className="text-sm text-gray-500">{REPORTS.length} reports &middot; {REPORTS.filter(r => r.schedule).length} scheduled</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-          <Plus className="w-3.5 h-3.5" /> Custom Report
-        </button>
+        <Button size="sm" icon={<Plus />}>Custom Report</Button>
       </div>
 
       {/* Tabs */}

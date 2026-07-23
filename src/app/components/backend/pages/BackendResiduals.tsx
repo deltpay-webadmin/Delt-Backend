@@ -6,6 +6,7 @@ import {
   TrendingUp, TrendingDown, DollarSign, Users, BarChart3,
   CalendarDays, Building2, RefreshCw, AlertCircle, Check, Plus,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ── Types ──
 type UploadStep = 'idle' | 'uploaded' | 'mapping' | 'processing' | 'done';

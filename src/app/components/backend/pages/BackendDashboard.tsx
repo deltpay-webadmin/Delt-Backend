@@ -4,6 +4,7 @@ import {
   Landmark, Info, Shield, BarChart3, Users, DollarSign, Activity,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button } from '../ui';
 
 // ─── ALERTS / NOTIFICATIONS ─────────────────────────────────────
 const ALERTS = [
@@ -94,9 +95,7 @@ export function BackendDashboard() {
               <span className="text-gray-500 font-medium">{fmtK(MERCHANTS_DATA.totalVolume)} processed this period</span>
             </p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
-            <RefreshCw className="w-4 h-4" /> Refresh Data
-          </button>
+          <Button icon={<RefreshCw />}>Refresh Data</Button>
         </div>
 
         {/* ═══ CRITICAL ALERT STRIP ═══ */}

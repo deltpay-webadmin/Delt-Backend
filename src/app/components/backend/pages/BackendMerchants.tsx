@@ -6,6 +6,7 @@ import {
   Plus, Search, Building2, Store, DollarSign, CreditCard, Heart,
   Banknote, Globe, Brain, ChevronDown,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ── Types ──
 type MerchantStatus = 'Active' | 'Inactive' | 'Pending';
@@ -180,13 +181,9 @@ export function BackendMerchants() {
           <h1 className="text-2xl font-bold text-gray-900">All Merchants</h1>
           <p className="text-sm text-gray-500 mt-0.5">{total} merchants across all products and plans</p>
         </div>
-        <button
-          onClick={() => setNewMerchantOpen(true)}
-          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
+        <Button icon={<Plus />} onClick={() => setNewMerchantOpen(true)}>
           Add Merchant
-        </button>
+        </Button>
       </div>
 
       {/* ── Summary Cards ── */}
@@ -329,8 +326,8 @@ export function BackendMerchants() {
           Showing <span className="font-medium text-gray-700">{filtered.length}</span> of <span className="font-medium text-gray-700">{total}</span> merchants
         </p>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[8px] hover:bg-gray-50 disabled:opacity-40" disabled>Previous</button>
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[8px] hover:bg-gray-50 disabled:opacity-40" disabled>Next</button>
+          <Button variant="secondary" size="sm" disabled>Previous</Button>
+          <Button variant="secondary" size="sm" disabled>Next</Button>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import {
   File, FileCheck, FileClock, FileX, Shield, Trash2,
   ExternalLink, Copy, Filter, BarChart3, FolderOpen,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ── Types ──
 type DocStatus = 'signed' | 'pending_signature' | 'sent' | 'draft' | 'expired' | 'voided';
@@ -104,7 +105,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Upload</button>
+          <Button size="sm" onClick={onClose}>Upload</Button>
         </div>
       </div>
     </div>
@@ -154,12 +155,8 @@ export function BackendDocuments() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
-            <Upload className="w-3.5 h-3.5" /> Upload
-          </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-            <PenTool className="w-3.5 h-3.5" /> New E-Sign Request
-          </button>
+          <Button variant="secondary" size="sm" icon={<Upload />} onClick={() => setShowUpload(true)}>Upload</Button>
+          <Button size="sm" icon={<PenTool />}>New E-Sign Request</Button>
         </div>
       </div>
 

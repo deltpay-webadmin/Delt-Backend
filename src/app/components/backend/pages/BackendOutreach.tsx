@@ -7,6 +7,7 @@ import {
   Calendar, Target, Activity, X, ChevronRight, Layers,
   Heart, GitMerge, ArrowRight, GripVertical, Trash2,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ══════════════════════════════════════
 // TYPES & MOCK DATA
@@ -359,9 +360,7 @@ export function BackendOutreach() {
                 {AUTO_TRIGGERS.filter(t => t.status === 'active').length} automations live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-              <Plus className="w-4 h-4" /> New Campaign
-            </button>
+            <Button icon={<Plus />}>New Campaign</Button>
           </div>
         </div>
 
@@ -383,27 +382,11 @@ export function BackendOutreach() {
         </div>
 
         {/* ── Tab Nav ── */}
-        <div className="border-b border-gray-200">
-          <div className="flex gap-1">
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-2 ${
-                  activeTab === t.key ? 'text-brand border-brand' : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                <t.icon className="w-3.5 h-3.5" />
-                {t.label}
-                {t.badge !== undefined && (
-                  <span className={`text-[10px] tabular-nums px-1.5 py-px rounded-full ${
-                    activeTab === t.key ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-500'
-                  }`}>{t.badge}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          active={activeTab}
+          onChange={setActiveTab}
+          tabs={tabs.map(t => ({ id: t.key, label: t.label, icon: <t.icon />, count: t.badge }))}
+        />
 
         {/* ════════════════════════════════════════ */}
         {/* CAMPAIGN DASHBOARD TAB                  */}
@@ -689,16 +672,14 @@ export function BackendOutreach() {
                         </p>
                       )}
                     </div>
-                    <button
+                    <Button
+                      size="lg"
+                      icon={<Send />}
                       onClick={() => bulkSegment && bulkTemplate && setShowBulkConfirm(true)}
                       disabled={!bulkSegment || !bulkTemplate}
-                      className={`px-5 py-2.5 text-sm font-medium rounded-[8px] flex items-center gap-2 transition-colors ${
-                        bulkSegment && bulkTemplate
-                          ? 'bg-brand text-white hover:bg-brand-hover'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}>
-                      <Send className="w-4 h-4" /> Send Campaign
-                    </button>
+                    >
+                      Send Campaign
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -747,9 +728,7 @@ export function BackendOutreach() {
                   This is where the CRM starts working <strong>for</strong> you instead of you working the CRM.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
-                <Plus className="w-3.5 h-3.5" /> New Rule
-              </button>
+              <Button size="sm" icon={<Plus />} className="ml-auto shrink-0">New Rule</Button>
             </div>
 
             {/* Trigger KPIs */}

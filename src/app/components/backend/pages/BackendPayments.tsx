@@ -7,6 +7,7 @@ import {
   Banknote, ArrowRight, Phone, Mail, MoreHorizontal,
   Wallet, ArrowLeftRight, ShieldAlert, Zap, ChevronDown,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type PaymentStatus = 'success' | 'failed' | 'pending' | 'returned' | 'scheduled';
@@ -135,12 +136,8 @@ export function BackendPayments() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
-            <Download className="w-3.5 h-3.5" /> Export
-          </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-            <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
-          </button>
+          <Button variant="secondary" size="sm" icon={<Download />}>Export</Button>
+          <Button size="sm" icon={<RefreshCw />}>Retry Failed</Button>
         </div>
       </div>
 

@@ -16,6 +16,7 @@ import {
   ScanLine, FileWarning, Server, Shield,
   Activity, Users, DollarSign, Store,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 /* ═══════════════════════════════════════════════════
    CONTROL STATUS RIBBON — universal visual language
@@ -957,9 +958,7 @@ export function BackendCompliance() {
                     </button>
                   ))}
                 </div>
-                <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
-                  <Download className="w-3 h-3" /> Export All
-                </button>
+                <Button size="sm" className="ml-auto shrink-0" icon={<Download />}>Export All</Button>
               </div>
 
               <div className="text-[10px] text-gray-400 mb-3">{filteredEvidence.length} records {auditControl ? `\u00B7 filtered by ${CONTROLS.find(c => c.key === auditControl)?.label}` : ''}</div>

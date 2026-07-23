@@ -16,6 +16,7 @@ import {
   Smartphone,
   ArrowRight,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 import { useOnboarding, onboardingActions, type OnboardingApp, type SLAStatus, type OnbStep } from '../crmStore';
 
 // ── Local aliases (kept to minimize diff) ──
@@ -710,18 +711,8 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
           {/* Quick actions */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <button
-                onClick={sendReminder}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-brand text-white rounded-[8px] hover:bg-brand-hover transition-colors"
-              >
-                Send Reminder
-              </button>
-              <button
-                onClick={() => setReassignOpen(v => !v)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-[8px] hover:bg-gray-50 transition-colors"
-              >
-                Reassign Agent
-              </button>
+              <Button className="flex-1" onClick={sendReminder}>Send Reminder</Button>
+              <Button variant="secondary" className="flex-1" onClick={() => setReassignOpen(v => !v)}>Reassign Agent</Button>
             </div>
             {reassignOpen && (
               <div className="rounded-[8px] border border-gray-200 bg-white p-2 space-y-1">

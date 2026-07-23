@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Package, Save, ChevronDown, X } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 interface BundleRow {
   id: string;
@@ -78,13 +79,7 @@ export function BackendBundles() {
             <h1 className="text-2xl font-bold text-gray-900">Bundle Settings</h1>
             <p className="text-sm text-gray-500 mt-0.5">Configure credit amounts, expiration periods, and automation rules for merchant bundles.</p>
           </div>
-          <button
-            onClick={handleSaveAll}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            {saved ? 'Saved!' : 'Save Changes'}
-          </button>
+          <Button icon={<Save />} onClick={handleSaveAll}>{saved ? 'Saved!' : 'Save Changes'}</Button>
         </div>
 
         {/* Section 1: Credit Amounts */}
@@ -200,18 +195,8 @@ export function BackendBundles() {
                       <td className="px-5 py-3.5 text-right">
                         {isEditing ? (
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={cancelEdit}
-                              className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-[8px] hover:bg-gray-50"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={saveEdit}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-brand rounded-[8px] hover:bg-brand-hover"
-                            >
-                              Apply
-                            </button>
+                            <Button variant="secondary" size="sm" onClick={cancelEdit}>Cancel</Button>
+                            <Button size="sm" onClick={saveEdit}>Apply</Button>
                           </div>
                         ) : (
                           <button

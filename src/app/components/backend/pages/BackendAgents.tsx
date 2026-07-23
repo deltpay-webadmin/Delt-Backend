@@ -33,6 +33,7 @@ import {
   Info,
   Check,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type AgentStatus = 'Active' | 'Inactive' | 'Probation';
@@ -238,10 +239,7 @@ export function BackendAgents() {
           <h1 className="text-2xl font-bold text-gray-900">Agents</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your sales team, Sub-ISOs, and agent performance.</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors shadow-sm">
-          <Plus className="w-4 h-4" />
-          Onboard Agent
-        </button>
+        <Button icon={<Plus />}>Onboard Agent</Button>
       </div>
 
       {/* Summary Cards */}
@@ -605,9 +603,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
                                   </div>
-                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
-                                    Save
-                                  </button>
+                                  <Button onClick={saveCustomSplit}>Save</Button>
                                 </div>
                                 <p className="text-[11px] text-gray-400 mt-1.5">Override for negotiated split agreements</p>
                               </div>
@@ -625,10 +621,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[8px] hover:bg-gray-50 transition-colors">
-                <Edit className="w-4 h-4" />
-                Edit
-              </button>
+              <Button variant="secondary" icon={<Edit />}>Edit</Button>
               <button
                 onClick={() => setShowReassignModal(true)}
                 className="inline-flex items-center gap-2 px-3 py-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-[8px] hover:bg-amber-100 transition-colors"
@@ -656,30 +649,16 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
 
       {/* Tabs */}
       <div className="bg-white rounded-[8px] border border-gray-200">
-        <div className="px-5 border-b border-gray-200 flex gap-0">
-          {([
-            { key: 'portfolio' as const, label: 'Merchant Portfolio', icon: Store },
-            { key: 'commissions' as const, label: 'Commission History', icon: DollarSign },
-            { key: 'pipeline' as const, label: 'Pipeline', icon: Briefcase },
-          ]).map(t => {
-            const Icon = t.icon;
-            const active = tab === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-colors ${
-                  active
-                    ? 'border-brand text-brand'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+        <Tabs
+          className="px-5"
+          active={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'portfolio', label: 'Merchant Portfolio', icon: <Store /> },
+            { id: 'commissions', label: 'Commission History', icon: <DollarSign /> },
+            { id: 'pipeline', label: 'Pipeline', icon: <Briefcase /> },
+          ]}
+        />
 
         {/* Tab Content */}
         {tab === 'portfolio' && (
@@ -996,15 +975,8 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
           </div>
         </div>
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[8px] hover:bg-gray-50 transition-colors">
-            Cancel
-          </button>
-          <button
-            disabled={!targetAgent}
-            className="px-4 py-2 text-sm font-medium text-white bg-brand rounded-[8px] hover:bg-brand-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
-          >
-            Reassign Portfolio
-          </button>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button disabled={!targetAgent}>Reassign Portfolio</Button>
         </div>
       </div>
     </div>

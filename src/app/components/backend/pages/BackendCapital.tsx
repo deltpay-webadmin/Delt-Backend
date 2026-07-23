@@ -237,30 +237,18 @@ export function BackendCapital() {
         {!isEmpty && (
           <>
             {/* ── View Tabs ── */}
-            <div className="border-b border-gray-200">
-              <div className="flex gap-1">
-                {([
-                  { key: 'portfolio' as TabKey, label: 'Portfolio Overview' },
-                  { key: 'activity' as TabKey, label: 'ACH Activity' },
-                  { key: 'risk' as TabKey, label: 'Risk & Fraud' },
-                  { key: 'collections' as TabKey, label: 'Collections' },
-                  { key: 'renewals' as TabKey, label: 'Renewals' },
-                  { key: 'concentration' as TabKey, label: 'Concentration & Vintage' },
-                ]).map(t => (
-                  <button
-                    key={t.key}
-                    onClick={() => setActiveTab(t.key)}
-                    className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] ${
-                      activeTab === t.key
-                        ? 'text-brand border-brand'
-                        : 'text-gray-500 border-transparent hover:text-gray-700'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Tabs
+              active={activeTab}
+              onChange={setActiveTab}
+              tabs={[
+                { id: 'portfolio' as TabKey, label: 'Portfolio Overview' },
+                { id: 'activity' as TabKey, label: 'ACH Activity' },
+                { id: 'risk' as TabKey, label: 'Risk & Fraud' },
+                { id: 'collections' as TabKey, label: 'Collections' },
+                { id: 'renewals' as TabKey, label: 'Renewals' },
+                { id: 'concentration' as TabKey, label: 'Concentration & Vintage' },
+              ]}
+            />
 
             {/* ═══ PORTFOLIO TAB ═══ */}
             {activeTab === 'portfolio' && (
@@ -519,12 +507,7 @@ export function BackendCapital() {
                                   <PaymentLedger m={m} />
 
                                   <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); setAddPaymentFor(m); }}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-brand text-white hover:bg-brand-hover rounded-[8px] transition-colors"
-                                    >
-                                      <Plus className="w-3.5 h-3.5" /> Add Payment
-                                    </button>
+                                    <Button size="sm" icon={<Plus />} onClick={(e) => { e.stopPropagation(); setAddPaymentFor(m); }}>Add Payment</Button>
                                     <button
                                       onClick={(e) => { e.stopPropagation(); navigate(`/deals/${m.id}`); }}
                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/5 rounded-[8px] transition-colors"
@@ -747,10 +730,9 @@ function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => 
         </div>
         <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[8px]">Cancel</button>
-          <button onClick={submit} disabled={!valid || saving}
-            className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-[8px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
+          <Button onClick={submit} disabled={!valid || saving}>
             {saving ? 'Saving…' : 'Record Payment'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -770,12 +752,7 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       <p className="text-sm text-gray-500 max-w-md mx-auto mb-5">
         Add deals manually to build your portfolio. Once automation (ACH.com, DataMerch, FiCoSo, Fundomate) is wired up, new deals will flow in automatically.
       </p>
-      <button
-        onClick={onAdd}
-        className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2"
-      >
-        <Plus className="w-4 h-4" /> Add your first deal
-      </button>
+      <Button size="lg" icon={<Plus />} onClick={onAdd}>Add your first deal</Button>
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
         {[
           { title: 'Self-Funded', body: 'Family office capital deployed at 2%/mo. Tracks RTR, WAF, daily ACH, and net P&L after cost of capital.' },
@@ -911,13 +888,7 @@ function ActivityTab({ onImport }: { onImport: () => void }) {
         <p className="text-xs text-gray-500 mt-1.5 max-w-sm mx-auto">
           Import an ACH.com RptActivitySummary export to populate daily originations, settlements, and returns.
         </p>
-        <button
-          onClick={onImport}
-          className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-white bg-brand hover:bg-brand/90 rounded transition-colors"
-        >
-          <Upload size={14} />
-          Import ACH activity
-        </button>
+        <Button size="sm" icon={<Upload />} onClick={onImport} className="mt-4">Import ACH activity</Button>
       </div>
     );
   }
@@ -954,13 +925,7 @@ function ActivityTab({ onImport }: { onImport: () => void }) {
             <span className="text-[10px] text-gray-400">{lastError ? 'offline' : 'local'}</span>
           )}
         </div>
-        <button
-          onClick={onImport}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-white bg-brand hover:bg-brand/90 rounded transition-colors"
-        >
-          <Upload size={14} />
-          Import ACH activity
-        </button>
+        <Button size="sm" icon={<Upload />} onClick={onImport}>Import ACH activity</Button>
       </div>
 
       {/* KPI grid */}
@@ -1237,7 +1202,7 @@ function CollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalat
                     </div>
                   ))}</div>
                 </td>
-                <td className="py-3"><button onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[8px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button></td>
+                <td className="py-3"><Button size="sm" onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }}>{nextStage.name} →</Button></td>
               </tr>);
             })}{DEALS.filter(m => m.status === 'slow' || m.status === 'default').length === 0 && (
               <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">No delinquent accounts — all collections current</td></tr>
@@ -1439,8 +1404,8 @@ function CollectionModal({ dealId, DEALS, onClose }: { dealId: string; DEALS: Ca
           ))}
         </div>
         <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
-          <button onClick={onClose} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Close</button>
+          <Button>Advance to Next Stage</Button>
+          <Button variant="secondary" onClick={onClose}>Close</Button>
         </div>
       </div>
     </div>

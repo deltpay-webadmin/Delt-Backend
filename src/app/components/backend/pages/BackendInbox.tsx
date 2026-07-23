@@ -7,6 +7,7 @@ import {
   Inbox, ChevronDown, Circle, ExternalLink, Calendar,
   Mic, PhoneOff, PhoneIncoming, PhoneOutgoing,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ── Types ──
 type ChannelType = 'email' | 'sms' | 'call' | 'note';
@@ -159,9 +160,7 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
-            <button onClick={onClose} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-              <Send className="w-3.5 h-3.5" /> Send
-            </button>
+            <Button size="sm" icon={<Send />} onClick={onClose}>Send</Button>
           </div>
         </div>
       </div>
@@ -218,10 +217,7 @@ export function BackendInbox() {
             <p className="text-sm text-gray-500">{unreadCount} unread &middot; {threads.length} conversations across all merchants</p>
           </div>
         </div>
-        <button onClick={() => setShowCompose(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-          <Plus className="w-3.5 h-3.5" /> Compose
-        </button>
+        <Button size="sm" icon={<Plus />} onClick={() => setShowCompose(true)}>Compose</Button>
       </div>
 
       {/* Split view */}

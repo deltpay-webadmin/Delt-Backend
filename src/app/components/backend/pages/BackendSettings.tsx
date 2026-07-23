@@ -4,6 +4,7 @@ import {
   Plus, Check, X, Eye, EyeOff, Lock, Unlock, UserCircle,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button, Tabs } from '../ui';
 
 // ─── ROLE DEFINITIONS ───────────────────────────────────────────
 const ROLES = [
@@ -170,12 +171,12 @@ export function BackendSettings() {
   const [expandedRole, setExpandedRole] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
 
-  const tabs: { key: SettingsTab; label: string; icon: React.ElementType }[] = [
-    { key: 'general', label: 'General', icon: Settings },
-    { key: 'integrations', label: 'Integrations', icon: Link2 },
-    { key: 'roles', label: 'Roles & Permissions', icon: Shield },
-    { key: 'users', label: 'User Management', icon: Users },
-    { key: 'audit', label: 'Audit Log', icon: ClipboardList },
+  const tabs: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'general', label: 'General', icon: <Settings /> },
+    { id: 'integrations', label: 'Integrations', icon: <Link2 /> },
+    { id: 'roles', label: 'Roles & Permissions', icon: <Shield /> },
+    { id: 'users', label: 'User Management', icon: <Users /> },
+    { id: 'audit', label: 'Audit Log', icon: <ClipboardList /> },
   ];
 
   return (
@@ -188,24 +189,7 @@ export function BackendSettings() {
         </div>
 
         {/* Tab Bar */}
-        <div className="border-b border-gray-200 mb-6">
-          <div className="flex gap-0">
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-1.5 ${
-                  tab === t.key
-                    ? 'text-brand border-brand'
-                    : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                <t.icon className="w-3.5 h-3.5" />
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs active={tab} onChange={setTab} tabs={tabs} className="mb-6" />
 
         {/* ═══ GENERAL ═══ */}
         {tab === 'general' && (
@@ -256,7 +240,7 @@ export function BackendSettings() {
                         </div>
                       ))}
                       <div className="flex justify-end pt-4 mt-2 border-t border-gray-100">
-                        <button className="px-5 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
+                        <Button>Save Changes</Button>
                       </div>
                     </div>
                   )}
@@ -302,7 +286,7 @@ export function BackendSettings() {
                       <button className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[8px] hover:bg-red-50 transition-colors">Disconnect</button>
                     </>
                   ) : (
-                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[8px] hover:bg-brand-hover transition-colors">Connect</button>
+                    <Button size="sm">Connect</Button>
                   )}
                 </div>
               </div>
@@ -318,9 +302,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Roles</h2>
                 <p className="text-sm text-gray-400 mt-0.5">System roles define baseline access. Permissions enforced across all modules.</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
-                <Plus className="w-4 h-4" /> Custom Role
-              </button>
+              <Button icon={<Plus />}>Custom Role</Button>
             </div>
             <div className="space-y-2.5">
               {ROLES.map(role => {
@@ -399,9 +381,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Users & Access</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{USERS.length} users across {ROLES.length} roles</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
-                <Plus className="w-4 h-4" /> Invite User
-              </button>
+              <Button icon={<Plus />}>Invite User</Button>
             </div>
             <div className="border border-gray-200 rounded-[8px] overflow-hidden">
               <table className="w-full">
