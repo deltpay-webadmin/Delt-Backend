@@ -6,6 +6,7 @@ import {
   ArrowUpRight, ArrowDownRight, ChevronRight, Copy, Link2,
   Settings, Trash2, MoreHorizontal, Store, ChevronDown,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type SiteStatus = 'live' | 'building' | 'draft' | 'suspended';
@@ -168,26 +169,16 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
         {/* Actions */}
         <div className="px-5 py-3 border-t border-gray-200 flex items-center gap-2">
           {site.status === 'live' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-              <Edit3 className="w-3.5 h-3.5" /> Edit Site
-            </button>
+            <Button size="sm" icon={<Edit3 />}>Edit Site</Button>
           )}
           {site.status === 'building' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-              <Layers className="w-3.5 h-3.5" /> Continue Building
-            </button>
+            <Button size="sm" icon={<Layers />}>Continue Building</Button>
           )}
           {site.status === 'draft' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-              <Zap className="w-3.5 h-3.5" /> Start Build
-            </button>
+            <Button size="sm" icon={<Zap />}>Start Build</Button>
           )}
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
-            <Eye className="w-3.5 h-3.5" /> Preview
-          </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
-            <Settings className="w-3.5 h-3.5" /> Domain Settings
-          </button>
+          <Button variant="secondary" size="sm" icon={<Eye />}>Preview</Button>
+          <Button variant="secondary" size="sm" icon={<Settings />}>Domain Settings</Button>
         </div>
       </div>
     </div>
@@ -230,9 +221,7 @@ export function BackendWebsites() {
             <p className="text-sm text-gray-500">Manage merchant websites, domains, and analytics</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-          <Plus className="w-3.5 h-3.5" /> New Site
-        </button>
+        <Button size="sm" icon={<Plus />}>New Site</Button>
       </div>
 
       {/* KPIs */}
