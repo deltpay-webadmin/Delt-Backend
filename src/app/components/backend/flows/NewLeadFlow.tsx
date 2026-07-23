@@ -27,6 +27,7 @@ import {
 import { toast } from 'sonner@2.0.3';
 import { leadActions, LEAD_PRODUCTS, type Lead, type LeadProduct } from '../crmStore';
 import { MCC_CODES, mccLabel } from './mccCodes';
+import { Button } from '../ui';
 
 // Owners are a single-item list today, but the menu is data-driven so more can
 // be added here (or wired to a users table) without touching the UI.
@@ -381,18 +382,12 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
 
         {/* Footer */}
         <div className="px-5 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors"
-          >
+          <Button variant="secondary" onClick={handleClose}>
             Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4" /> Create lead
-          </button>
+          </Button>
+          <Button icon={<Plus />} onClick={handleSubmit}>
+            Create lead
+          </Button>
         </div>
       </div>
     </div>

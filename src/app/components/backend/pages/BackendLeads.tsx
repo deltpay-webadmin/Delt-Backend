@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { NewLeadFlow } from '../flows/NewLeadFlow';
+import { Button, Tabs } from '../ui';
 import {
   Plus,
   Search,
@@ -969,13 +970,9 @@ export function BackendLeads() {
             <h1 className="text-2xl font-bold text-gray-900">Sales Leads</h1>
             <p className="text-sm text-gray-600 mt-1">{totalLeads} total leads in pipeline</p>
           </div>
-          <button
-            onClick={() => setNewLeadOpen(true)}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
+          <Button icon={<Plus />} onClick={() => setNewLeadOpen(true)}>
             New Lead
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -991,24 +988,15 @@ export function BackendLeads() {
         </div>
 
         {/* Tabs: Leads / Referrals */}
-        <div className="flex items-center gap-1 border-b border-gray-200 mb-6">
-          <button
-            onClick={() => setMainTab('leads')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'leads' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Leads Pipeline
-          </button>
-          <button
-            onClick={() => setMainTab('referrals')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'referrals' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Referrals
-          </button>
-        </div>
+        <Tabs
+          className="mb-6"
+          active={mainTab}
+          onChange={setMainTab}
+          tabs={[
+            { id: 'leads', label: 'Leads Pipeline' },
+            { id: 'referrals', label: 'Referrals' },
+          ]}
+        />
       </div>
 
       {mainTab === 'referrals' ? (
