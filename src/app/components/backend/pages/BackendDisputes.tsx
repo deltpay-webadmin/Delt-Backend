@@ -7,6 +7,7 @@ import {
   ChevronDown, X, Paperclip, MessageSquare, User, Calendar,
   Zap, Activity,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ══════════════════════════════════════
 // TYPES & DATA
@@ -356,9 +357,7 @@ export function BackendDisputes() {
                 Live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Log Dispute
-            </button>
+            <Button icon={<Plus />}>Log Dispute</Button>
           </div>
         </div>
 
@@ -383,26 +382,11 @@ export function BackendDisputes() {
         </div>
 
         {/* ── Tab Nav ── */}
-        <div className="border-b border-gray-200">
-          <div className="flex gap-1">
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-2 ${
-                  activeTab === t.key ? 'text-brand border-brand' : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                {t.label}
-                {t.badge !== undefined && (
-                  <span className={`text-[10px] tabular-nums px-1.5 py-px rounded-full ${
-                    activeTab === t.key ? 'bg-brand/10 text-brand' : 'bg-gray-100 text-gray-500'
-                  }`}>{t.badge}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          active={activeTab}
+          onChange={setActiveTab}
+          tabs={tabs.map(t => ({ id: t.key, label: t.label, count: t.badge }))}
+        />
 
         {/* ════════════════════════════════════════ */}
         {/* INBOX TAB                               */}
@@ -976,9 +960,7 @@ export function BackendDisputes() {
                           <td className="py-2.5"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text}`}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span></td>
                           <td className="pr-5 py-2.5">
                             {a.status === 'pending' ? (
-                              <button className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[8px] hover:bg-brand-hover transition-colors">
-                                Issue Refund
-                              </button>
+                              <Button size="sm">Issue Refund</Button>
                             ) : <span className="text-xs text-gray-400">-</span>}
                           </td>
                         </tr>
@@ -1449,12 +1431,8 @@ export function BackendDisputes() {
                         </div>
                         {!collected ? (
                           <div className="flex items-center gap-2">
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[8px] hover:bg-gray-50 flex items-center gap-1.5">
-                              <Upload className="w-3 h-3" /> Upload
-                            </button>
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[8px] hover:bg-gray-50 flex items-center gap-1.5">
-                              <GripVertical className="w-3 h-3" /> From Vault
-                            </button>
+                            <Button variant="secondary" size="sm" icon={<Upload />}>Upload</Button>
+                            <Button variant="secondary" size="sm" icon={<GripVertical />}>From Vault</Button>
                           </div>
                         ) : (
                           <button className="px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-100 rounded-[8px] flex items-center gap-1">
@@ -1475,10 +1453,8 @@ export function BackendDisputes() {
                   <span className="text-xs text-gray-500">{dispute.evidenceCollected.length}/{dispute.evidenceTypes.length} collected</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Cancel</button>
-                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-2">
-                    <Send className="w-3.5 h-3.5" /> Submit for Review
-                  </button>
+                  <Button variant="secondary" onClick={() => setEvidenceModal(null)}>Cancel</Button>
+                  <Button icon={<Send />}>Submit for Review</Button>
                 </div>
               </div>
             </div>
@@ -1549,8 +1525,8 @@ export function BackendDisputes() {
               </div>
 
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3">
-                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
-                <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Close</button>
+                <Button className="flex-1">Fight This Dispute</Button>
+                <Button variant="secondary" onClick={() => setCostCalcId(null)}>Close</Button>
               </div>
             </div>
           </div>

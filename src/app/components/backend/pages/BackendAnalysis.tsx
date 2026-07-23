@@ -266,18 +266,18 @@ export function BackendAnalysis() {
 
                 {/* Actions */}
                 <div className="mt-4 flex items-center gap-3">
-                  <button
+                  <Button
+                    size="lg"
                     onClick={analyze}
                     disabled={!files.length || status === 'uploading' || status === 'analyzing'}
-                    className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {status === 'uploading' || status === 'analyzing' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                    icon={status === 'uploading' || status === 'analyzing' ? (
+                      <Loader2 className="animate-spin" />
                     ) : (
-                      <Sparkles className="w-4 h-4" />
+                      <Sparkles />
                     )}
+                  >
                     {status === 'uploading' ? 'Uploading...' : status === 'analyzing' ? 'Analyzing...' : 'Analyze Statement'}
-                  </button>
+                  </Button>
                   {(status === 'uploading' || status === 'analyzing') && (
                     <p className="text-xs text-gray-400">
                       {status === 'uploading' ? 'Uploading file...' : 'AI is extracting fees and calculating savings...'}
@@ -318,13 +318,7 @@ export function BackendAnalysis() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => navigate('/leads')}
-                        className="px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
-                      >
-                        View in Pipeline
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      <Button size="sm" trailingIcon={<ArrowRight />} onClick={() => navigate('/leads')}>View in Pipeline</Button>
                       <button
                         onClick={() => setLeadBannerVisible(false)}
                         className="p-1.5 hover:bg-gray-100 rounded transition-colors"
@@ -438,10 +432,7 @@ export function BackendAnalysis() {
 
                       {/* CTA buttons */}
                       <div className="mt-auto pt-5 flex items-center gap-3">
-                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
-                          <Download className="w-4 h-4" />
-                          Generate Proposal PDF
-                        </button>
+                        <Button size="lg" className="flex-1" icon={<Download />}>Generate Proposal PDF</Button>
                         {autoLeadCreated ? (
                           <button
                             onClick={() => navigate('/leads')}

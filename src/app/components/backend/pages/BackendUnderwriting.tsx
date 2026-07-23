@@ -10,6 +10,7 @@ import {
 import { useAppNavigate } from '../NavigationContext';
 import { useUnderwriting, underwritingActions, type UWStage, type ProductType, type UWApplication as Application } from '../crmStore';
 import { NewApplicationFlow } from '../flows/NewApplicationFlow';
+import { Button } from '../ui';
 
 const STAGES: UWStage[] = ['Received', 'Doc Collection', 'Bank Review', 'Credit Analysis', 'Committee', 'Approved', 'Declined'];
 
@@ -257,12 +258,7 @@ export function BackendUnderwriting() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button
-            onClick={() => setNewAppOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover"
-          >
-            <Plus className="w-3.5 h-3.5" /> New Application
-          </button>
+          <Button size="sm" icon={<Plus />} onClick={() => setNewAppOpen(true)}>New Application</Button>
         </div>
       </div>
 
@@ -595,7 +591,7 @@ function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCr
         </div>
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-[8px] hover:bg-white">Cancel</button>
-          <button type="submit" className="px-4 py-2 text-sm bg-brand text-white rounded-[8px] hover:bg-brand-hover">Create Application</button>
+          <Button type="submit">Create Application</Button>
         </div>
       </form>
     </div>

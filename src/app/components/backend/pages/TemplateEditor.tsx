@@ -7,6 +7,7 @@ import {
   CheckCircle, X, Settings, Send,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button } from '../ui';
 
 // ── Template library by product + channel ──
 type TemplateChannel = 'email' | 'text';
@@ -202,19 +203,8 @@ export function TemplateEditor() {
           <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors text-gray-500" title="Duplicate Template">
             <Copy className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => navigate(returnPath)}
-            className="px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors"
-          >
-            Discard
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-1.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
-          >
-            <Save className="w-3.5 h-3.5" />
-            Save Template
-          </button>
+          <Button variant="secondary" size="sm" onClick={() => navigate(returnPath)}>Discard</Button>
+          <Button size="sm" icon={<Save />} onClick={handleSave}>Save Template</Button>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import {
   CheckSquare, LayoutGrid, List, BarChart3,
   Target, Users, Bell, Briefcase, Shield,
 } from 'lucide-react';
+import { Button } from '../ui';
 
 // ── Types ──
 type Priority = 'critical' | 'high' | 'medium' | 'low';
@@ -144,7 +145,7 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Create Task</button>
+          <Button size="sm" onClick={onClose}>Create Task</Button>
         </div>
       </div>
     </div>
@@ -207,10 +208,7 @@ export function BackendTasks() {
             <button onClick={() => setView('list')} className={`p-1.5 rounded-[8px] ${view === 'list' ? 'bg-white shadow-sm' : ''}`}><List className="w-3.5 h-3.5 text-gray-600" /></button>
             <button onClick={() => setView('board')} className={`p-1.5 rounded-[8px] ${view === 'board' ? 'bg-white shadow-sm' : ''}`}><LayoutGrid className="w-3.5 h-3.5 text-gray-600" /></button>
           </div>
-          <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
-            <Plus className="w-3.5 h-3.5" /> New Task
-          </button>
+          <Button size="sm" icon={<Plus />} onClick={() => setShowModal(true)}>New Task</Button>
         </div>
       </div>
 

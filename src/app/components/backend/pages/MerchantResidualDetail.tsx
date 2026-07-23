@@ -7,6 +7,7 @@ import {
   Mail, MapPin, Clock, Search, ChevronDown, Info,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button, Tabs } from '../ui';
 
 // ── Helpers ──
 const fmt = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
@@ -282,12 +283,8 @@ export function MerchantResidualDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
-              <Edit3 className="w-4 h-4" /> Edit
-            </button>
-            <button className="px-3.5 py-2 bg-brand text-white rounded-[8px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
-              <Download className="w-4 h-4" /> Export Statement
-            </button>
+            <Button variant="secondary" icon={<Edit3 />}>Edit</Button>
+            <Button icon={<Download />}>Export Statement</Button>
           </div>
         </div>
 
@@ -302,24 +299,12 @@ export function MerchantResidualDetail() {
         </div>
 
         {/* ── Tab Bar ── */}
-        <div className="border-b border-gray-200 mb-6">
-          <div className="flex gap-0">
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-[1px] flex items-center gap-1.5 ${
-                  activeTab === t.key
-                    ? 'text-brand border-brand'
-                    : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                <t.icon className="w-3.5 h-3.5" />
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          active={activeTab}
+          onChange={setActiveTab}
+          className="mb-6"
+          tabs={tabs.map(t => ({ id: t.key, label: t.label, icon: <t.icon /> }))}
+        />
 
         {/* ═══ RESIDUAL DETAIL TAB ═══ */}
         {activeTab === 'residuals' && (
@@ -1120,8 +1105,8 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
-                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Close</button>
+                  {cb.status !== 'Won' && <Button>Submit Representment</Button>}
+                  <Button variant="secondary" onClick={() => setDisputeModal({ open: false, chargeback: null })}>Close</Button>
                 </div>
               </div>
             </div>
