@@ -28,7 +28,7 @@ const TYPE_CONFIG: Record<ActivityType, { icon: React.ElementType; color: string
   email: { icon: Mail, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200', label: 'Email' },
   sms: { icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200', label: 'SMS' },
   note: { icon: Edit3, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200', label: 'Note' },
-  status_change: { icon: GitBranch, color: 'text-brand', bg: 'bg-indigo-50 border-indigo-200', label: 'Status' },
+  status_change: { icon: GitBranch, color: 'text-brand', bg: 'bg-brand-50 border-brand-200', label: 'Status' },
   deal: { icon: Banknote, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200', label: 'Deal' },
   payment: { icon: DollarSign, color: 'text-green-600', bg: 'bg-green-50 border-green-200', label: 'Payment' },
   task: { icon: CheckCircle, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200', label: 'Task' },
@@ -81,7 +81,7 @@ function QuickNoteModal({ onClose, onSave }: { onClose: () => void; onSave: (not
               const Icon = cfg.icon;
               return (
                 <button key={t} onClick={() => setType(t)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-medium border transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium border transition-colors ${
                     type === t ? `${cfg.bg} ${cfg.color} font-semibold` : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
                   }`}>
                   <Icon className="w-3 h-3" />{cfg.label}
@@ -92,22 +92,22 @@ function QuickNoteModal({ onClose, onSave }: { onClose: () => void; onSave: (not
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant</label>
             <input value={merchant} onChange={e => setMerchant(e.target.value)} placeholder="Search merchant..."
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Details</label>
             <textarea value={content} onChange={e => setContent(e.target.value)} rows={4} placeholder={type === 'call' ? 'Call notes, outcome, follow-up...' : type === 'email' ? 'Email subject, key points...' : 'Write your note...'}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
           </div>
           {type === 'call' && (
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Duration</label>
-                <input placeholder="e.g. 5m 30s" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+                <input placeholder="e.g. 5m 30s" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Outcome</label>
-                <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20">
+                <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20">
                   <option>Connected</option>
                   <option>Voicemail</option>
                   <option>No answer</option>
@@ -118,9 +118,9 @@ function QuickNoteModal({ onClose, onSave }: { onClose: () => void; onSave: (not
           )}
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
-          <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
           <button onClick={() => { onSave({ merchant, content, type }); onClose(); }}
-            className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Log Activity</button>
+            className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Log Activity</button>
         </div>
       </div>
     </div>
@@ -188,7 +188,7 @@ export function BackendActivityTimeline() {
           </div>
         </div>
         <button onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors">
+          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
           <Plus className="w-3.5 h-3.5" /> Log Activity
         </button>
       </div>
@@ -199,11 +199,11 @@ export function BackendActivityTimeline() {
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search activities..."
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           <div className="flex items-center gap-1 flex-wrap">
             <button onClick={() => setTypeFilter('all')}
-              className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${typeFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+              className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${typeFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
               All ({ACTIVITIES.length})
             </button>
             {(['call', 'email', 'sms', 'note', 'deal', 'payment', 'alert', 'status_change', 'document', 'task', 'system'] as ActivityType[]).map(t => {
@@ -213,7 +213,7 @@ export function BackendActivityTimeline() {
               if (count === 0) return null;
               return (
                 <button key={t} onClick={() => setTypeFilter(typeFilter === t ? 'all' : t)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                     typeFilter === t ? `${cfg.bg} ${cfg.color}` : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>
                   <Icon className="w-3 h-3" />{cfg.label} ({count})
@@ -222,7 +222,7 @@ export function BackendActivityTimeline() {
             })}
           </div>
           {merchantFilter && (
-            <button onClick={() => setMerchantFilter(null)} className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 text-brand border border-indigo-200 rounded-[6px] text-[10px] font-semibold">
+            <button onClick={() => setMerchantFilter(null)} className="flex items-center gap-1 px-2.5 py-1.5 bg-brand-50 text-brand border border-brand-200 rounded-[8px] text-[10px] font-semibold">
               <Store className="w-3 h-3" />{merchantFilter} <X className="w-3 h-3" />
             </button>
           )}
@@ -258,7 +258,7 @@ export function BackendActivityTimeline() {
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-xs font-bold text-gray-900">{ev.title}</h4>
-                            {ev.dealId && <span className="text-[9px] font-mono text-brand bg-indigo-50 px-1.5 py-0.5 rounded">{ev.dealId}</span>}
+                            {ev.dealId && <span className="text-[9px] font-mono text-brand bg-brand-50 px-1.5 py-0.5 rounded">{ev.dealId}</span>}
                           </div>
                           <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">{ev.description}</p>
                           {/* Metadata */}

@@ -91,12 +91,12 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Title</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Task title..."
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Description</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Details..."
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -104,7 +104,7 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
               <div className="flex gap-1">
                 {(['critical', 'high', 'medium', 'low'] as Priority[]).map(p => (
                   <button key={p} onClick={() => setPriority(p)}
-                    className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border transition-colors ${
+                    className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border transition-colors ${
                       priority === p ? `${PRIORITY_CONFIG[p].bg} ${PRIORITY_CONFIG[p].color} border-current` : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
                     }`}>{PRIORITY_CONFIG[p].label}</button>
                 ))}
@@ -113,7 +113,7 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Category</label>
               <select value={category} onChange={e => setCategory(e.target.value as TaskCategory)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
                 {Object.entries(CATEGORY_CONFIG).map(([k, v]) => (
                   <option key={k} value={k}>{k.charAt(0).toUpperCase() + k.slice(1)}</option>
                 ))}
@@ -124,7 +124,7 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Assignee</label>
               <select value={assignee} onChange={e => setAssignee(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20">
                 <option value="">Select...</option>
                 <option>Marcus Johnson</option>
                 <option>Sarah Kim</option>
@@ -134,17 +134,17 @@ function NewTaskModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Due Date</label>
               <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20" />
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20" />
             </div>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Merchant (optional)</label>
-            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
+            <input placeholder="Search merchant..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20" />
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
-          <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Create Task</button>
+          <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Create Task</button>
         </div>
       </div>
     </div>
@@ -203,12 +203,12 @@ export function BackendTasks() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-gray-100 rounded-[6px] p-0.5">
-            <button onClick={() => setView('list')} className={`p-1.5 rounded-[4px] ${view === 'list' ? 'bg-white shadow-sm' : ''}`}><List className="w-3.5 h-3.5 text-gray-600" /></button>
-            <button onClick={() => setView('board')} className={`p-1.5 rounded-[4px] ${view === 'board' ? 'bg-white shadow-sm' : ''}`}><LayoutGrid className="w-3.5 h-3.5 text-gray-600" /></button>
+          <div className="flex bg-gray-100 rounded-[8px] p-0.5">
+            <button onClick={() => setView('list')} className={`p-1.5 rounded-[8px] ${view === 'list' ? 'bg-white shadow-sm' : ''}`}><List className="w-3.5 h-3.5 text-gray-600" /></button>
+            <button onClick={() => setView('board')} className={`p-1.5 rounded-[8px] ${view === 'board' ? 'bg-white shadow-sm' : ''}`}><LayoutGrid className="w-3.5 h-3.5 text-gray-600" /></button>
           </div>
           <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
             <Plus className="w-3.5 h-3.5" /> New Task
           </button>
         </div>
@@ -241,13 +241,13 @@ export function BackendTasks() {
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tasks..."
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           {/* Status filters */}
           <div className="flex items-center gap-1">
             {(['all', 'todo', 'in_progress', 'blocked', 'done'] as const).map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
-                className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                   statusFilter === s ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                 }`}>{s === 'all' ? 'All' : STATUS_CONFIG[s].label}</button>
             ))}
@@ -256,14 +256,14 @@ export function BackendTasks() {
           <div className="flex items-center gap-1">
             {(['all', 'critical', 'high', 'medium', 'low'] as const).map(p => (
               <button key={p} onClick={() => setPriorityFilter(p)}
-                className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                   priorityFilter === p ? (p === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${PRIORITY_CONFIG[p].bg} ${PRIORITY_CONFIG[p].color} border-current`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                 }`}>{p === 'all' ? 'Any priority' : PRIORITY_CONFIG[p].label}</button>
             ))}
           </div>
           {/* Assignee */}
           {assigneeFilter && (
-            <button onClick={() => setAssigneeFilter(null)} className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 text-brand border border-indigo-200 rounded-[6px] text-[10px] font-semibold">
+            <button onClick={() => setAssigneeFilter(null)} className="flex items-center gap-1 px-2.5 py-1.5 bg-brand-50 text-brand border border-brand-200 rounded-[8px] text-[10px] font-semibold">
               <User className="w-3 h-3" />{assigneeFilter} <X className="w-3 h-3" />
             </button>
           )}
@@ -279,7 +279,7 @@ export function BackendTasks() {
             const statusTasks = filtered.filter(t => t.status === status);
             return (
               <div key={status} className="min-h-[300px]">
-                <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-[6px] border ${cfg.bg}`}>
+                <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-[8px] border ${cfg.bg}`}>
                   <Icon className={`w-3.5 h-3.5 ${cfg.color}`} />
                   <span className="text-xs font-bold text-gray-900">{cfg.label}</span>
                   <span className="ml-auto text-[10px] font-mono text-gray-400">{statusTasks.length}</span>
@@ -343,7 +343,7 @@ export function BackendTasks() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono text-gray-400">{task.id}</span>
-                    {task.dealId && <span className="text-[9px] font-mono text-brand bg-indigo-50 px-1.5 py-0.5 rounded">{task.dealId}</span>}
+                    {task.dealId && <span className="text-[9px] font-mono text-brand bg-brand-50 px-1.5 py-0.5 rounded">{task.dealId}</span>}
                     {task.overdue && task.status !== 'done' && <span className="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">OVERDUE</span>}
                   </div>
                   <h4 className={`text-xs font-semibold mt-0.5 truncate ${task.status === 'done' ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{task.title}</h4>

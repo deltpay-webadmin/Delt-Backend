@@ -181,7 +181,7 @@ export function OnboardingFlow({
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="p-2 -mr-2 -mt-1 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                className="p-2 -mr-2 -mt-1 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-[8px] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -274,14 +274,14 @@ export function OnboardingFlow({
                   <button
                     onClick={onClose}
                     disabled={submitting}
-                    className="px-3.5 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-50 rounded-[6px] transition-colors disabled:opacity-50"
+                    className="px-3.5 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-50 rounded-[8px] transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleNext}
                     disabled={submitting}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-white bg-brand hover:bg-brand-hover rounded-[6px] transition-colors shadow-sm disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-white bg-brand hover:bg-brand-hover rounded-[8px] transition-colors shadow-sm disabled:opacity-60"
                   >
                     {submitting ? (
                       <>
@@ -337,14 +337,14 @@ function SuccessPanel({
         {success.primaryCta && (
           <button
             onClick={success.primaryCta.onClick}
-            className="flex-1 px-4 py-2.5 text-[13px] font-semibold text-white bg-brand hover:bg-brand-hover rounded-[6px] transition-colors shadow-sm"
+            className="flex-1 px-4 py-2.5 text-[13px] font-semibold text-white bg-brand hover:bg-brand-hover rounded-[8px] transition-colors shadow-sm"
           >
             {success.primaryCta.label}
           </button>
         )}
         <button
           onClick={success.secondaryCta?.onClick || onClose}
-          className="flex-1 px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors"
+          className="flex-1 px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors"
         >
           {success.secondaryCta?.label || 'Done'}
         </button>
@@ -403,7 +403,7 @@ export function TextField({
           inputMode={inputMode}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full ${prefix ? 'pl-6' : 'pl-3'} ${suffix ? 'pr-12' : 'pr-3'} py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors placeholder:text-gray-400`}
+          className={`w-full ${prefix ? 'pl-6' : 'pl-3'} ${suffix ? 'pr-12' : 'pr-3'} py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors placeholder:text-gray-400`}
         />
         {suffix && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-gray-400 pointer-events-none">
@@ -435,7 +435,7 @@ export function SelectField({
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors"
+        className="w-full px-3 py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors"
       >
         {opts.map(o => (
           <option key={o.value} value={o.value}>
@@ -470,7 +470,7 @@ export function TextArea({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors placeholder:text-gray-400 resize-none"
+        className="w-full px-3 py-2 text-[13px] text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors placeholder:text-gray-400 resize-none"
       />
     </div>
   );
@@ -506,7 +506,7 @@ export function RadioCards<T extends string>({
             >
               {o.icon && (
                 <div
-                  className={`w-8 h-8 rounded-[6px] flex items-center justify-center shrink-0 ${
+                  className={`w-8 h-8 rounded-[8px] flex items-center justify-center shrink-0 ${
                     active ? 'bg-brand/10 text-brand' : 'bg-gray-50 text-gray-500'
                   }`}
                 >
@@ -563,7 +563,7 @@ export function ReviewCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[10px] border border-gray-200 bg-gray-50/60 px-4 py-3">
+    <div className="rounded-[8px] border border-gray-200 bg-gray-50/60 px-4 py-3">
       <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1">
         {title}
       </div>
@@ -596,7 +596,7 @@ export function Checkbox({
       }`}
     >
       <div
-        className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+        className={`w-4 h-4 rounded-[8px] border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
           checked ? 'bg-brand border-brand' : 'border-gray-300'
         }`}
       >
@@ -713,7 +713,7 @@ export function FileDrop({
           {files.map(f => (
             <div
               key={f.id}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-[6px]"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-[8px]"
             >
               <FileText className="w-3.5 h-3.5 text-gray-400 shrink-0" />
               <span className="text-[12px] text-gray-700 truncate flex-1">{f.name}</span>
@@ -758,14 +758,14 @@ export function RepeaterSection({
     <div className="space-y-3">
       {title && <FieldLabel>{title}</FieldLabel>}
       {items.length === 0 && emptyHint && (
-        <div className="text-[12px] text-gray-500 bg-gray-50 border border-gray-100 rounded-[6px] px-3 py-2.5">
+        <div className="text-[12px] text-gray-500 bg-gray-50 border border-gray-100 rounded-[8px] px-3 py-2.5">
           {emptyHint}
         </div>
       )}
       {items.map((item, i) => (
         <div
           key={item.id}
-          className="rounded-[10px] border border-gray-200 px-4 py-3 relative bg-white"
+          className="rounded-[8px] border border-gray-200 px-4 py-3 relative bg-white"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">

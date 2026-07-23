@@ -121,13 +121,13 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <h3 className="text-sm font-bold text-gray-900">New Message</h3>
-            <div className="flex bg-gray-100 rounded-[6px] p-0.5">
+            <div className="flex bg-gray-100 rounded-[8px] p-0.5">
               {(['email', 'sms'] as const).map(c => {
                 const cfg = CHANNEL_CONFIG[c];
                 const Icon = cfg.icon;
                 return (
                   <button key={c} onClick={() => setChannel(c)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-[4px] text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1 px-3 py-1 rounded-[8px] text-xs font-medium transition-all ${
                       channel === c ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
                     }`}><Icon className="w-3 h-3" />{cfg.label}</button>
                 );
@@ -140,26 +140,26 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 w-16 shrink-0">To:</span>
             <input value={to} onChange={e => setTo(e.target.value)} placeholder={channel === 'email' ? 'email@merchant.com' : 'Phone number'}
-              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           {channel === 'email' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-16 shrink-0">Subject:</span>
               <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject line..."
-                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
           )}
           <textarea value={body} onChange={e => setBody(e.target.value)} rows={channel === 'email' ? 10 : 4}
             placeholder={channel === 'email' ? 'Write your email...' : 'Write your message...'}
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" />
         </div>
         <div className="flex items-center justify-between px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <div className="flex items-center gap-2">
             <button className="p-1.5 hover:bg-gray-100 rounded"><Paperclip className="w-4 h-4 text-gray-400" /></button>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[6px]">Cancel</button>
-            <button onClick={onClose} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
+            <button onClick={onClose} className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
               <Send className="w-3.5 h-3.5" /> Send
             </button>
           </div>
@@ -219,7 +219,7 @@ export function BackendInbox() {
           </div>
         </div>
         <button onClick={() => setShowCompose(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> Compose
         </button>
       </div>
@@ -233,12 +233,12 @@ export function BackendInbox() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations..."
-                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1 flex-wrap">
               {(['all', 'unread', 'starred'] as const).map(s => (
                 <button key={s} onClick={() => setStatusFilter(s)}
-                  className={`px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${
+                  className={`px-2 py-1 rounded-[8px] text-[10px] font-semibold border transition-colors ${
                     statusFilter === s ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? `All (${threads.length})` : s === 'unread' ? `Unread (${unreadCount})` : `Starred (${starredCount})`}</button>
               ))}
@@ -246,13 +246,13 @@ export function BackendInbox() {
                 {(['all', 'email', 'sms', 'call'] as const).map(c => {
                   if (c === 'all') return (
                     <button key={c} onClick={() => setChannelFilter('all')}
-                      className={`px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${channelFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
+                      className={`px-2 py-1 rounded-[8px] text-[10px] font-semibold border transition-colors ${channelFilter === 'all' ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
                   );
                   const cfg = CHANNEL_CONFIG[c];
                   const Icon = cfg.icon;
                   return (
                     <button key={c} onClick={() => setChannelFilter(channelFilter === c ? 'all' : c)}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-[4px] text-[10px] font-semibold border transition-colors ${
+                      className={`flex items-center gap-1 px-2 py-1 rounded-[8px] text-[10px] font-semibold border transition-colors ${
                         channelFilter === c ? `${cfg.bg} ${cfg.color}` : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                       }`}><Icon className="w-3 h-3" /></button>
                   );
@@ -286,7 +286,7 @@ export function BackendInbox() {
                       </div>
                       <div className="flex items-center gap-1.5 mb-1">
                         <span className="text-[10px] text-gray-500">{thread.contact}</span>
-                        {thread.dealId && <span className="text-[8px] font-mono text-brand bg-indigo-50 px-1 py-0.5 rounded">{thread.dealId}</span>}
+                        {thread.dealId && <span className="text-[8px] font-mono text-brand bg-brand-50 px-1 py-0.5 rounded">{thread.dealId}</span>}
                       </div>
                       <p className={`text-[11px] truncate ${isUnread ? 'text-gray-700' : 'text-gray-400'}`}>{thread.lastMessage}</p>
                       <div className="flex items-center gap-2 mt-1">
@@ -318,7 +318,7 @@ export function BackendInbox() {
                 <div className="flex items-center gap-2 mb-0.5">
                   <h3 className="text-sm font-bold text-gray-900">{activeThread.merchant}</h3>
                   <span className="text-[10px] font-mono text-gray-400">{activeThread.merchantId}</span>
-                  {activeThread.dealId && <span className="text-[9px] font-mono text-brand bg-indigo-50 px-1.5 py-0.5 rounded">{activeThread.dealId}</span>}
+                  {activeThread.dealId && <span className="text-[9px] font-mono text-brand bg-brand-50 px-1.5 py-0.5 rounded">{activeThread.dealId}</span>}
                 </div>
                 <div className="flex items-center gap-3 text-[11px] text-gray-500">
                   <span className="flex items-center gap-1"><User className="w-3 h-3" />{activeThread.contact}</span>
@@ -366,7 +366,7 @@ export function BackendInbox() {
                         <div className="mt-3 pt-2 border-t border-gray-100 flex items-center gap-2 flex-wrap">
                           <Paperclip className="w-3 h-3 text-gray-400 shrink-0" />
                           {msg.attachments.map((a, i) => (
-                            <button key={i} className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-[4px] text-[10px] text-gray-600 hover:bg-gray-100 border border-gray-200">
+                            <button key={i} className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-[8px] text-[10px] text-gray-600 hover:bg-gray-100 border border-gray-200">
                               <FileText className="w-3 h-3 text-gray-400" />{a}
                             </button>
                           ))}
@@ -384,12 +384,12 @@ export function BackendInbox() {
                 <div className="flex-1 relative">
                   <input value={replyText} onChange={e => setReplyText(e.target.value)}
                     placeholder={`Reply to ${activeThread.contact}...`}
-                    className="w-full pl-4 pr-20 py-2.5 bg-white border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                    className="w-full pl-4 pr-20 py-2.5 bg-white border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                     onKeyDown={e => { if (e.key === 'Enter') setReplyText(''); }} />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button className="p-1 hover:bg-gray-100 rounded"><Paperclip className="w-3.5 h-3.5 text-gray-400" /></button>
                     <button onClick={() => setReplyText('')}
-                      className={`p-1.5 rounded-[4px] transition-all ${replyText.trim() ? 'bg-brand hover:bg-brand-hover' : 'bg-gray-200'}`}>
+                      className={`p-1.5 rounded-[8px] transition-all ${replyText.trim() ? 'bg-brand hover:bg-brand-hover' : 'bg-gray-200'}`}>
                       <Send className="w-3 h-3 text-white" />
                     </button>
                   </div>

@@ -102,7 +102,7 @@ const alerts = [
 const sevConfig = {
   critical: { bg: 'bg-red-50 border-red-200', iconBg: 'bg-red-100', icon: 'text-red-600', badge: 'bg-red-600 text-white' },
   warning: { bg: 'bg-amber-50 border-amber-200', iconBg: 'bg-amber-100', icon: 'text-amber-600', badge: 'bg-amber-500 text-white' },
-  info: { bg: 'bg-indigo-50/60 border-indigo-200', iconBg: 'bg-indigo-100', icon: 'text-indigo-600', badge: 'bg-indigo-600 text-white' },
+  info: { bg: 'bg-brand-50/60 border-brand-200', iconBg: 'bg-brand-100', icon: 'text-brand', badge: 'bg-brand text-white' },
 };
 
 const flowCastData = [
@@ -182,10 +182,10 @@ export function BackendLensAI() {
             <p className="text-sm text-gray-500 mt-0.5">Predictive intelligence for your portfolio</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex bg-gray-100 rounded-[6px] p-0.5">
+            <div className="flex bg-gray-100 rounded-[8px] p-0.5">
               <button
                 onClick={() => setTab('dashboard')}
-                className={`px-4 py-2 text-sm font-medium rounded-[4px] transition-all ${
+                className={`px-4 py-2 text-sm font-medium rounded-[8px] transition-all ${
                   tab === 'dashboard'
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
@@ -195,7 +195,7 @@ export function BackendLensAI() {
               </button>
               <button
                 onClick={() => setTab('ask')}
-                className={`px-4 py-2 text-sm font-medium rounded-[4px] transition-all flex items-center gap-1.5 ${
+                className={`px-4 py-2 text-sm font-medium rounded-[8px] transition-all flex items-center gap-1.5 ${
                   tab === 'ask'
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
@@ -241,7 +241,7 @@ function DashboardTab() {
         {/* Predicted Collections */}
         <div className="bg-white rounded-[8px] border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-emerald-50 rounded-[8px] flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
             </div>
             <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full">+8.2%</span>
@@ -254,7 +254,7 @@ function DashboardTab() {
         {/* At-Risk Deals */}
         <div className="bg-white rounded-[8px] border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-amber-50 rounded-[8px] flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
             </div>
             <span className="text-xs text-red-600 font-medium bg-red-50 px-2 py-0.5 rounded-full">+1 this week</span>
@@ -267,10 +267,10 @@ function DashboardTab() {
         {/* Renewal Opportunities */}
         <div className="bg-white rounded-[8px] border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center">
-              <RotateCcw className="w-5 h-5 text-indigo-600" />
+            <div className="w-9 h-9 bg-brand-50 rounded-[8px] flex items-center justify-center">
+              <RotateCcw className="w-5 h-5 text-brand" />
             </div>
-            <span className="text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded-full">$340K potential</span>
+            <span className="text-xs text-brand font-medium bg-brand-50 px-2 py-0.5 rounded-full">$340K potential</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">4</p>
           <p className="text-sm text-gray-500 mt-1">Renewal Opportunities</p>
@@ -290,7 +290,7 @@ function DashboardTab() {
             return (
               <div key={i} className={`${sev.bg} border rounded-[8px] p-4 sm:p-5 transition-all hover:shadow-sm`}>
                 <div className="flex gap-4">
-                  <div className={`w-9 h-9 ${sev.iconBg} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                  <div className={`w-9 h-9 ${sev.iconBg} rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5`}>
                     {alert.severity === 'critical' ? (
                       <Zap className={`w-5 h-5 ${sev.icon}`} />
                     ) : alert.severity === 'warning' ? (
@@ -311,7 +311,7 @@ function DashboardTab() {
                       {alert.actions.map((action, j) => (
                         <button
                           key={j}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-[6px] transition-colors ${
+                          className={`px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors ${
                             j === 0
                               ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm'
                               : 'text-gray-500 hover:text-gray-700'
@@ -338,11 +338,11 @@ function DashboardTab() {
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-0.5 bg-indigo-600 rounded" />
+              <div className="w-3 h-0.5 bg-brand rounded" />
               <span className="text-gray-600">Projected</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 bg-indigo-100 rounded-sm border border-indigo-200" />
+              <div className="w-3 h-3 bg-brand-100 rounded-sm border border-brand-200" />
               <span className="text-gray-600">Confidence Band</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -423,7 +423,7 @@ function AskTab({
         {messages.length === 0 ? (
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 max-w-xl mx-auto text-center">
-            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5">
+            <div className="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mb-5">
               <Sparkles className="w-7 h-7 text-brand" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Ask Lens anything</h2>
@@ -437,9 +437,9 @@ function AskTab({
                   <button
                     key={i}
                     onClick={() => handleSend(prompt.text)}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-[8px] text-left hover:border-brand/30 hover:bg-indigo-50/30 transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-gray-200 rounded-[8px] text-left hover:border-brand/30 hover:bg-brand-50/30 transition-all group"
                   >
-                    <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                    <div className="w-8 h-8 bg-brand-50 rounded-[8px] flex items-center justify-center flex-shrink-0 group-hover:bg-brand-100 transition-colors">
                       <Icon className="w-4 h-4 text-brand" />
                     </div>
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">{prompt.text}</span>
@@ -461,7 +461,7 @@ function AskTab({
                 ) : (
                   <div className="max-w-2xl">
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-8 h-8 rounded-[8px] bg-brand-50 flex items-center justify-center flex-shrink-0 mt-1">
                         <Brain className="w-4 h-4 text-brand" />
                       </div>
                       <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-md px-5 py-4">
@@ -476,7 +476,7 @@ function AskTab({
                           )}
                         </p>
                         {msg.table && (
-                          <div className="mt-4 overflow-x-auto rounded-md border border-gray-200">
+                          <div className="mt-4 overflow-x-auto rounded-[8px] border border-gray-200">
                             <table className="w-full text-xs">
                               <thead>
                                 <tr className="bg-gray-50">
@@ -530,7 +530,7 @@ function AskTab({
               <button
                 onClick={() => handleSend()}
                 disabled={!chatInput.trim()}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-[6px] flex items-center justify-center transition-all ${
+                className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-[8px] flex items-center justify-center transition-all ${
                   chatInput.trim() ? 'bg-brand hover:bg-brand-hover' : 'bg-gray-200'
                 }`}
               >

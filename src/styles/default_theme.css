@@ -43,10 +43,18 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Delt product tokens */
-  --brand: #4318FF;
-  --brand-hover: #3311DD;
-  --brand-light: #7B61FF;
+  /* Delt product tokens — brand ramp (indigo) */
+  --brand-50: #EEF2FF;
+  --brand-100: #E0E7FF;
+  --brand-200: #C7D2FE;
+  --brand-300: #A5B4FC;
+  --brand-400: #818CF8;
+  --brand-500: #6366F1;
+  --brand-600: #4F46E5;
+  --brand-700: #4338CA;
+  --brand: #4F46E5;
+  --brand-hover: #4338CA;
+  --brand-light: #6366F1;
   --canvas: #F8FAFC;
   --canvas-muted: #FAFBFD;
   --info: #0284C7;
@@ -93,9 +101,17 @@
   --sidebar-ring: oklch(0.439 0 0);
 
   /* Delt product tokens — brand is constant across themes */
-  --brand: #4318FF;
-  --brand-hover: #3311DD;
-  --brand-light: #7B61FF;
+  --brand-50: #EEF2FF;
+  --brand-100: #E0E7FF;
+  --brand-200: #C7D2FE;
+  --brand-300: #A5B4FC;
+  --brand-400: #818CF8;
+  --brand-500: #6366F1;
+  --brand-600: #4F46E5;
+  --brand-700: #4338CA;
+  --brand: #4F46E5;
+  --brand-hover: #4338CA;
+  --brand-light: #6366F1;
   --canvas: oklch(0.145 0 0);
   --canvas-muted: oklch(0.19 0 0);
   --info: #0284C7;
@@ -143,6 +159,14 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Delt product tokens exposed to Tailwind */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-light: var(--brand-light);

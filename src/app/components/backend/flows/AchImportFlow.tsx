@@ -301,7 +301,7 @@ export function AchImportFlow({ open, onClose }: AchImportFlowProps) {
                     onDragLeave={() => setDragOver(false)}
                     onDrop={onDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
+                    className={`border-2 border-dashed rounded-[8px] p-10 text-center cursor-pointer transition-colors ${
                       dragOver ? 'border-brand bg-brand/5' : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'
                     }`}
                   >

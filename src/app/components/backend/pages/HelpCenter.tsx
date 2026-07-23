@@ -194,7 +194,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -298,7 +298,7 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
             {!q && (
               <section>
                 <div className="bg-white rounded-[8px] border border-gray-200 p-8 text-center">
-                  <div className="w-12 h-12 bg-brand/[0.06] rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-brand/[0.06] rounded-[12px] flex items-center justify-center mx-auto mb-4">
                     <MessageCircle className="w-6 h-6 text-brand" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1.5">Still need help?</h3>
@@ -306,11 +306,11 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
                     Can't find what you're looking for? Our support team is available Monday–Friday, 9 AM–6 PM EST.
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />
                       Contact Support
                     </button>
-                    <button className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors flex items-center gap-2">
+                    <button className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors flex items-center gap-2">
                       <Ticket className="w-4 h-4" />
                       Submit a Ticket
                     </button>

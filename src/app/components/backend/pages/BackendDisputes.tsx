@@ -243,7 +243,7 @@ const stageConfig: Record<DisputeStage, { label: string; color: string; bg: stri
   evidence: { label: 'Evidence Collection', color: 'text-amber-700', bg: 'bg-amber-50' },
   draft: { label: 'Draft Response', color: 'text-orange-700', bg: 'bg-orange-50' },
   review: { label: 'Review', color: 'text-purple-700', bg: 'bg-purple-50' },
-  submitted: { label: 'Submitted', color: 'text-brand', bg: 'bg-indigo-50' },
+  submitted: { label: 'Submitted', color: 'text-brand', bg: 'bg-brand-50' },
   awaiting: { label: 'Awaiting Decision', color: 'text-gray-700', bg: 'bg-gray-100' },
   won: { label: 'Won', color: 'text-emerald-700', bg: 'bg-emerald-50' },
   lost: { label: 'Lost', color: 'text-red-700', bg: 'bg-red-50' },
@@ -356,7 +356,7 @@ export function BackendDisputes() {
                 Live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> Log Dispute
             </button>
           </div>
@@ -414,12 +414,12 @@ export function BackendDisputes() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search disputes, merchants, reason codes..."
-                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
               </div>
               <div className="flex items-center gap-1">
                 {['all', 'new', 'evidence', 'draft', 'review', 'submitted', 'awaiting'].map(s => (
                   <button key={s} onClick={() => setStageFilter(s)}
-                    className={`px-2.5 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${stageFilter === s ? 'bg-brand/10 text-brand' : 'text-gray-500 hover:bg-gray-50'}`}>
+                    className={`px-2.5 py-1.5 rounded-[8px] text-xs font-medium transition-colors ${stageFilter === s ? 'bg-brand/10 text-brand' : 'text-gray-500 hover:bg-gray-50'}`}>
                     {s === 'all' ? 'All Active' : stageConfig[s as DisputeStage]?.label || s}
                   </button>
                 ))}
@@ -444,7 +444,7 @@ export function BackendDisputes() {
                     return (
                       <React.Fragment key={d.id}>
                         <tr onClick={() => setSelectedDispute(isSelected ? null : d.id)}
-                          className={`border-b border-gray-100 cursor-pointer transition-colors ${isSelected ? 'bg-indigo-50/40' : 'hover:bg-gray-50/80'}`}>
+                          className={`border-b border-gray-100 cursor-pointer transition-colors ${isSelected ? 'bg-brand-50/40' : 'hover:bg-gray-50/80'}`}>
                           <td className="pl-5 py-3">
                             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${uc.bg} ${uc.text}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${uc.dot} ${urg === 'critical' ? 'animate-pulse' : ''}`} />
@@ -485,11 +485,11 @@ export function BackendDisputes() {
                           <td className="pr-5 py-3">
                             <div className="flex items-center gap-1">
                               <button onClick={(e) => { e.stopPropagation(); setEvidenceModal(d.id); }}
-                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Evidence Builder">
+                                className="p-1.5 rounded-[8px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Evidence Builder">
                                 <FileText className="w-3.5 h-3.5" />
                               </button>
                               <button onClick={(e) => { e.stopPropagation(); setCostCalcId(d.id); }}
-                                className="p-1.5 rounded-[4px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Cost Calculator">
+                                className="p-1.5 rounded-[8px] hover:bg-gray-100 text-gray-400 hover:text-brand transition-colors" title="Cost Calculator">
                                 <Calculator className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -546,7 +546,7 @@ export function BackendDisputes() {
                                   {d.evidenceTypes.map(ev => {
                                     const collected = d.evidenceCollected.includes(ev);
                                     return (
-                                      <div key={ev} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-xs ${collected ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                                      <div key={ev} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-[8px] text-xs ${collected ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
                                         {collected ? <CheckCircle className="w-3 h-3 text-emerald-500" /> : <div className="w-3 h-3 rounded-full border border-gray-300" />}
                                         {ev}
                                       </div>
@@ -567,7 +567,7 @@ export function BackendDisputes() {
                                 <p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-2">Activity Log</p>
                                 <div className="space-y-2 max-h-[140px] overflow-y-auto">
                                   {d.notes.map((n, i) => (
-                                    <div key={i} className="bg-white rounded-[4px] border border-gray-200 px-2.5 py-2">
+                                    <div key={i} className="bg-white rounded-[8px] border border-gray-200 px-2.5 py-2">
                                       <div className="flex items-center justify-between mb-0.5">
                                         <span className="text-[10px] font-semibold text-gray-700">{n.author}</span>
                                         <span className="text-[9px] text-gray-400">{fmtDate(n.date)}</span>
@@ -617,7 +617,7 @@ export function BackendDisputes() {
                         const urg = urgencyOf(d);
                         return (
                           <div key={d.id} onClick={() => { setActiveTab('inbox'); setSelectedDispute(d.id); }}
-                            className={`rounded-[6px] border p-2.5 cursor-pointer hover:shadow-sm transition-all ${
+                            className={`rounded-[8px] border p-2.5 cursor-pointer hover:shadow-sm transition-all ${
                               urg === 'critical' ? 'border-red-200 bg-red-50/30' : 'border-gray-200 hover:border-brand/30'
                             }`}>
                             <div className="flex items-center justify-between mb-1">
@@ -647,7 +647,7 @@ export function BackendDisputes() {
                       })}
                       {/* Show lost disputes in the Won column */}
                       {lostDisputes.map(d => (
-                        <div key={d.id} className="rounded-[6px] border border-red-200 bg-red-50/30 p-2.5 cursor-pointer hover:shadow-sm"
+                        <div key={d.id} className="rounded-[8px] border border-red-200 bg-red-50/30 p-2.5 cursor-pointer hover:shadow-sm"
                           onClick={() => { setActiveTab('inbox'); setStageFilter('all'); setSelectedDispute(d.id); }}>
                           <div className="flex items-center justify-between mb-1">
                             <p className="text-[10px] font-bold text-gray-500">{d.id}</p>
@@ -768,7 +768,7 @@ export function BackendDisputes() {
                         </div>
                         <div>
                           <p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-2">Recommended Strategy</p>
-                          <p className="text-xs text-gray-600 leading-relaxed bg-indigo-50/50 rounded-[6px] p-3 border border-indigo-100">{info.strategy}</p>
+                          <p className="text-xs text-gray-600 leading-relaxed bg-brand-50/50 rounded-[8px] p-3 border border-brand-100">{info.strategy}</p>
                         </div>
                       </div>
                     </div>
@@ -976,7 +976,7 @@ export function BackendDisputes() {
                           <td className="py-2.5"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sc.bg} ${sc.text}`}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span></td>
                           <td className="pr-5 py-2.5">
                             {a.status === 'pending' ? (
-                              <button className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">
+                              <button className="px-3 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[8px] hover:bg-brand-hover transition-colors">
                                 Issue Refund
                               </button>
                             ) : <span className="text-xs text-gray-400">-</span>}
@@ -1006,7 +1006,7 @@ export function BackendDisputes() {
                     const color = pctOfThreshold >= 0.8 ? 'text-red-600' : pctOfThreshold >= 0.5 ? 'text-amber-600' : 'text-emerald-600';
                     const barColor = pctOfThreshold >= 0.8 ? 'bg-red-500' : pctOfThreshold >= 0.5 ? 'bg-amber-500' : 'bg-emerald-500';
                     return (
-                      <div key={i} className="bg-gray-50 rounded-[6px] p-3">
+                      <div key={i} className="bg-gray-50 rounded-[8px] p-3">
                         <p className="text-xs font-semibold text-gray-900 mb-2">{m.merchant}</p>
                         <div className="flex items-end justify-between mb-1.5">
                           <span className={`text-lg font-bold tabular-nums ${color}`}>{(m.ratio * 100).toFixed(2)}%</span>
@@ -1241,7 +1241,7 @@ export function BackendDisputes() {
                 <div className="px-5 py-4">
                   {/* Fine tier reference */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                    <div className="rounded-[6px] border border-blue-200 bg-blue-50/50 p-3">
+                    <div className="rounded-[8px] border border-blue-200 bg-blue-50/50 p-3">
                       <p className="text-[10px] text-blue-700 uppercase tracking-wide font-bold mb-2">Visa VDMP Fine Schedule</p>
                       <div className="space-y-1">
                         {[
@@ -1260,7 +1260,7 @@ export function BackendDisputes() {
                         ))}
                       </div>
                     </div>
-                    <div className="rounded-[6px] border border-orange-200 bg-orange-50/50 p-3">
+                    <div className="rounded-[8px] border border-orange-200 bg-orange-50/50 p-3">
                       <p className="text-[10px] text-orange-700 uppercase tracking-wide font-bold mb-2">Mastercard ECM Fine Schedule</p>
                       <div className="space-y-1">
                         {[
@@ -1288,7 +1288,7 @@ export function BackendDisputes() {
                       const textColor = m.pctOfThreshold >= 0.8 ? 'text-red-600' : m.pctOfThreshold >= 0.5 ? 'text-amber-600' : 'text-emerald-600';
                       const monthlyFine = m.pctOfThreshold >= 1.0 ? (m.network === 'Visa' ? 25000 : 5000) : m.pctOfThreshold >= 0.8 ? 500 : 0;
                       return (
-                        <div key={i} className={`rounded-[6px] border p-3 ${m.pctOfThreshold >= 0.8 ? 'border-red-200 bg-red-50/30' : 'border-gray-200 bg-gray-50/50'}`}>
+                        <div key={i} className={`rounded-[8px] border p-3 ${m.pctOfThreshold >= 0.8 ? 'border-red-200 bg-red-50/30' : 'border-gray-200 bg-gray-50/50'}`}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-semibold text-gray-900">{m.merchant}</p>
@@ -1339,7 +1339,7 @@ export function BackendDisputes() {
                         <span className="text-sm font-bold tabular-nums text-red-700">{fmt(item.value)}</span>
                       </div>
                     ))}
-                    <div className="bg-red-50 rounded-[6px] p-3 flex items-center justify-between">
+                    <div className="bg-red-50 rounded-[8px] p-3 flex items-center justify-between">
                       <p className="text-sm font-bold text-red-800">Total Cost of Doing Nothing</p>
                       <span className="text-xl font-bold tabular-nums text-red-700">{fmt(totalInaction)}</span>
                     </div>
@@ -1367,7 +1367,7 @@ export function BackendDisputes() {
                         <span className={`text-sm font-bold tabular-nums ${item.positive ? 'text-emerald-700' : 'text-gray-600'}`}>{item.positive ? '+' : '-'}{fmt(item.value)}</span>
                       </div>
                     ))}
-                    <div className="bg-emerald-50 rounded-[6px] p-3">
+                    <div className="bg-emerald-50 rounded-[8px] p-3">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-bold text-emerald-800">Net Expected Value</p>
                         <span className="text-xl font-bold tabular-nums text-emerald-700">+{fmt(totalExpectedRecovery - totalRepresentmentCost)}</span>
@@ -1377,7 +1377,7 @@ export function BackendDisputes() {
                         <span className="text-lg font-bold tabular-nums text-emerald-800">+{portfolioROI.toFixed(0)}%</span>
                       </div>
                     </div>
-                    <div className="bg-brand/5 rounded-[6px] border border-brand/20 p-3 mt-2">
+                    <div className="bg-brand/5 rounded-[8px] border border-brand/20 p-3 mt-2">
                       <p className="text-xs text-brand font-semibold mb-1">Bottom Line</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         For every <strong className="text-gray-900">$1</strong> spent on representment labor, you recover an expected <strong className="text-emerald-700">${(totalExpectedRecovery / totalRepresentmentCost).toFixed(2)}</strong> in transaction revenue.
@@ -1417,14 +1417,14 @@ export function BackendDisputes() {
                     <h2 className="text-lg font-bold text-gray-900">Evidence Builder</h2>
                     <p className="text-xs text-gray-500">{dispute.id} — {dispute.merchant} — {dispute.cardNetwork} {dispute.reasonCode}</p>
                   </div>
-                  <button onClick={() => setEvidenceModal(null)} className="p-2 hover:bg-gray-100 rounded-[6px] text-gray-500 text-lg">&times;</button>
+                  <button onClick={() => setEvidenceModal(null)} className="p-2 hover:bg-gray-100 rounded-[8px] text-gray-500 text-lg">&times;</button>
                 </div>
               </div>
 
               {rcInfo && (
-                <div className="px-6 py-3 bg-indigo-50/50 border-b border-indigo-100">
-                  <p className="text-[10px] text-indigo-600 uppercase tracking-wide font-bold mb-1">Recommended Strategy — {dispute.reasonCode}</p>
-                  <p className="text-xs text-indigo-700 leading-relaxed">{rcInfo.strategy}</p>
+                <div className="px-6 py-3 bg-brand-50/50 border-b border-brand-100">
+                  <p className="text-[10px] text-brand uppercase tracking-wide font-bold mb-1">Recommended Strategy — {dispute.reasonCode}</p>
+                  <p className="text-xs text-brand-hover leading-relaxed">{rcInfo.strategy}</p>
                 </div>
               )}
 
@@ -1434,7 +1434,7 @@ export function BackendDisputes() {
                 {dispute.evidenceTypes.map((ev, i) => {
                   const collected = dispute.evidenceCollected.includes(ev);
                   return (
-                    <div key={i} className={`rounded-[6px] border p-3 ${collected ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-200 border-dashed bg-gray-50'}`}>
+                    <div key={i} className={`rounded-[8px] border p-3 ${collected ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-200 border-dashed bg-gray-50'}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                           {collected ? (
@@ -1449,15 +1449,15 @@ export function BackendDisputes() {
                         </div>
                         {!collected ? (
                           <div className="flex items-center gap-2">
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
+                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[8px] hover:bg-gray-50 flex items-center gap-1.5">
                               <Upload className="w-3 h-3" /> Upload
                             </button>
-                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[6px] hover:bg-gray-50 flex items-center gap-1.5">
+                            <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded-[8px] hover:bg-gray-50 flex items-center gap-1.5">
                               <GripVertical className="w-3 h-3" /> From Vault
                             </button>
                           </div>
                         ) : (
-                          <button className="px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-100 rounded-[4px] flex items-center gap-1">
+                          <button className="px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-100 rounded-[8px] flex items-center gap-1">
                             <Eye className="w-3 h-3" /> View
                           </button>
                         )}
@@ -1475,8 +1475,8 @@ export function BackendDisputes() {
                   <span className="text-xs text-gray-500">{dispute.evidenceCollected.length}/{dispute.evidenceTypes.length} collected</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-2">
+                  <button onClick={() => setEvidenceModal(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Cancel</button>
+                  <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-2">
                     <Send className="w-3.5 h-3.5" /> Submit for Review
                   </button>
                 </div>
@@ -1511,7 +1511,7 @@ export function BackendDisputes() {
                     <h2 className="text-lg font-bold text-gray-900">Chargeback Cost Calculator</h2>
                     <p className="text-xs text-gray-500">{dispute.id} — {dispute.merchant}</p>
                   </div>
-                  <button onClick={() => setCostCalcId(null)} className="p-2 hover:bg-gray-100 rounded-[6px] text-gray-500 text-lg">&times;</button>
+                  <button onClick={() => setCostCalcId(null)} className="p-2 hover:bg-gray-100 rounded-[8px] text-gray-500 text-lg">&times;</button>
                 </div>
               </div>
 
@@ -1537,7 +1537,7 @@ export function BackendDisputes() {
                   </div>
                 </div>
 
-                <div className="bg-emerald-50 rounded-[6px] border border-emerald-200 p-3">
+                <div className="bg-emerald-50 rounded-[8px] border border-emerald-200 p-3">
                   <p className="text-[10px] text-emerald-700 uppercase tracking-wide font-semibold mb-2">ROI of Fighting This Dispute</p>
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs"><span className="text-emerald-700">Win probability ({dispute.reasonCode})</span><span className="font-bold text-emerald-800">{fmtPct(REASON_CODES[dispute.reasonCode]?.winRate || 0.5)}</span></div>
@@ -1549,8 +1549,8 @@ export function BackendDisputes() {
               </div>
 
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3">
-                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
-                <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Close</button>
+                <button className="flex-1 px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Fight This Dispute</button>
+                <button onClick={() => setCostCalcId(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Close</button>
               </div>
             </div>
           </div>

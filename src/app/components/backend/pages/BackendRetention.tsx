@@ -285,7 +285,7 @@ export function BackendRetention() {
       </div>
 
       {/* Outreach Engagement Insight */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-[8px] border border-indigo-200 p-4 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-[8px] border border-brand-200 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
             <Megaphone className="w-4.5 h-4.5 text-brand" />
@@ -295,7 +295,7 @@ export function BackendRetention() {
             <p className="text-xs text-gray-500 mt-0.5">6 of 8 engaged merchants show rising health scores — 2 disengaged merchants are declining. <span className="font-medium text-gray-700">Merchants who open &amp; respond to outreach churn 42% less.</span></p>
           </div>
         </div>
-        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
+        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
       </div>
 
       {/* Table */}
@@ -345,14 +345,14 @@ export function BackendRetention() {
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1 max-w-xs">
                         {m.signals.map(s => (
-                          <span key={s} className={`inline-flex px-2 py-0.5 text-[11px] font-medium border rounded-md whitespace-nowrap ${signalChip(s)}`}>
+                          <span key={s} className={`inline-flex px-2 py-0.5 text-[11px] font-medium border rounded-[8px] whitespace-nowrap ${signalChip(s)}`}>
                             {s}
                           </span>
                         ))}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${planBadgeCls(m.plan)}`}>
+                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${planBadgeCls(m.plan)}`}>
                         {m.plan}
                       </span>
                     </td>
@@ -369,14 +369,14 @@ export function BackendRetention() {
                       <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
                         <button
                           onClick={() => setSelectedMerchant(m)}
-                          className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors"
                           title="View"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => addTask(m.id, 'Schedule Agent Call')}
-                          className="p-1.5 hover:bg-amber-50 rounded-md text-gray-400 hover:text-amber-600 transition-colors"
+                          className="p-1.5 hover:bg-amber-50 rounded-[8px] text-gray-400 hover:text-amber-600 transition-colors"
                           title="Assign Save Task"
                         >
                           <ClipboardPlus className="w-4 h-4" />
@@ -420,7 +420,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
-        <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
+        <div className={`w-9 h-9 ${v.bg} rounded-[8px] flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
@@ -463,7 +463,7 @@ function DetailPanel({ merchant, tasks, onAddTask, onClose }: {
               <p className="text-xs text-gray-500 mt-0.5">{merchant.id} &middot; {merchant.agent}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -552,10 +552,10 @@ function DetailPanel({ merchant, tasks, onAddTask, onClose }: {
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-[8px] border text-left transition-colors ${
                       isActive
                         ? 'bg-emerald-50 border-emerald-200 cursor-default'
-                        : 'bg-white border-gray-200 hover:bg-indigo-50 hover:border-indigo-200'
+                        : 'bg-white border-gray-200 hover:bg-brand-50 hover:border-brand-200'
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                    <div className={`w-9 h-9 rounded-[8px] flex items-center justify-center shrink-0 ${
                       isActive ? 'bg-emerald-100' : 'bg-gray-100'
                     }`}>
                       {isActive ? (
@@ -572,7 +572,7 @@ function DetailPanel({ merchant, tasks, onAddTask, onClose }: {
                       <p className="text-xs text-gray-500">{pb.desc}</p>
                     </div>
                     {!isActive && (
-                      <span className="text-xs text-indigo-600 font-medium shrink-0">Assign →</span>
+                      <span className="text-xs text-brand font-medium shrink-0">Assign →</span>
                     )}
                   </button>
                 );
@@ -582,12 +582,12 @@ function DetailPanel({ merchant, tasks, onAddTask, onClose }: {
 
           {/* Active Tasks Summary */}
           {tasks.length > 0 && (
-            <div className="bg-indigo-50 rounded-[8px] border border-indigo-200 p-4">
+            <div className="bg-brand-50 rounded-[8px] border border-brand-200 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-indigo-600" />
-                <span className="text-sm font-medium text-indigo-700">{tasks.length} Active Save Task{tasks.length > 1 ? 's' : ''}</span>
+                <Clock className="w-4 h-4 text-brand" />
+                <span className="text-sm font-medium text-brand-hover">{tasks.length} Active Save Task{tasks.length > 1 ? 's' : ''}</span>
               </div>
-              <p className="text-xs text-indigo-600">
+              <p className="text-xs text-brand">
                 Assigned to {merchant.agent} &middot; Created just now
               </p>
             </div>

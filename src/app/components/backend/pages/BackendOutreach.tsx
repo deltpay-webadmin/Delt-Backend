@@ -359,7 +359,7 @@ export function BackendOutreach() {
                 {AUTO_TRIGGERS.filter(t => t.status === 'active').length} automations live
               </span>
             </div>
-            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Campaign
             </button>
           </div>
@@ -419,7 +419,7 @@ export function BackendOutreach() {
                 return (
                   <div key={ch} className="bg-white rounded-[8px] border border-gray-200 p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className={`w-8 h-8 rounded-[6px] ${c.bg} flex items-center justify-center`}>
+                      <div className={`w-8 h-8 rounded-[8px] ${c.bg} flex items-center justify-center`}>
                         <Icon className={`w-4 h-4 ${c.text}`} />
                       </div>
                       <div>
@@ -428,15 +428,15 @@ export function BackendOutreach() {
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="text-center py-2 bg-gray-50 rounded-[4px]">
+                      <div className="text-center py-2 bg-gray-50 rounded-[8px]">
                         <p className="text-xs font-bold text-gray-900">{data.sent > 0 ? fmtPct(data.opened / data.sent) : '—'}</p>
                         <p className="text-[9px] text-gray-400">Open</p>
                       </div>
-                      <div className="text-center py-2 bg-gray-50 rounded-[4px]">
+                      <div className="text-center py-2 bg-gray-50 rounded-[8px]">
                         <p className="text-xs font-bold text-gray-900">{data.sent > 0 ? fmtPct(data.clicked / data.sent) : '—'}</p>
                         <p className="text-[9px] text-gray-400">Click</p>
                       </div>
-                      <div className="text-center py-2 bg-gray-50 rounded-[4px]">
+                      <div className="text-center py-2 bg-gray-50 rounded-[8px]">
                         <p className="text-xs font-bold text-gray-900">{data.sent > 0 ? fmtPct(data.responded / data.sent) : '—'}</p>
                         <p className="text-[9px] text-gray-400">Response</p>
                       </div>
@@ -451,12 +451,12 @@ export function BackendOutreach() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search campaigns, templates, segments..."
-                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                  className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
               </div>
               <div className="flex items-center gap-1.5">
                 {['all', 'email', 'sms', 'portal_cta'].map(ch => (
                   <button key={ch} onClick={() => setChannelFilter(ch)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-[6px] transition-colors ${
+                    className={`px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors ${
                       channelFilter === ch ? 'bg-brand text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}>
                     {ch === 'all' ? 'All' : channelIcon[ch as Channel].label}
@@ -464,7 +464,7 @@ export function BackendOutreach() {
                 ))}
               </div>
               <select value={agentFilter} onChange={e => setAgentFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20">
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20">
                 <option value="all">All Agents</option>
                 <option value="Sarah M.">Sarah M.</option>
                 <option value="Lyndon R.">Lyndon R.</option>
@@ -579,7 +579,7 @@ export function BackendOutreach() {
         {/* ════════════════════════════════════════ */}
         {activeTab === 'bulk' && (
           <div className="space-y-5">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-[8px] border border-indigo-200 p-4 flex items-start gap-3">
+            <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-[8px] border border-brand-200 p-4 flex items-start gap-3">
               <Layers className="w-5 h-5 text-brand mt-0.5 shrink-0" />
               <div>
                 <h3 className="text-sm font-bold text-gray-900">Segmented Bulk Campaigns</h3>
@@ -603,7 +603,7 @@ export function BackendOutreach() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {segments.map((seg, i) => (
                         <button key={i} onClick={() => setBulkSegment(seg.label)}
-                          className={`text-left px-3 py-2.5 rounded-[6px] border transition-all ${
+                          className={`text-left px-3 py-2.5 rounded-[8px] border transition-all ${
                             bulkSegment === seg.label
                               ? 'border-brand bg-brand/5 ring-1 ring-brand/20'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -620,19 +620,19 @@ export function BackendOutreach() {
                     <label className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-2 block">2. Choose Template</label>
                     <div className="flex items-center gap-2">
                       <select value={bulkTemplate} onChange={e => setBulkTemplate(e.target.value)}
-                        className="flex-1 px-3 py-2.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
+                        className="flex-1 px-3 py-2.5 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
                         <option value="">Select a template...</option>
                         {templates.map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
                       {bulkTemplate && TEMPLATE_PREVIEWS[bulkTemplate] && (
-                        <button onClick={() => setPreviewTemplate(bulkTemplate)} className="px-3 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 shrink-0">
+                        <button onClick={() => setPreviewTemplate(bulkTemplate)} className="px-3 py-2.5 border border-gray-200 rounded-[8px] text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 shrink-0">
                           <Eye className="w-4 h-4" /> Preview
                         </button>
                       )}
                     </div>
                     {/* Inline Template Preview */}
                     {bulkTemplate && TEMPLATE_PREVIEWS[bulkTemplate] && (
-                      <div className="mt-3 border border-gray-200 rounded-[6px] overflow-hidden">
+                      <div className="mt-3 border border-gray-200 rounded-[8px] overflow-hidden">
                         <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {TEMPLATE_PREVIEWS[bulkTemplate].channel === 'email' ? <Mail className="w-3.5 h-3.5 text-blue-600" /> : <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />}
@@ -667,7 +667,7 @@ export function BackendOutreach() {
                         const Icon = c.icon;
                         return (
                           <button key={ch} onClick={() => setBulkChannel(ch)}
-                            className={`flex items-center gap-2 px-4 py-2.5 rounded-[6px] border text-sm font-medium transition-all ${
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-[8px] border text-sm font-medium transition-all ${
                               bulkChannel === ch
                                 ? 'border-brand bg-brand/5 text-brand ring-1 ring-brand/20'
                                 : 'border-gray-200 text-gray-600 hover:bg-gray-50'
@@ -692,7 +692,7 @@ export function BackendOutreach() {
                     <button
                       onClick={() => bulkSegment && bulkTemplate && setShowBulkConfirm(true)}
                       disabled={!bulkSegment || !bulkTemplate}
-                      className={`px-5 py-2.5 text-sm font-medium rounded-[6px] flex items-center gap-2 transition-colors ${
+                      className={`px-5 py-2.5 text-sm font-medium rounded-[8px] flex items-center gap-2 transition-colors ${
                         bulkSegment && bulkTemplate
                           ? 'bg-brand text-white hover:bg-brand-hover'
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -747,7 +747,7 @@ export function BackendOutreach() {
                   This is where the CRM starts working <strong>for</strong> you instead of you working the CRM.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Rule
               </button>
             </div>
@@ -819,7 +819,7 @@ export function BackendOutreach() {
                           </p>
                           <p className="text-[9px] text-gray-400">conversion</p>
                         </div>
-                        <button className={`p-2 rounded-[6px] border transition-colors ${
+                        <button className={`p-2 rounded-[8px] border transition-colors ${
                           isActive ? 'border-gray-200 text-gray-500 hover:bg-gray-50' : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
                         }`}>
                           {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -849,7 +849,7 @@ export function BackendOutreach() {
                   Create multi-step automated campaigns that nurture merchants over time. Each sequence is triggered by a condition and sends messages at defined intervals.
                 </p>
               </div>
-              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+              <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                 <Plus className="w-3.5 h-3.5" /> New Sequence
               </button>
             </div>
@@ -929,7 +929,7 @@ export function BackendOutreach() {
                                   <div className={`w-10 h-10 rounded-full ${ch.bg} flex items-center justify-center shrink-0 mt-1`}>
                                     <StepIcon className={`w-4 h-4 ${ch.text}`} />
                                   </div>
-                                  <div className="flex-1 border border-gray-200 rounded-[6px] overflow-hidden">
+                                  <div className="flex-1 border border-gray-200 rounded-[8px] overflow-hidden">
                                     <div className="px-3 py-2.5 bg-gray-50 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
                                         <span className="text-xs font-bold text-gray-900">Step {idx + 1}</span>
@@ -973,7 +973,7 @@ export function BackendOutreach() {
         {/* ════════════════════════════════════════ */}
         {activeTab === 'portal' && (
           <div className="space-y-5">
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-[8px] border border-purple-200 p-4 flex items-start gap-3">
+            <div className="bg-gradient-to-r from-purple-50 to-brand-50 rounded-[8px] border border-purple-200 p-4 flex items-start gap-3">
               <MousePointerClick className="w-5 h-5 text-purple-600 mt-0.5 shrink-0" />
               <div>
                 <h3 className="text-sm font-bold text-gray-900">Portal CTA Performance</h3>
@@ -1070,7 +1070,7 @@ export function BackendOutreach() {
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">Running</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className={`rounded-[6px] border p-4 ${winner === 'A' ? 'border-emerald-300 bg-emerald-50/30' : 'border-gray-200'}`}>
+                    <div className={`rounded-[8px] border p-4 ${winner === 'A' ? 'border-emerald-300 bg-emerald-50/30' : 'border-gray-200'}`}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-blue-600">Variant A (Blue)</span>
                         {winner === 'A' && <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Winner</span>}
@@ -1081,7 +1081,7 @@ export function BackendOutreach() {
                         <div><p className="text-lg font-bold text-gray-900">{fmtPct(varA.convRate)}</p><p className="text-[9px] text-gray-400">Conv Rate</p></div>
                       </div>
                     </div>
-                    <div className={`rounded-[6px] border p-4 ${winner === 'B' ? 'border-emerald-300 bg-emerald-50/30' : 'border-gray-200'}`}>
+                    <div className={`rounded-[8px] border p-4 ${winner === 'B' ? 'border-emerald-300 bg-emerald-50/30' : 'border-gray-200'}`}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-bold text-emerald-600">Variant B (Green)</span>
                         {winner === 'B' && <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Winner ↑{fmtPct(lift)} lift</span>}
@@ -1201,7 +1201,7 @@ export function BackendOutreach() {
             </div>
             <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 rounded-b-[8px] flex items-center justify-between">
               <p className="text-[10px] text-gray-400">Merge fields (e.g. {'{{merchant_name}}'}) auto-populated per recipient</p>
-              <button onClick={() => setPreviewTemplate(null)} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">Close</button>
+              <button onClick={() => setPreviewTemplate(null)} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Close</button>
             </div>
           </div>
         </div>
@@ -1221,15 +1221,15 @@ export function BackendOutreach() {
                 <p className="text-xs text-gray-500">This will send immediately</p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-[6px] p-3 space-y-2 mb-5 text-sm">
+            <div className="bg-gray-50 rounded-[8px] p-3 space-y-2 mb-5 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Segment:</span><span className="font-medium text-gray-900">{bulkSegment}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Template:</span><span className="font-medium text-gray-900">{bulkTemplate}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Channel:</span><span className="font-medium text-gray-900">{channelIcon[bulkChannel].label}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Recipients:</span><span className="font-bold text-brand">{segments.find(s => s.label === bulkSegment)?.count || 0} merchants</span></div>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50">Cancel</button>
-              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover flex items-center justify-center gap-2">
+              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowBulkConfirm(false)} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover flex items-center justify-center gap-2">
                 <Send className="w-4 h-4" /> Send Now
               </button>
             </div>

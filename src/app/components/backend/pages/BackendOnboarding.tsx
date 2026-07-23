@@ -209,7 +209,7 @@ function stepBadgeCls(step: StepName) {
     case 'Application Submitted': return 'bg-gray-100 text-gray-700 border-gray-200';
     case 'Bank Verification': return 'bg-blue-50 text-blue-700 border-blue-200';
     case 'Identity Verification': return 'bg-violet-50 text-violet-700 border-violet-200';
-    case 'Underwriting': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'Underwriting': return 'bg-brand-50 text-brand-hover border-brand-200';
     case 'Docs & E-Sign': return 'bg-amber-50 text-amber-700 border-amber-200';
     case 'Funded': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
   }
@@ -219,7 +219,7 @@ const pipelineStepColors: Record<StepName, string> = {
   'Application Submitted': 'bg-gray-50 border-gray-200',
   'Bank Verification': 'bg-blue-50 border-blue-200',
   'Identity Verification': 'bg-violet-50 border-violet-200',
-  'Underwriting': 'bg-indigo-50 border-indigo-200',
+  'Underwriting': 'bg-brand-50 border-brand-200',
   'Docs & E-Sign': 'bg-amber-50 border-amber-200',
   'Funded': 'bg-emerald-50 border-emerald-200',
 };
@@ -347,7 +347,7 @@ export function BackendOnboarding() {
         <select
           value={agentFilter}
           onChange={e => setAgentFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white"
+          className="px-3 py-2 text-sm border border-gray-200 rounded-[8px] bg-white"
         >
           <option value="All">All agents</option>
           {AGENTS.map(a => <option key={a} value={a}>{a}</option>)}
@@ -355,7 +355,7 @@ export function BackendOnboarding() {
         <select
           value={slaFilter}
           onChange={e => setSlaFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white"
+          className="px-3 py-2 text-sm border border-gray-200 rounded-[8px] bg-white"
         >
           <option value="All">All SLA statuses</option>
           <option value="On Track">On Track</option>
@@ -404,14 +404,14 @@ export function BackendOnboarding() {
                     </td>
                     <td className="px-4 py-3 text-gray-700">{app.agent}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${stepBadgeCls(app.currentStep)}`}>
+                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${stepBadgeCls(app.currentStep)}`}>
                         {STEP_SHORT[app.currentStep]}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right text-gray-700">{app.timeInStep}</td>
                     <td className="px-4 py-3 text-right text-gray-500">{app.slaTarget}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium border rounded-md ${slaBadgeCls(app.slaStatus)}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${slaBadgeCls(app.slaStatus)}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${slaDot(app.slaStatus)}`} />
                         {app.slaStatus}
                       </span>
@@ -421,14 +421,14 @@ export function BackendOnboarding() {
                       <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
                         <button
                           onClick={() => setSelectedAppId(app.id)}
-                          className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors"
                           title="View"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleNudge(app.id, app.merchantName)}
-                          className="p-1.5 hover:bg-amber-50 rounded-md text-gray-400 hover:text-amber-600 transition-colors relative"
+                          className="p-1.5 hover:bg-amber-50 rounded-[8px] text-gray-400 hover:text-amber-600 transition-colors relative"
                           title="Nudge merchant"
                         >
                           <Bell className="w-4 h-4" />
@@ -441,7 +441,7 @@ export function BackendOnboarding() {
                         {app.currentStep !== 'Funded' && (
                           <button
                             onClick={() => handleAdvance(app.id, app.merchantName)}
-                            className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-600 transition-colors"
+                            className="p-1.5 hover:bg-emerald-50 rounded-[8px] text-gray-400 hover:text-emerald-600 transition-colors"
                             title="Advance to next step"
                           >
                             <ArrowRight className="w-4 h-4" />
@@ -474,7 +474,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   variant: 'indigo' | 'emerald' | 'blue' | 'red';
 }) {
   const map = {
-    indigo: { bg: 'bg-indigo-50', icon: 'text-indigo-600' },
+    indigo: { bg: 'bg-brand-50', icon: 'text-brand' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600' },
     blue: { bg: 'bg-blue-50', icon: 'text-blue-600' },
     red: { bg: 'bg-red-50', icon: 'text-red-600' },
@@ -484,7 +484,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
-        <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
+        <div className={`w-9 h-9 ${v.bg} rounded-[8px] flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
@@ -536,7 +536,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
             <h2 className="text-lg font-semibold text-gray-900">{app.merchantName}</h2>
             <p className="text-xs text-gray-500 mt-0.5">{app.id} &middot; Agent: {app.agent}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -561,8 +561,8 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
                           <CheckCircle className="w-4 h-4 text-emerald-600" />
                         </div>
                       ) : isCurrent ? (
-                        <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                          <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+                        <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                          <Loader2 className="w-4 h-4 text-brand animate-spin" />
                         </div>
                       ) : (
                         <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
@@ -577,7 +577,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
 
                     {/* Content */}
                     <div className={`pb-5 ${i === app.steps.length - 1 ? 'pb-0' : ''}`}>
-                      <p className={`text-sm font-medium ${isFuture ? 'text-gray-400' : isCurrent ? 'text-indigo-700' : 'text-gray-900'}`}>
+                      <p className={`text-sm font-medium ${isFuture ? 'text-gray-400' : isCurrent ? 'text-brand-hover' : 'text-gray-900'}`}>
                         {step.step}
                       </p>
                       {isCompleted && (
@@ -585,7 +585,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
                       )}
                       {isCurrent && (
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-xs text-indigo-600 font-medium">In Progress</span>
+                          <span className="text-xs text-brand font-medium">In Progress</span>
                           <span className="text-xs text-gray-400">&middot;</span>
                           <span className="text-xs text-gray-500">{app.timeInStep} / {step.slaTarget} SLA</span>
                         </div>
@@ -621,7 +621,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
                     {app.blocker}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-md ${slaBadgeCls(app.slaStatus)}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${slaBadgeCls(app.slaStatus)}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${slaDot(app.slaStatus)}`} />
                       {app.slaStatus}
                     </span>
@@ -637,15 +637,15 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
             <h3 className="text-sm font-semibold text-gray-900 mb-3">Merchant-Facing View</h3>
             <div className="rounded-[8px] border border-gray-200 overflow-hidden">
               {/* Mock phone-like header */}
-              <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-5 py-4">
+              <div className="bg-gradient-to-r from-brand to-brand-hover px-5 py-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Smartphone className="w-4 h-4 text-indigo-200" />
-                  <span className="text-xs text-indigo-200 font-medium">What the applicant sees</span>
+                  <Smartphone className="w-4 h-4 text-brand-200" />
+                  <span className="text-xs text-brand-200 font-medium">What the applicant sees</span>
                 </div>
                 <p className="text-white text-sm font-semibold">
                   Step {applicantStepNum} of {STEPS.length}: {app.currentStep}
                 </p>
-                <p className="text-indigo-200 text-xs mt-1">
+                <p className="text-brand-200 text-xs mt-1">
                   Estimated {app.currentStepIndex < 3 ? '24hrs' : app.currentStepIndex < 5 ? '48hrs' : '24hrs'} remaining
                 </p>
               </div>
@@ -659,7 +659,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
                         i < app.currentStepIndex
                           ? 'bg-emerald-500'
                           : i === app.currentStepIndex
-                          ? 'bg-indigo-500'
+                          ? 'bg-brand-500'
                           : 'bg-gray-200'
                       }`} />
                     </div>
@@ -671,7 +671,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
                     <span>Complete</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                    <div className="w-2 h-2 rounded-full bg-brand-500" />
                     <span>Current</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -684,8 +684,8 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
               {/* Action prompt */}
               <div className="px-5 py-4 border-t border-gray-200">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center shrink-0">
-                    <User className="w-4 h-4 text-indigo-600" />
+                  <div className="w-8 h-8 bg-brand-50 rounded-[8px] flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4 text-brand" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Action needed from you</p>
@@ -712,32 +712,32 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
             <div className="flex items-center gap-2">
               <button
                 onClick={sendReminder}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-indigo-600 text-white rounded-[6px] hover:bg-indigo-700 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium bg-brand text-white rounded-[8px] hover:bg-brand-hover transition-colors"
               >
                 Send Reminder
               </button>
               <button
                 onClick={() => setReassignOpen(v => !v)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-[6px] hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-[8px] hover:bg-gray-50 transition-colors"
               >
                 Reassign Agent
               </button>
             </div>
             {reassignOpen && (
-              <div className="rounded-[6px] border border-gray-200 bg-white p-2 space-y-1">
+              <div className="rounded-[8px] border border-gray-200 bg-white p-2 space-y-1">
                 <p className="text-xs text-gray-500 px-2 py-1">Select a new agent</p>
                 {AGENTS.map(agent => (
                   <button
                     key={agent}
                     onClick={() => reassign(agent)}
-                    className={`w-full text-left px-3 py-2 text-sm rounded-[4px] transition-colors ${
+                    className={`w-full text-left px-3 py-2 text-sm rounded-[8px] transition-colors ${
                       agent === app.agent
-                        ? 'bg-indigo-50 text-indigo-700 font-medium'
+                        ? 'bg-brand-50 text-brand-hover font-medium'
                         : 'hover:bg-gray-50 text-gray-700'
                     }`}
                   >
                     {agent}
-                    {agent === app.agent && <span className="text-xs text-indigo-500 ml-2">(current)</span>}
+                    {agent === app.agent && <span className="text-xs text-brand-500 ml-2">(current)</span>}
                   </button>
                 ))}
               </div>
@@ -745,7 +745,7 @@ function SlideOutPanel({ app, onClose }: { app: OnboardingApp; onClose: () => vo
             {app.currentStep !== 'Funded' && (
               <button
                 onClick={advanceStep}
-                className="w-full px-4 py-2.5 text-sm font-medium border border-emerald-200 bg-emerald-50 text-emerald-700 rounded-[6px] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full px-4 py-2.5 text-sm font-medium border border-emerald-200 bg-emerald-50 text-emerald-700 rounded-[8px] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5"
               >
                 <ArrowRight className="w-4 h-4" />
                 Advance to Next Step

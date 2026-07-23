@@ -18,7 +18,7 @@ const STAGE_CONFIG: Record<UWStage, { color: string; bg: string; border: string;
   'Doc Collection': { color: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200', dot: 'bg-purple-500' },
   'Bank Review': { color: 'text-cyan-700', bg: 'bg-cyan-50', border: 'border-cyan-200', dot: 'bg-cyan-500' },
   'Credit Analysis': { color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', dot: 'bg-amber-500' },
-  'Committee': { color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200', dot: 'bg-indigo-500' },
+  'Committee': { color: 'text-brand-hover', bg: 'bg-brand-50', border: 'border-brand-200', dot: 'bg-brand-500' },
   'Approved': { color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', dot: 'bg-emerald-500' },
   'Declined': { color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', dot: 'bg-red-500' },
 };
@@ -128,7 +128,7 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
 
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-semibold text-gray-900">{fmt(app.requestedAmount)}</span>
-        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${app.productType === 'MCA' ? 'bg-indigo-50 text-indigo-600' : app.productType === 'Term Loan' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>{app.productType}</span>
+        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${app.productType === 'MCA' ? 'bg-brand-50 text-brand' : app.productType === 'Term Loan' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>{app.productType}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-1 mb-2">
@@ -146,7 +146,7 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
       )}
 
       {app.factorRate && (
-        <div className="bg-gray-50 rounded-[4px] px-2 py-1.5 mb-2">
+        <div className="bg-gray-50 rounded-[8px] px-2 py-1.5 mb-2">
           <div className="flex items-center justify-between text-[10px]">
             <span className="text-gray-400">Factor</span><span className="font-semibold text-gray-700">{app.factorRate}x</span>
           </div>
@@ -167,8 +167,8 @@ function KanbanCard({ app, onView }: { app: Application; onView: () => void }) {
 
       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
         <div className="flex items-center gap-1.5">
-          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
-            <span className="text-[8px] font-semibold text-indigo-700">{app.reviewerInitials}</span>
+          <div className="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center">
+            <span className="text-[8px] font-semibold text-brand-hover">{app.reviewerInitials}</span>
           </div>
           <span className="text-[10px] text-gray-400">{app.reviewer.split(' ')[0]}</span>
         </div>
@@ -249,17 +249,17 @@ export function BackendUnderwriting() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 rounded-[6px] p-0.5">
-            <button onClick={() => setViewMode('kanban')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
+          <div className="flex items-center bg-gray-100 rounded-[8px] p-0.5">
+            <button onClick={() => setViewMode('kanban')} className={`p-1.5 rounded-[8px] transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
               <LayoutGrid className="w-4 h-4" />
             </button>
-            <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-[4px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
+            <button onClick={() => setViewMode('table')} className={`p-1.5 rounded-[8px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
               <List className="w-4 h-4" />
             </button>
           </div>
           <button
             onClick={() => setNewAppOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover"
           >
             <Plus className="w-3.5 h-3.5" /> New Application
           </button>
@@ -294,7 +294,7 @@ export function BackendUnderwriting() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search applications..."
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
         </div>
         {viewMode === 'table' && (
           <div className="flex items-center gap-1 overflow-x-auto">
@@ -304,7 +304,7 @@ export function BackendUnderwriting() {
               const cfg = tab !== 'All' ? STAGE_CONFIG[tab] : null;
               return (
                 <button key={tab} onClick={() => setActiveTab(tab)}
-                  className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                     isActive ? (cfg ? `${cfg.bg} ${cfg.color} ${cfg.border}` : 'bg-brand/5 text-brand border-brand/20') : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{tab} <span className="ml-0.5 opacity-70">{count}</span></button>
               );
@@ -312,7 +312,7 @@ export function BackendUnderwriting() {
           </div>
         )}
         <select value={reviewerFilter} onChange={e => setReviewerFilter(e.target.value)}
-          className="px-3 py-1.5 bg-white border border-gray-200 rounded-[6px] text-[10px] font-semibold text-gray-500 focus:outline-none">
+          className="px-3 py-1.5 bg-white border border-gray-200 rounded-[8px] text-[10px] font-semibold text-gray-500 focus:outline-none">
           <option value="All">All Reviewers</option>
           <option>David Kim</option>
           <option>Sarah Mitchell</option>
@@ -411,7 +411,7 @@ export function BackendUnderwriting() {
                         <p className="text-[10px] text-gray-400">{app.industry} &middot; {app.state}</p>
                       </td>
                       <td className="px-3 py-3">
-                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${app.productType === 'MCA' ? 'bg-indigo-50 text-indigo-600' : app.productType === 'Term Loan' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>{app.productType}</span>
+                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${app.productType === 'MCA' ? 'bg-brand-50 text-brand' : app.productType === 'Term Loan' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>{app.productType}</span>
                       </td>
                       <td className="px-3 py-3 text-xs font-semibold text-gray-900">{fmt(app.requestedAmount)}</td>
                       <td className="px-3 py-3 text-[10px] text-gray-600">{fmt(app.monthlyRevenue)}</td>
@@ -443,8 +443,8 @@ export function BackendUnderwriting() {
                       <td className="px-3 py-3 text-[10px] font-mono text-gray-600">{app.factorRate ? `${app.factorRate}x` : '—'}</td>
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-[8px] font-semibold text-indigo-700">{app.reviewerInitials}</span>
+                          <div className="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center">
+                            <span className="text-[8px] font-semibold text-brand-hover">{app.reviewerInitials}</span>
                           </div>
                           <span className="text-[10px] text-gray-500">{app.reviewer.split(' ')[0]}</span>
                         </div>
@@ -454,7 +454,7 @@ export function BackendUnderwriting() {
                       </td>
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
-                          <button onClick={() => navigate(`/underwriting/${app.id}`)} title="Open" className="p-1 hover:bg-indigo-50 rounded text-gray-400 hover:text-brand">
+                          <button onClick={() => navigate(`/underwriting/${app.id}`)} title="Open" className="p-1 hover:bg-brand-50 rounded text-gray-400 hover:text-brand">
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           {!['Approved', 'Declined'].includes(app.stage) && (
@@ -545,7 +545,7 @@ function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <form onClick={e => e.stopPropagation()} onSubmit={submit} className="bg-white rounded-[10px] shadow-xl w-full max-w-xl overflow-hidden">
+      <form onClick={e => e.stopPropagation()} onSubmit={submit} className="bg-white rounded-[8px] shadow-xl w-full max-w-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-900">New Underwriting Application</h2>
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
@@ -553,19 +553,19 @@ function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCr
         <div className="px-5 py-4 grid grid-cols-2 gap-3">
           <div className="col-span-2">
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Business Name</label>
-            <input required value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Bakery LLC" className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand" />
+            <input required value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Bakery LLC" className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Industry</label>
-            <input value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">State</label>
-            <input value={state} onChange={e => setState(e.target.value)} maxLength={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] uppercase" />
+            <input value={state} onChange={e => setState(e.target.value)} maxLength={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px] uppercase" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Product Type</label>
-            <select value={productType} onChange={e => setProductType(e.target.value as ProductType)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px] bg-white">
+            <select value={productType} onChange={e => setProductType(e.target.value as ProductType)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px] bg-white">
               <option>MCA</option>
               <option>Term Loan</option>
               <option>Line of Credit</option>
@@ -574,28 +574,28 @@ function NewApplicationModal({ onClose, onCreated }: { onClose: () => void; onCr
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Source</label>
-            <input value={source} onChange={e => setSource(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input value={source} onChange={e => setSource(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Requested Amount ($)</label>
-            <input type="number" value={requestedAmount} onChange={e => setRequestedAmount(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input type="number" value={requestedAmount} onChange={e => setRequestedAmount(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Monthly Revenue ($)</label>
-            <input type="number" value={monthlyRevenue} onChange={e => setMonthlyRevenue(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input type="number" value={monthlyRevenue} onChange={e => setMonthlyRevenue(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Credit Score</label>
-            <input type="number" value={creditScore} onChange={e => setCreditScore(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input type="number" value={creditScore} onChange={e => setCreditScore(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-700 mb-1">Months in Business</label>
-            <input type="number" value={monthsInBusiness} onChange={e => setMonthsInBusiness(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[6px]" />
+            <input type="number" value={monthsInBusiness} onChange={e => setMonthsInBusiness(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-[8px]" />
           </div>
         </div>
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-[6px] hover:bg-white">Cancel</button>
-          <button type="submit" className="px-4 py-2 text-sm bg-brand text-white rounded-[6px] hover:bg-brand-hover">Create Application</button>
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-[8px] hover:bg-white">Cancel</button>
+          <button type="submit" className="px-4 py-2 text-sm bg-brand text-white rounded-[8px] hover:bg-brand-hover">Create Application</button>
         </div>
       </form>
     </div>

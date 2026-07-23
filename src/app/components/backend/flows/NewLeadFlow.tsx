@@ -92,7 +92,7 @@ function BusinessTypePicker({
           setOpen(o => !o);
           setTimeout(() => inputRef.current?.focus(), 0);
         }}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-left focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
       >
         <span className={selected ? 'text-gray-900 truncate' : 'text-gray-400'}>
           {selected ? mccLabel(selected) : 'Search business type (MCC)…'}
@@ -112,7 +112,7 @@ function BusinessTypePicker({
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Search 981 MCC codes…"
-                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
                 />
               </div>
             </div>
@@ -132,12 +132,12 @@ function BusinessTypePicker({
                         setQuery('');
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 ${
-                        isSel ? 'bg-indigo-50' : ''
+                        isSel ? 'bg-brand-50' : ''
                       }`}
                     >
                       <span className="font-mono text-xs text-gray-500 w-10 shrink-0">{m.code}</span>
                       <span className="text-gray-800 flex-1 truncate">{m.description}</span>
-                      {isSel && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
+                      {isSel && <Check className="w-4 h-4 text-brand shrink-0" />}
                     </button>
                   );
                 })
@@ -225,7 +225,7 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
   if (!open) return null;
 
   const inputCls =
-    'w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500';
+    'w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500';
   const labelCls = 'block text-xs font-medium text-gray-600 mb-1.5';
 
   return (
@@ -240,7 +240,7 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
               Add the basics now — enrich as it moves through the pipeline.
             </p>
           </div>
-          <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors">
+          <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
             <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
@@ -312,7 +312,7 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
                     onClick={() => toggleProduct(p)}
                     className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-[8px] border text-xs font-medium transition-colors ${
                       active
-                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        ? 'border-brand bg-brand-50 text-brand-hover'
                         : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -383,13 +383,13 @@ export function NewLeadFlow({ open, onClose, onCreated }: NewLeadFlowProps) {
         <div className="px-5 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+            className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" /> Create lead
           </button>

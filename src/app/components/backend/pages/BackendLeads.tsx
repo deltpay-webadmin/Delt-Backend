@@ -144,9 +144,9 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
       </div>
 
       {lead.referredBy && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50 rounded-[6px] border border-indigo-200 mb-3">
-          <UserPlus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-          <p className="text-xs text-indigo-700">
+        <div className="flex items-center gap-2 px-3 py-2 bg-brand-50 rounded-[8px] border border-brand-200 mb-3">
+          <UserPlus className="w-3.5 h-3.5 text-brand shrink-0" />
+          <p className="text-xs text-brand-hover">
             <span className="font-medium">Referred by:</span> {lead.referredBy}
           </p>
         </div>
@@ -156,7 +156,7 @@ function WelcomeBundleSection({ lead }: { lead: Lead }) {
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors"
           >
             <Gift className="w-3.5 h-3.5" />
             Assign Bundle
@@ -305,7 +305,7 @@ function StageProgress({ stage, stepDetails }: { stage: StageName; stepDetails?:
                     isComplete
                       ? 'bg-emerald-600 text-white'
                       : isCurrent
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-brand text-white'
                       : 'bg-gray-200 text-gray-500'
                   }`}
                 >
@@ -421,7 +421,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getPriorityColor(lead.priority)}`}>{lead.priority} Priority</span>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
@@ -473,8 +473,8 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                           </div>
                         ) : isCurrent ? (
-                          <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                            <Loader2 className="w-3.5 h-3.5 text-indigo-600 animate-spin" />
+                          <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                            <Loader2 className="w-3.5 h-3.5 text-brand animate-spin" />
                           </div>
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
@@ -486,9 +486,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                         )}
                       </div>
                       <div className="pb-3">
-                        <p className={`text-sm ${isFuture ? 'text-gray-400' : isCurrent ? 'text-indigo-700 font-medium' : 'text-gray-900 font-medium'}`}>{step.stage}</p>
+                        <p className={`text-sm ${isFuture ? 'text-gray-400' : isCurrent ? 'text-brand-hover font-medium' : 'text-gray-900 font-medium'}`}>{step.stage}</p>
                         {isCompleted && <p className="text-[11px] text-gray-500">{step.completedAt}</p>}
-                        {isCurrent && <p className="text-[11px] text-indigo-600">In progress</p>}
+                        {isCurrent && <p className="text-[11px] text-brand">In progress</p>}
                       </div>
                     </div>
                   );
@@ -510,9 +510,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
 
             {/* Merchant-facing preview line */}
             {onboardingStepNum !== null && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50 rounded-[6px] border border-indigo-200">
-                <Smartphone className="w-4 h-4 text-indigo-500 shrink-0" />
-                <p className="text-xs text-indigo-700">
+              <div className="flex items-center gap-2 px-3 py-2 bg-brand-50 rounded-[8px] border border-brand-200">
+                <Smartphone className="w-4 h-4 text-brand-500 shrink-0" />
+                <p className="text-xs text-brand-hover">
                   <span className="font-medium">Applicant sees:</span> Step {onboardingStepNum} of {ONBOARDING_STAGES.length}
                   {lead.stage !== 'Funded' && ` — ${lead.stage} — Estimated ${stageIndex(lead.stage) < 6 ? '24' : '48'}hrs`}
                 </p>
@@ -529,7 +529,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+                  activeTab === tab ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -549,8 +549,8 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
             <div className="space-y-4">
               {lead.timeline.map((item, index) => (
                 <div key={index} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                    {item.icon || <Clock className="w-4 h-4 text-indigo-600" />}
+                  <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    {item.icon || <Clock className="w-4 h-4 text-brand" />}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{item.title}</p>
@@ -568,7 +568,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
           {activeTab === 'notes' && (
             <div className="space-y-4">
               {lead.notes && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-[8px] p-4">
                   <div className="flex items-start gap-3">
                     <FileText className="w-5 h-5 text-amber-600 mt-0.5" />
                     <div className="flex-1">
@@ -579,9 +579,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 </div>
               )}
               {(lead.extraNotes || []).map(n => (
-                <div key={n.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={n.id} className="bg-white border border-gray-200 rounded-[8px] p-4">
                   <div className="flex items-start gap-3">
-                    <MessageSquare className="w-5 h-5 text-indigo-500 mt-0.5" />
+                    <MessageSquare className="w-5 h-5 text-brand-500 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900 whitespace-pre-wrap">{n.body}</p>
                       <p className="text-xs text-gray-500 mt-2">Added by {n.author} • {n.timestamp}</p>
@@ -593,12 +593,12 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 value={newNote}
                 onChange={e => setNewNote(e.target.value)}
                 placeholder="Add a new note..."
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                 rows={4}
               />
               <button
                 onClick={handleAddNote}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors"
+                className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors"
               >
                 Add Note
               </button>
@@ -607,12 +607,12 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
           {activeTab === 'tasks' && (
             <div className="space-y-3">
               {(lead.tasks || []).map(t => (
-                <div key={t.id} className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                <div key={t.id} className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-[8px]">
                   <input
                     type="checkbox"
                     checked={t.done}
                     onChange={() => leadActions.toggleTask(lead.id, t.id)}
-                    className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded cursor-pointer"
+                    className="mt-1 w-4 h-4 text-brand border-gray-300 rounded cursor-pointer"
                   />
                   <div className="flex-1">
                     <p className={`text-sm font-medium ${t.done ? 'text-gray-500 line-through' : 'text-gray-900'}`}>{t.title}</p>
@@ -629,11 +629,11 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                   onChange={e => setNewTask(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAddTask()}
                   placeholder="New task title..."
-                  className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
                 <button
                   onClick={handleAddTask}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap"
+                  className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors whitespace-nowrap"
                 >
                   Add Task
                 </button>
@@ -647,19 +647,19 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
           <div className="flex items-center gap-3">
             <button
               onClick={handleAdvanceStage}
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors"
+              className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors"
             >
               Next Stage
             </button>
             <button
               onClick={handleSubmitApp}
-              className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[6px] hover:bg-emerald-700 transition-colors"
+              className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[8px] hover:bg-emerald-700 transition-colors"
             >
               Submit Application
             </button>
             <button
               onClick={handleMarkLost}
-              className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors"
+              className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors"
             >
               Mark Lost
             </button>
@@ -739,21 +739,21 @@ function ReferralsTab() {
   return (
     <div className="space-y-6">
       {/* Referral Offer Card */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-[8px] p-6 text-white">
+      <div className="bg-gradient-to-r from-brand to-brand-hover rounded-[8px] p-6 text-white">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 bg-white/20 rounded-[12px] flex items-center justify-center shrink-0">
             <Gift className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-semibold">Refer a Business</h3>
-            <p className="text-indigo-200 text-sm mt-1">For every successful referral that gets funded, both parties receive:</p>
+            <p className="text-brand-200 text-sm mt-1">For every successful referral that gets funded, both parties receive:</p>
             <div className="flex flex-wrap items-center gap-3 mt-3">
-              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">${program.rewardAmount} Account Credit</span>
-              <span className="text-indigo-300">+</span>
-              <span className="px-3 py-1.5 bg-white/20 rounded-[6px] text-sm font-medium">{program.freeMonths} Month{program.freeMonths > 1 ? 's' : ''} Free {program.planTier}</span>
+              <span className="px-3 py-1.5 bg-white/20 rounded-[8px] text-sm font-medium">${program.rewardAmount} Account Credit</span>
+              <span className="text-brand-300">+</span>
+              <span className="px-3 py-1.5 bg-white/20 rounded-[8px] text-sm font-medium">{program.freeMonths} Month{program.freeMonths > 1 ? 's' : ''} Free {program.planTier}</span>
             </div>
           </div>
-          <button onClick={() => setEditModalOpen(true)} className="px-4 py-2 bg-white text-indigo-700 text-sm font-semibold rounded-[6px] hover:bg-indigo-50 transition-colors shrink-0 flex items-center gap-1.5">
+          <button onClick={() => setEditModalOpen(true)} className="px-4 py-2 bg-white text-brand-hover text-sm font-semibold rounded-[8px] hover:bg-brand-50 transition-colors shrink-0 flex items-center gap-1.5">
             <Edit className="w-3.5 h-3.5" /> Edit Offer
           </button>
         </div>
@@ -787,26 +787,26 @@ function ReferralsTab() {
                   <td className="px-5 py-3"><code className="text-xs bg-gray-100 px-2 py-0.5 rounded">{r.referralCode}</code></td>
                   <td className="px-5 py-3 text-gray-500 text-xs">{r.date}</td>
                   <td className="px-5 py-3 text-center">
-                    <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${refStatusCls(r.status)}`}>{r.status}</span>
+                    <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${refStatusCls(r.status)}`}>{r.status}</span>
                   </td>
                   <td className="px-5 py-3 text-center">
-                    <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${rewardCls(r.rewardStatus)}`}>{r.rewardStatus}</span>
+                    <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${rewardCls(r.rewardStatus)}`}>{r.rewardStatus}</span>
                   </td>
                   <td className="px-5 py-3 text-right font-medium text-gray-900">{r.rewardAmount}</td>
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-center gap-1">
                       {r.status === 'Pending' && (
-                        <button onClick={() => contactReferral(r)} title="Mark as contacted" className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600">
+                        <button onClick={() => contactReferral(r)} title="Mark as contacted" className="p-1.5 hover:bg-blue-50 rounded-[8px] text-gray-400 hover:text-blue-600">
                           <Phone className="w-3.5 h-3.5" />
                         </button>
                       )}
                       {(r.status === 'Pending' || r.status === 'Contacted') && (
-                        <button onClick={() => convertReferral(r)} title="Mark as converted" className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-600">
+                        <button onClick={() => convertReferral(r)} title="Mark as converted" className="p-1.5 hover:bg-emerald-50 rounded-[8px] text-gray-400 hover:text-emerald-600">
                           <CheckCircle className="w-3.5 h-3.5" />
                         </button>
                       )}
                       {r.status === 'Converted' && r.rewardStatus === 'Pending' && (
-                        <button onClick={() => payReward(r)} title="Pay reward" className="p-1.5 hover:bg-emerald-50 rounded-md text-gray-400 hover:text-emerald-700">
+                        <button onClick={() => payReward(r)} title="Pay reward" className="p-1.5 hover:bg-emerald-50 rounded-[8px] text-gray-400 hover:text-emerald-700">
                           <DollarSign className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -829,30 +829,30 @@ function ReferralsTab() {
           <div className="relative bg-white rounded-[8px] shadow-2xl border border-gray-200 p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-gray-900">Edit Referral Offer</h3>
-              <button onClick={() => setEditModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-[6px]"><X className="w-4 h-4 text-gray-500" /></button>
+              <button onClick={() => setEditModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-[8px]"><X className="w-4 h-4 text-gray-500" /></button>
             </div>
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-gray-700 block mb-1.5">Reward Amount ($)</label>
-                <input type="number" value={rewardAmount} onChange={e => setRewardAmount(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                <input type="number" value={rewardAmount} onChange={e => setRewardAmount(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 block mb-1.5">Free Months</label>
-                <input type="number" value={freeMonths} onChange={e => setFreeMonths(e.target.value)} min="1" max="12" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+                <input type="number" value={freeMonths} onChange={e => setFreeMonths(e.target.value)} min="1" max="12" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 block mb-1.5">Plan Tier</label>
-                <select value={planTier} onChange={e => setPlanTier(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                <select value={planTier} onChange={e => setPlanTier(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
                   <option>Starter</option><option>Growth</option><option>Pro</option><option>Enterprise</option>
                 </select>
               </div>
-              <div className="bg-indigo-50 rounded-[6px] p-3">
-                <p className="text-xs text-indigo-700"><span className="font-medium">Preview:</span> Refer a business &rarr; ${rewardAmount} credit + {freeMonths} month{Number(freeMonths) > 1 ? 's' : ''} free {planTier}</p>
+              <div className="bg-brand-50 rounded-[8px] p-3">
+                <p className="text-xs text-brand-hover"><span className="font-medium">Preview:</span> Refer a business &rarr; ${rewardAmount} credit + {freeMonths} month{Number(freeMonths) > 1 ? 's' : ''} free {planTier}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 mt-5">
-              <button onClick={saveProgram} className="flex-1 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
-              <button onClick={() => setEditModalOpen(false)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Cancel</button>
+              <button onClick={saveProgram} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
+              <button onClick={() => setEditModalOpen(false)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Cancel</button>
             </div>
           </div>
         </div>
@@ -881,13 +881,13 @@ export function BackendLeads() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'Payments': return 'bg-indigo-50 text-indigo-700';
+      case 'Payments': return 'bg-brand-50 text-brand-hover';
       case 'Capital': return 'bg-amber-50 text-amber-700';
       case 'Website': return 'bg-sky-50 text-sky-700';
       case 'Ai': return 'bg-violet-50 text-violet-700';
       case 'Leasing': return 'bg-emerald-50 text-emerald-700';
       // legacy
-      case 'MCA': return 'bg-indigo-50 text-indigo-700';
+      case 'MCA': return 'bg-brand-50 text-brand-hover';
       case 'Residual': return 'bg-purple-50 text-purple-700';
       default: return 'bg-gray-100 text-gray-700';
     }
@@ -952,7 +952,7 @@ export function BackendLeads() {
         case 'Application Submitted': return 'bg-gray-100 text-gray-700 border-gray-200';
         case 'Bank Verification': return 'bg-blue-50 text-blue-700 border-blue-200';
         case 'Identity Verification': return 'bg-violet-50 text-violet-700 border-violet-200';
-        case 'Underwriting': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        case 'Underwriting': return 'bg-brand-50 text-brand-hover border-brand-200';
         case 'Docs & E-Sign': return 'bg-amber-50 text-amber-700 border-amber-200';
         case 'Funded': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       }
@@ -971,7 +971,7 @@ export function BackendLeads() {
           </div>
           <button
             onClick={() => setNewLeadOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             New Lead
@@ -995,7 +995,7 @@ export function BackendLeads() {
           <button
             onClick={() => setMainTab('leads')}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'leads' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+              mainTab === 'leads' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             Leads Pipeline
@@ -1003,7 +1003,7 @@ export function BackendLeads() {
           <button
             onClick={() => setMainTab('referrals')}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              mainTab === 'referrals' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+              mainTab === 'referrals' ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             Referrals
@@ -1027,13 +1027,13 @@ export function BackendLeads() {
                   placeholder="Search by business name, contact, or industry..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               >
                 <option value="All">All Status</option>
                 <option value="New">New</option>
@@ -1044,7 +1044,7 @@ export function BackendLeads() {
               <select
                 value={typeFilter}
                 onChange={e => setTypeFilter(e.target.value)}
-                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               >
                 <option value="All">All Products</option>
                 <option value="Payments">Payments</option>
@@ -1056,7 +1056,7 @@ export function BackendLeads() {
               <select
                 value={stageFilter}
                 onChange={e => setStageFilter(e.target.value)}
-                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               >
                 <option value="All">All Stages</option>
                 {ALL_STAGES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -1064,7 +1064,7 @@ export function BackendLeads() {
               <select
                 value={agentFilter}
                 onChange={e => setAgentFilter(e.target.value)}
-                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               >
                 <option value="All">All Agents</option>
                 {[...new Set(leads.map(l => l.assignedAgent))].map(a => (
@@ -1072,9 +1072,9 @@ export function BackendLeads() {
                 ))}
               </select>
               {/* View Mode Toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-0.5 shrink-0">
-                <button onClick={() => setViewMode('table')} className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`} title="Table view"><List className="w-4 h-4" /></button>
-                <button onClick={() => setViewMode('kanban')} className={`p-2 rounded-md transition-colors ${viewMode === 'kanban' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`} title="Kanban view"><LayoutGrid className="w-4 h-4" /></button>
+              <div className="flex items-center bg-gray-100 rounded-[8px] p-0.5 shrink-0">
+                <button onClick={() => setViewMode('table')} className={`p-2 rounded-[8px] transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-brand' : 'text-gray-500 hover:text-gray-700'}`} title="Table view"><List className="w-4 h-4" /></button>
+                <button onClick={() => setViewMode('kanban')} className={`p-2 rounded-[8px] transition-colors ${viewMode === 'kanban' ? 'bg-white shadow-sm text-brand' : 'text-gray-500 hover:text-gray-700'}`} title="Kanban view"><LayoutGrid className="w-4 h-4" /></button>
               </div>
             </div>
           </div>
@@ -1158,8 +1158,8 @@ export function BackendLeads() {
                       >
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                              <Building2 className="w-5 h-5 text-indigo-600" />
+                            <div className="w-10 h-10 rounded-[8px] bg-brand-50 flex items-center justify-center flex-shrink-0">
+                              <Building2 className="w-5 h-5 text-brand" />
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-gray-900">{lead.businessName}</p>
@@ -1179,12 +1179,12 @@ export function BackendLeads() {
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${stageBadgeCls(lead.stage)}`}>
+                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${stageBadgeCls(lead.stage)}`}>
                             {lead.stage}
                           </span>
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`inline-block px-2.5 py-1 rounded-md text-sm font-bold ${getScoreColor(lead.score)}`}>{lead.score}</span>
+                          <span className={`inline-block px-2.5 py-1 rounded-[8px] text-sm font-bold ${getScoreColor(lead.score)}`}>{lead.score}</span>
                         </td>
                         <td className="px-5 py-4">
                           <select
@@ -1194,7 +1194,7 @@ export function BackendLeads() {
                               leadActions.setStatus(lead.id, e.target.value as any);
                               toast.success(`${lead.businessName} set to ${e.target.value}`);
                             }}
-                            className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 ${selectClass(lead.status)}`}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-brand-500 ${selectClass(lead.status)}`}
                             onClick={e => e.stopPropagation()}
                           >
                             <option value="New">New</option>
@@ -1210,7 +1210,7 @@ export function BackendLeads() {
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <button onClick={() => setSelectedLead(lead)} className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                          <button onClick={() => setSelectedLead(lead)} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
                             <ChevronRight className="w-5 h-5 text-gray-400" />
                           </button>
                         </td>

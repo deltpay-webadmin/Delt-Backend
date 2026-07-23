@@ -80,7 +80,7 @@ export function BackendBundles() {
           </div>
           <button
             onClick={handleSaveAll}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
             {saved ? 'Saved!' : 'Save Changes'}
@@ -112,7 +112,7 @@ export function BackendBundles() {
                   const draft = isEditing ? editDraft! : bundle;
 
                   return (
-                    <tr key={bundle.id} className={`${isEditing ? 'bg-indigo-50/30' : 'hover:bg-gray-50'} transition-colors`}>
+                    <tr key={bundle.id} className={`${isEditing ? 'bg-brand-50/30' : 'hover:bg-gray-50'} transition-colors`}>
                       <td className="px-5 py-3.5">
                         <span className="font-medium text-gray-900">{bundle.name}</span>
                       </td>
@@ -125,7 +125,7 @@ export function BackendBundles() {
                               type="number"
                               value={draft.amount}
                               onChange={(e) => setEditDraft({ ...draft, amount: Number(e.target.value) })}
-                              className="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                              className="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                             />
                           </div>
                         ) : (
@@ -139,7 +139,7 @@ export function BackendBundles() {
                               type="number"
                               value={draft.expiration}
                               onChange={(e) => setEditDraft({ ...draft, expiration: Number(e.target.value) })}
-                              className="w-full pl-2.5 pr-8 py-1.5 border border-gray-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                              className="w-full pl-2.5 pr-8 py-1.5 border border-gray-300 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                             />
                             <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">days</span>
                           </div>
@@ -152,7 +152,7 @@ export function BackendBundles() {
                           <div className="relative">
                             <button
                               onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 hover:bg-gray-50 min-w-[140px]"
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 border border-gray-300 rounded-[8px] text-sm text-gray-700 hover:bg-gray-50 min-w-[140px]"
                             >
                               <span className="truncate">
                                 {draft.categories.length === 0 ? 'All categories' : `${draft.categories.length} selected`}
@@ -202,13 +202,13 @@ export function BackendBundles() {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={cancelEdit}
-                              className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-[6px] hover:bg-gray-50"
+                              className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-[8px] hover:bg-gray-50"
                             >
                               Cancel
                             </button>
                             <button
                               onClick={saveEdit}
-                              className="px-3 py-1.5 text-xs font-medium text-white bg-brand rounded-[6px] hover:bg-brand-hover"
+                              className="px-3 py-1.5 text-xs font-medium text-white bg-brand rounded-[8px] hover:bg-brand-hover"
                             >
                               Apply
                             </button>
@@ -216,7 +216,7 @@ export function BackendBundles() {
                         ) : (
                           <button
                             onClick={() => startEdit(bundle)}
-                            className="px-3 py-1.5 text-xs font-medium text-brand hover:bg-indigo-50 rounded-[6px] transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand-50 rounded-[8px] transition-colors"
                           >
                             Edit
                           </button>
@@ -248,7 +248,7 @@ export function BackendBundles() {
                   type="number"
                   value={defaultExpiration}
                   onChange={(e) => setDefaultExpiration(Number(e.target.value))}
-                  className="w-20 px-2.5 py-1.5 border border-gray-300 rounded-[6px] text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                  className="w-20 px-2.5 py-1.5 border border-gray-300 rounded-[8px] text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                 />
                 <span className="text-sm text-gray-500">days</span>
               </div>

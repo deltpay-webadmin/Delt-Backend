@@ -51,7 +51,7 @@ const PAYMENT_CATEGORIES: { key: LoanPaymentCategory; label: string }[] = [
   { key: 'adjustment', label: 'Adjustment' },
 ];
 const categoryBadge: Record<LoanPaymentCategory, string> = {
-  debit: 'bg-indigo-50 text-indigo-600',
+  debit: 'bg-brand-50 text-brand',
   lump: 'bg-emerald-50 text-emerald-600',
   personal_zelle: 'bg-blue-50 text-blue-600',
   reversal: 'bg-red-50 text-red-600',
@@ -203,7 +203,7 @@ export function BackendCapital() {
   ];
 
   const statusTabColors: Record<string, { active: string; badge: string }> = {
-    all: { active: 'bg-indigo-50 text-indigo-700', badge: 'bg-indigo-100 text-indigo-700' },
+    all: { active: 'bg-brand-50 text-brand-hover', badge: 'bg-brand-100 text-brand-hover' },
     active: { active: 'bg-emerald-50 text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' },
     slow: { active: 'bg-amber-50 text-amber-700', badge: 'bg-amber-100 text-amber-700' },
     default: { active: 'bg-red-50 text-red-700', badge: 'bg-red-100 text-red-700' },
@@ -228,7 +228,7 @@ export function BackendCapital() {
             <ModeIndicator isLoading={isLoading} isOnline={isOnline} lastError={lastError} dealCount={DEALS.length} />
             <button
               onClick={() => setNewDealOpen(true)}
-              className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" /> New Deal
             </button>
@@ -274,7 +274,7 @@ export function BackendCapital() {
                   <div className="lg:col-span-2 bg-white rounded-[8px] border border-gray-200 p-5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand to-brand-light" />
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-indigo-50 text-indigo-600">Self-Funded</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-brand-50 text-brand">Self-Funded</span>
                       <span className="text-xs text-gray-400">{M.selfCount} deals · Family office capital @ 2%/mo</span>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -335,13 +335,13 @@ export function BackendCapital() {
                         <button
                           key={t.key}
                           onClick={() => setChannelFilter(t.key)}
-                          className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                          className={`px-3 py-1.5 rounded-[8px] text-xs font-medium transition-colors flex items-center gap-1.5 ${
                             channelFilter === t.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                           }`}
                         >
                           {t.label}
                           <span className={`text-[10px] tabular-nums px-1.5 py-px rounded-full ${
-                            channelFilter === t.key ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-200 text-gray-500'
+                            channelFilter === t.key ? 'bg-brand-50 text-brand' : 'bg-gray-200 text-gray-500'
                           }`}>{t.count}</span>
                         </button>
                       ))}
@@ -354,7 +354,7 @@ export function BackendCapital() {
                           <button
                             key={t.key}
                             onClick={() => setFilter(t.key)}
-                            className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                            className={`px-3 py-1.5 rounded-[8px] text-xs font-medium transition-colors flex items-center gap-1.5 ${
                               isActive ? colors.active : 'text-gray-500 hover:bg-gray-50'
                             }`}
                           >
@@ -373,7 +373,7 @@ export function BackendCapital() {
                       value={search}
                       onChange={e => setSearch(e.target.value)}
                       placeholder="Search merchant or ID..."
-                      className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                      className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                     />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export function BackendCapital() {
                           <React.Fragment key={m.id}>
                             <tr
                               onClick={() => setExpandedRow(isExp ? null : m.id)}
-                              className={`border-b border-gray-100 cursor-pointer transition-colors ${isExp ? 'bg-indigo-50/30' : 'hover:bg-gray-50/80'}`}
+                              className={`border-b border-gray-100 cursor-pointer transition-colors ${isExp ? 'bg-brand-50/30' : 'hover:bg-gray-50/80'}`}
                             >
                               <td className="pl-5 py-3">
                                 <div className="flex items-center gap-2 flex-wrap">
@@ -525,13 +525,13 @@ export function BackendCapital() {
                                   <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
                                     <button
                                       onClick={(e) => { e.stopPropagation(); setAddPaymentFor(m); }}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-brand text-white hover:bg-brand-hover rounded-[6px] transition-colors"
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-brand text-white hover:bg-brand-hover rounded-[8px] transition-colors"
                                     >
                                       <Plus className="w-3.5 h-3.5" /> Add Payment
                                     </button>
                                     <button
                                       onClick={(e) => { e.stopPropagation(); navigate(`/deals/${m.id}`); }}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/5 rounded-[6px] transition-colors"
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/5 rounded-[8px] transition-colors"
                                     >
                                       Open Full Detail <ChevronRight className="w-3.5 h-3.5" />
                                     </button>
@@ -642,7 +642,7 @@ function PaymentLedger({ m }: { m: CapitalDeal }) {
       {payments.length === 0 ? (
         <p className="text-xs text-gray-400 py-3">No payments recorded yet for this deal.</p>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-[6px] overflow-hidden max-h-72 overflow-y-auto">
+        <div className="bg-white border border-gray-200 rounded-[8px] overflow-hidden max-h-72 overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="sticky top-0">
               <tr className="bg-gray-50 border-b border-gray-200 text-left text-[10px] uppercase tracking-wide text-gray-400">
@@ -711,7 +711,7 @@ function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="bg-white rounded-[10px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-[8px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
         <div className="px-5 py-4 border-b border-gray-200">
           <h3 className="text-base font-semibold text-gray-900">Add Payment</h3>
           <p className="text-xs text-gray-500 mt-0.5">{deal.merchant} · {deal.id}</p>
@@ -720,39 +720,39 @@ function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => 
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Payment Date</label>
             <input type="date" value={date} onChange={e => setDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Amount</label>
             <div className="flex items-center gap-2">
-              <div className="flex rounded-[6px] border border-gray-200 overflow-hidden">
+              <div className="flex rounded-[8px] border border-gray-200 overflow-hidden">
                 <button type="button" onClick={() => setSign('+')}
                   className={`px-3 py-2 text-sm font-bold ${sign === '+' ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500'}`}>+</button>
                 <button type="button" onClick={() => setSign('-')}
                   className={`px-3 py-2 text-sm font-bold ${sign === '-' ? 'bg-red-500 text-white' : 'bg-white text-gray-500'}`}>−</button>
               </div>
               <input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-[6px] text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-[8px] text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <p className="text-[11px] text-gray-400 mt-1">Use − for reversals / bounces.</p>
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
             <select value={category} onChange={e => setCategory(e.target.value as LoanPaymentCategory)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
+              className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand">
               {PAYMENT_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Optional"
-              className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
           </div>
         </div>
         <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[6px]">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[8px]">Cancel</button>
           <button onClick={submit} disabled={!valid || saving}
-            className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-[6px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
+            className="px-4 py-2 text-sm font-medium bg-brand text-white rounded-[8px] hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed">
             {saving ? 'Saving…' : 'Record Payment'}
           </button>
         </div>
@@ -776,7 +776,7 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       </p>
       <button
         onClick={onAdd}
-        className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2"
+        className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2"
       >
         <Plus className="w-4 h-4" /> Add your first deal
       </button>
@@ -1116,7 +1116,7 @@ function RiskTab({ DEALS }: { DEALS: CapitalDeal[] }) {
           {fraudRules.map((flag, i) => {
             const sevColors = { critical: 'bg-red-100 text-red-800 border-red-200', high: 'bg-red-50 text-red-700 border-red-100', medium: 'bg-amber-50 text-amber-700 border-amber-100' };
             return (
-              <div key={i} className={`rounded-[6px] border p-3 ${flag.flagged.length > 0 ? sevColors[flag.severity] : 'bg-gray-50 border-gray-200'}`}>
+              <div key={i} className={`rounded-[8px] border p-3 ${flag.flagged.length > 0 ? sevColors[flag.severity] : 'bg-gray-50 border-gray-200'}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -1241,7 +1241,7 @@ function CollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalat
                     </div>
                   ))}</div>
                 </td>
-                <td className="py-3"><button onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button></td>
+                <td className="py-3"><button onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[8px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button></td>
               </tr>);
             })}{DEALS.filter(m => m.status === 'slow' || m.status === 'default').length === 0 && (
               <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">No delinquent accounts — all collections current</td></tr>
@@ -1303,7 +1303,7 @@ function RenewalsTab({ DEALS }: { DEALS: CapitalDeal[] }) {
                 <td className="py-3 text-sm tabular-nums text-gray-600">{daysSF}d</td>
                 <td className="py-3"><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold tabular-nums ${sColor}`}>{score}/100</span></td>
                 <td className="py-3">{m.renewalEligible ? <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 text-violet-600"><RefreshCw className="w-2.5 h-2.5" /> Yes</span> : <span className="text-xs text-gray-400">Not yet</span>}</td>
-                <td className="pr-5 py-3"><div className="bg-gray-50 rounded-[6px] px-2.5 py-1.5 inline-block"><p className="text-xs font-semibold text-gray-900">{fmtK(sugAmt)} @ {sugFactor.toFixed(2)}x</p><p className="text-[10px] text-gray-400">{score >= 75 ? '25% increase, reduced rate' : 'Same terms renewal'}</p></div></td>
+                <td className="pr-5 py-3"><div className="bg-gray-50 rounded-[8px] px-2.5 py-1.5 inline-block"><p className="text-xs font-semibold text-gray-900">{fmtK(sugAmt)} @ {sugFactor.toFixed(2)}x</p><p className="text-[10px] text-gray-400">{score >= 75 ? '25% increase, reduced rate' : 'Same terms renewal'}</p></div></td>
               </tr>);
             })}{DEALS.filter(m => m.status !== 'paid').length === 0 && (
               <tr><td colSpan={8} className="py-8 text-center text-sm text-gray-400">No active deals</td></tr>
@@ -1328,7 +1328,7 @@ function ConcentrationTab({ M }: { M: any }) {
           total={M.totalVolume}
           colors={['#4318FF', '#F97316']}
           footer={
-            <div className="mt-3 p-3 bg-gray-50 rounded-[6px]">
+            <div className="mt-3 p-3 bg-gray-50 rounded-[8px]">
               <p className="text-[11px] text-gray-500 font-medium mb-1">Capital at Risk</p>
               <p className="text-[11px] text-gray-600 leading-relaxed">
                 Self-funded: {fmt(M.selfDeployed)} deployed (your capital)<br />
@@ -1425,7 +1425,7 @@ function CollectionModal({ dealId, DEALS, onClose }: { dealId: string; DEALS: Ca
       <div className="relative bg-white rounded-[8px] shadow-2xl border border-gray-200 w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
           <div><h2 className="text-lg font-bold text-gray-900">Collection Workflow</h2><p className="text-xs text-gray-500">{deal.merchant} — {deal.id}</p></div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[6px] text-gray-500 text-lg">&times;</button>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[8px] text-gray-500 text-lg">&times;</button>
         </div>
         <div className="px-6 py-5 space-y-1">
           {stages.map((s, i) => (
@@ -1443,8 +1443,8 @@ function CollectionModal({ dealId, DEALS, onClose }: { dealId: string; DEALS: Ca
           ))}
         </div>
         <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
-          <button onClick={onClose} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
+          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Advance to Next Stage</button>
+          <button onClick={onClose} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Close</button>
         </div>
       </div>
     </div>
@@ -1480,7 +1480,7 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string; 
 function MiniKpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   const colorMap: Record<string, string> = { emerald: 'text-emerald-600', red: 'text-red-600', amber: 'text-amber-600' };
   return (
-    <div className="bg-gray-50 rounded-[6px] p-3">
+    <div className="bg-gray-50 rounded-[8px] p-3">
       <p className="text-[10px] text-gray-500 uppercase tracking-wide font-medium mb-1">{label}</p>
       <p className={`text-base font-bold leading-none ${accent ? colorMap[accent] || 'text-gray-900' : 'text-gray-900'}`}>{value}</p>
       {sub && <p className="text-[11px] text-gray-400 mt-1">{sub}</p>}
@@ -1501,7 +1501,7 @@ function ExpandedKpi({ label, value, sub, accent }: { label: string; value: Reac
 
 function ChannelBadge({ channel }: { channel: CapitalChannel }) {
   return channel === 'self' ? (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-indigo-50 text-indigo-600">Self</span>
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-brand-50 text-brand">Self</span>
   ) : (
     <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-orange-50 text-orange-600">FDM</span>
   );

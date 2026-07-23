@@ -20,7 +20,7 @@ export function SyncIndicator() {
   if (isLoading) {
     return (
       <span
-        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[6px] bg-gray-50 text-gray-500 border border-gray-200"
+        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[8px] bg-gray-50 text-gray-500 border border-gray-200"
         title="Loading CRM data from Supabase"
       >
         <Loader2 className="w-3 h-3 animate-spin" />
@@ -32,7 +32,7 @@ export function SyncIndicator() {
   if (lastError) {
     return (
       <span
-        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[6px] bg-red-50 text-red-600 border border-red-200"
+        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[8px] bg-red-50 text-red-600 border border-red-200"
         title={lastError}
       >
         <AlertTriangle className="w-3 h-3" />
@@ -44,7 +44,7 @@ export function SyncIndicator() {
   if (!isOnline) {
     return (
       <span
-        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[6px] bg-amber-50 text-amber-700 border border-amber-200"
+        className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[8px] bg-amber-50 text-amber-700 border border-amber-200"
         title="Running in local-only mode. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable persistence."
       >
         <WifiOff className="w-3 h-3" />
@@ -55,7 +55,7 @@ export function SyncIndicator() {
 
   return (
     <span
-      className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200"
+      className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-[8px] bg-emerald-50 text-emerald-700 border border-emerald-200"
       title="Connected to Supabase — changes sync live"
     >
       <Wifi className="w-3 h-3" />

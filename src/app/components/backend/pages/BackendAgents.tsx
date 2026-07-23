@@ -183,14 +183,14 @@ function pipelineStatusConfig(s: PipelineStatus) {
     case 'New': return { color: 'bg-blue-50 text-blue-700 border-blue-200', icon: Clock };
     case 'In Review': return { color: 'bg-amber-50 text-amber-700 border-amber-200', icon: Clock };
     case 'Approved': return { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: CheckCircle };
-    case 'Funded': return { color: 'bg-indigo-50 text-indigo-700 border-indigo-200', icon: CheckCircle };
+    case 'Funded': return { color: 'bg-brand-50 text-brand-hover border-brand-200', icon: CheckCircle };
     case 'Declined': return { color: 'bg-red-50 text-red-700 border-red-200', icon: XCircle };
   }
 }
 
 function typeBadge(t: string) {
   switch (t) {
-    case 'MCA': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'MCA': return 'bg-brand-50 text-brand-hover border-brand-200';
     case 'Lease': return 'bg-sky-50 text-sky-700 border-sky-200';
     case 'Residual': return 'bg-teal-50 text-teal-700 border-teal-200';
     default: return 'bg-gray-100 text-gray-500 border-gray-200';
@@ -238,7 +238,7 @@ export function BackendAgents() {
           <h1 className="text-2xl font-bold text-gray-900">Agents</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your sales team, Sub-ISOs, and agent performance.</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors shadow-sm">
+        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors shadow-sm">
           <Plus className="w-4 h-4" />
           Onboard Agent
         </button>
@@ -262,7 +262,7 @@ export function BackendAgents() {
               placeholder="Search agents..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -270,9 +270,9 @@ export function BackendAgents() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-[6px] border transition-colors ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-[8px] border transition-colors ${
                   statusFilter === s
-                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                    ? 'bg-brand-50 text-brand-hover border-brand-200'
                     : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -303,7 +303,7 @@ export function BackendAgents() {
                 <tr key={agent.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-semibold text-indigo-700 flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-xs font-semibold text-brand-hover flex-shrink-0">
                         {agent.initials}
                       </div>
                       <div>
@@ -313,7 +313,7 @@ export function BackendAgents() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium border rounded-md ${statusBadge(agent.status)}`}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium border rounded-[8px] ${statusBadge(agent.status)}`}>
                       {agent.status}
                     </span>
                   </td>
@@ -331,19 +331,19 @@ export function BackendAgents() {
                     <div className="flex items-center justify-center gap-1 relative">
                       <button
                         onClick={() => setSelectedAgent(agent)}
-                        className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors"
+                        className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors"
                         title="View"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
+                        className="p-1.5 hover:bg-gray-100 rounded-[8px] text-gray-400 hover:text-gray-600 transition-colors"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors"
+                        className="p-1.5 hover:bg-red-50 rounded-[8px] text-gray-400 hover:text-red-600 transition-colors"
                         title="Deactivate"
                       >
                         <UserX className="w-4 h-4" />
@@ -372,7 +372,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   variant: 'indigo' | 'emerald' | 'purple' | 'blue';
 }) {
   const variantMap = {
-    indigo: { bg: 'bg-indigo-50', icon: 'text-indigo-600' },
+    indigo: { bg: 'bg-brand-50', icon: 'text-brand' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600' },
     purple: { bg: 'bg-purple-50', icon: 'text-purple-600' },
     blue: { bg: 'bg-blue-50', icon: 'text-blue-600' },
@@ -382,7 +382,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
-        <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
+        <div className={`w-9 h-9 ${v.bg} rounded-[8px] flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
@@ -516,16 +516,16 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
           <div className="px-6 py-5 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
             {/* Agent Info */}
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-lg font-bold text-indigo-700 flex-shrink-0">
+              <div className="w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center text-lg font-bold text-brand-hover flex-shrink-0">
                 {agent.initials}
               </div>
               <div>
                 <div className="flex items-center gap-2.5 mb-1">
                   <h1 className="text-xl font-bold text-gray-900">{agent.name}</h1>
-                  <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-md ${statusBadge(agent.status)}`}>
+                  <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-[8px] ${statusBadge(agent.status)}`}>
                     {agent.status}
                   </span>
-                  <span className="inline-flex px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 rounded-md">
+                  <span className="inline-flex px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 rounded-[8px]">
                     {agent.type}
                   </span>
                 </div>
@@ -540,11 +540,11 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                   <div className="relative" ref={tierRef}>
                     <button
                       onClick={() => setTierDropdownOpen(!tierDropdownOpen)}
-                      className="inline-flex items-center gap-1.5 px-2 py-0.5 -my-0.5 rounded-md hover:bg-indigo-50 hover:text-indigo-700 transition-colors group cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 -my-0.5 rounded-[8px] hover:bg-brand-50 hover:text-brand-hover transition-colors group cursor-pointer"
                     >
                       <Star className="w-3.5 h-3.5 text-amber-500" />
-                      <span className="font-medium text-gray-700 group-hover:text-indigo-700">{currentTierLabel}</span>
-                      <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-indigo-500" />
+                      <span className="font-medium text-gray-700 group-hover:text-brand-hover">{currentTierLabel}</span>
+                      <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-brand-500" />
                     </button>
                     <span className="ml-1 text-[11px] text-gray-400">Effective {tierEffectiveDate}</span>
                     {tierSaved && (
@@ -563,7 +563,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                             <button
                               key={tier.id}
                               onClick={() => selectTier(tier.id)}
-                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${selectedTierId === tier.id ? 'bg-indigo-50' : ''}`}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${selectedTierId === tier.id ? 'bg-brand-50' : ''}`}
                             >
                               <div className="flex items-center gap-2.5">
                                 <div className={`w-2 h-2 rounded-full ${
@@ -573,22 +573,22 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                               </div>
                               <div className="flex items-center gap-2">
                                 <span className="text-gray-500">{tier.split}%</span>
-                                {selectedTierId === tier.id && <Check className="w-4 h-4 text-indigo-600" />}
+                                {selectedTierId === tier.id && <Check className="w-4 h-4 text-brand" />}
                               </div>
                             </button>
                           ))}
                           <div className="border-t border-gray-100 mt-1 pt-1">
                             <button
                               onClick={() => setSelectedTierId('custom')}
-                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${selectedTierId === 'custom' ? 'bg-indigo-50' : ''}`}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${selectedTierId === 'custom' ? 'bg-brand-50' : ''}`}
                             >
                               <div className="flex items-center gap-2.5">
-                                <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                <div className="w-2 h-2 rounded-full bg-brand-500" />
                                 <span className="font-medium text-gray-900">Custom</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <span className="text-gray-500">Negotiated</span>
-                                {selectedTierId === 'custom' && <Check className="w-4 h-4 text-indigo-600" />}
+                                {selectedTierId === 'custom' && <Check className="w-4 h-4 text-brand" />}
                               </div>
                             </button>
                             {selectedTierId === 'custom' && (
@@ -601,11 +601,11 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                                       max={99}
                                       value={customSplit}
                                       onChange={e => setCustomSplit(Math.min(99, Math.max(1, parseInt(e.target.value) || 0)))}
-                                      className="w-full px-3 py-2 pr-8 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent tabular-nums"
+                                      className="w-full px-3 py-2 pr-8 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent tabular-nums"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
                                   </div>
-                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">
+                                  <button onClick={saveCustomSplit} className="px-3 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
                                     Save
                                   </button>
                                 </div>
@@ -625,18 +625,18 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[6px] hover:bg-gray-50 transition-colors">
+              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[8px] hover:bg-gray-50 transition-colors">
                 <Edit className="w-4 h-4" />
                 Edit
               </button>
               <button
                 onClick={() => setShowReassignModal(true)}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-[6px] hover:bg-amber-100 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-[8px] hover:bg-amber-100 transition-colors"
               >
                 <ArrowRightLeft className="w-4 h-4" />
                 Reassign Portfolio
               </button>
-              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-[6px] hover:bg-red-100 transition-colors">
+              <button className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-[8px] hover:bg-red-100 transition-colors">
                 <UserX className="w-4 h-4" />
                 Deactivate
               </button>
@@ -670,7 +670,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                 onClick={() => setTab(t.key)}
                 className={`flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-colors ${
                   active
-                    ? 'border-indigo-600 text-indigo-600'
+                    ? 'border-brand text-brand'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -706,7 +706,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                     <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center">
+                          <div className="w-7 h-7 bg-gray-100 rounded-[8px] flex items-center justify-center">
                             <Store className="w-3.5 h-3.5 text-gray-500" />
                           </div>
                           <span className="font-medium text-gray-900">{m.name}</span>
@@ -714,12 +714,12 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                       </td>
                       <td className="px-4 py-3 text-right text-gray-700">{fmt(m.volume)}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-md ${typeBadge(m.type)}`}>
+                        <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-[8px] ${typeBadge(m.type)}`}>
                           {m.type}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-md ${mcaStatusBadge(m.mcaStatus)}`}>
+                        <span className={`inline-flex px-2 py-0.5 text-xs font-medium border rounded-[8px] ${mcaStatusBadge(m.mcaStatus)}`}>
                           {m.mcaStatus}
                         </span>
                       </td>
@@ -730,7 +730,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                           <div className="relative inline-block">
                             <button
                               onClick={() => setRatePopover(ratePopover === m.name ? null : m.name)}
-                              className="inline-flex items-center gap-1 text-gray-900 font-medium tabular-nums hover:text-indigo-600 transition-colors cursor-pointer"
+                              className="inline-flex items-center gap-1 text-gray-900 font-medium tabular-nums hover:text-brand transition-colors cursor-pointer"
                             >
                               {schedA.effectiveRate.toFixed(2)}%
                               <Info className="w-3 h-3 text-gray-400" />
@@ -763,7 +763,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                                   </div>
                                   <div className="flex justify-between text-xs border-t border-gray-100 pt-1.5">
                                     <span className="text-gray-500 font-medium">Effective Rate</span>
-                                    <span className="font-bold text-indigo-600 tabular-nums">{schedA.effectiveRate.toFixed(2)}%</span>
+                                    <span className="font-bold text-brand tabular-nums">{schedA.effectiveRate.toFixed(2)}%</span>
                                   </div>
                                 </div>
                               </div>
@@ -795,7 +795,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                         ) : (
                           <button
                             onClick={() => setUploadedScheduleA(prev => new Set([...prev, m.name]))}
-                            className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors"
+                            className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors"
                             title="Upload Schedule A"
                           >
                             <Upload className="w-4 h-4" />
@@ -842,18 +842,18 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                     <td className="px-4 py-3 text-right font-medium text-emerald-600">{fmtFull(c.earned)}</td>
                     <td className="px-4 py-3 text-center">
                       {c.status === 'Paid' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[8px]">
                           <CheckCircle className="w-3 h-3" /> Paid
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-[8px]">
                           <Clock className="w-3 h-3" /> Pending
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{c.paidDate}</td>
                     <td className="px-4 py-3 text-center">
-                      <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
+                      <button className="p-1.5 hover:bg-gray-100 rounded-[8px] text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
                         <Download className="w-4 h-4" />
                       </button>
                     </td>
@@ -906,7 +906,7 @@ function AgentDetailView({ agent, onBack }: { agent: Agent; onBack: () => void }
                       <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-4 py-3 font-medium text-gray-900">{p.leadName}</td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-md ${config.color}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${config.color}`}>
                             <StatusIcon className="w-3 h-3" />
                             {p.status}
                           </span>
@@ -964,14 +964,14 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
             <h2 className="text-lg font-semibold text-gray-900">Reassign Portfolio</h2>
             <p className="text-sm text-gray-500 mt-0.5">Transfer {agent.name}'s {agent.merchants} merchants to another agent.</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-[8px] text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
         <div className="px-6 py-5 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">From Agent</label>
-            <div className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-[6px] text-sm text-gray-700">
+            <div className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-[8px] text-sm text-gray-700">
               {agent.name} — {agent.merchants} merchants, {fmt(agent.monthlyVolume)} volume
             </div>
           </div>
@@ -980,7 +980,7 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
             <select
               value={targetAgent}
               onChange={e => setTargetAgent(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
             >
               <option value="">Select an agent...</option>
               {availableAgents.map(a => (
@@ -988,7 +988,7 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
               ))}
             </select>
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-3 flex gap-2.5">
+          <div className="bg-amber-50 border border-amber-200 rounded-[8px] p-3 flex gap-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700">
               This will reassign all {agent.merchants} merchants and their active deals to the selected agent. Commission history will remain with {agent.name}. This action cannot be easily undone.
@@ -996,12 +996,12 @@ function ReassignModal({ agent, onClose }: { agent: Agent; onClose: () => void }
           </div>
         </div>
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[6px] hover:bg-gray-50 transition-colors">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-[8px] hover:bg-gray-50 transition-colors">
             Cancel
           </button>
           <button
             disabled={!targetAgent}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-[6px] hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+            className="px-4 py-2 text-sm font-medium text-white bg-brand rounded-[8px] hover:bg-brand-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
           >
             Reassign Portfolio
           </button>

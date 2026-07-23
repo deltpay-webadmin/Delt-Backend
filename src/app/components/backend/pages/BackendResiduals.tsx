@@ -159,7 +159,7 @@ export function BackendResiduals() {
           </div>
           <button
             onClick={() => { setShowUpload(true); setStep('idle'); setFiles([]); }}
-            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
             Upload Report
@@ -200,7 +200,7 @@ export function BackendResiduals() {
                       onChange={e => e.target.files && handleFiles(e.target.files)}
                     />
                     <div className="flex flex-col items-center gap-3">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                      <div className={`w-12 h-12 rounded-[12px] flex items-center justify-center transition-colors ${
                         dragOver ? 'bg-brand/10' : 'bg-gray-100'
                       }`}>
                         <Upload className={`w-5 h-5 ${dragOver ? 'text-brand' : 'text-gray-400'}`} />
@@ -215,7 +215,7 @@ export function BackendResiduals() {
                   {files.length > 0 && (
                     <div className="mt-4">
                       {files.map((f, i) => (
-                        <div key={`${f.name}-${i}`} className="flex items-center gap-3 px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-[6px]">
+                        <div key={`${f.name}-${i}`} className="flex items-center gap-3 px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-[8px]">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                           <span className="text-sm text-gray-700 truncate flex-1">{f.name}</span>
                           <span className="text-xs text-gray-400 shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
@@ -226,7 +226,7 @@ export function BackendResiduals() {
                       ))}
                       <button
                         onClick={startMapping}
-                        className="mt-3 px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+                        className="mt-3 px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
                       >
                         <ArrowUpDown className="w-4 h-4" />
                         Detect & Map Columns
@@ -242,7 +242,7 @@ export function BackendResiduals() {
                   <p className="text-sm text-gray-500 mb-4">
                     We detected {columnMappings.length} columns in your file. Confirm or remap each to its system field.
                   </p>
-                  <div className="border border-gray-200 rounded-[6px] overflow-hidden">
+                  <div className="border border-gray-200 rounded-[8px] overflow-hidden">
                     <table className="w-full">
                       <thead>
                         <tr className="bg-gray-50">
@@ -263,7 +263,7 @@ export function BackendResiduals() {
                               <select
                                 value={m.mappedTo}
                                 onChange={e => updateMapping(i, e.target.value)}
-                                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                                className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                               >
                                 {systemFields.map(f => (
                                   <option key={f} value={f}>{f}</option>
@@ -289,14 +289,14 @@ export function BackendResiduals() {
                   <div className="flex items-center gap-3 mt-4">
                     <button
                       onClick={processReport}
-                      className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+                      className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Process Report
                     </button>
                     <button
                       onClick={() => setStep('uploaded')}
-                      className="px-4 py-2.5 bg-white text-gray-600 text-sm font-medium rounded-[6px] border border-gray-200 hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2.5 bg-white text-gray-600 text-sm font-medium rounded-[8px] border border-gray-200 hover:bg-gray-50 transition-colors"
                     >
                       Back
                     </button>
@@ -345,7 +345,7 @@ export function BackendResiduals() {
               <select
                 value={agentFilter}
                 onChange={e => setAgentFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               >
                 <option value="All">All Agents</option>
                 {agents.map(a => <option key={a} value={a}>{a}</option>)}
@@ -353,7 +353,7 @@ export function BackendResiduals() {
               <select
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
-                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                className="px-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
               >
                 <option value="March 2026">March 2026</option>
                 <option value="February 2026">February 2026</option>

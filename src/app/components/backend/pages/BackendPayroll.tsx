@@ -88,7 +88,7 @@ const runStatusIcon = (s: RunStatus) => {
 
 const categoryCls = (c: PayeeCategory) =>
   c === 'Employee'
-    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+    ? 'bg-brand-50 text-brand-hover border-brand-200'
     : 'bg-purple-50 text-purple-700 border-purple-200';
 
 const typeCls = (t: string) => {
@@ -140,7 +140,7 @@ export function BackendPayroll() {
             <h1 className="text-2xl font-bold text-gray-900">Payroll</h1>
             <p className="text-sm text-gray-600 mt-1">Manage employee and agent commission payouts</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Banknote className="w-4 h-4" /> Run Payroll
           </button>
         </div>
@@ -185,7 +185,7 @@ export function BackendPayroll() {
             {/* Employees Section */}
             <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-                <Users className="w-4 h-4 text-indigo-600" />
+                <Users className="w-4 h-4 text-brand" />
                 <h3 className="text-sm font-semibold text-gray-900">Employees</h3>
                 <span className="text-xs text-gray-500">({employeeItems.length})</span>
               </div>
@@ -290,7 +290,7 @@ export function BackendPayroll() {
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                   Review all line items before approving. Approved payroll is final.
                 </div>
-                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" /> Approve & Run
                 </button>
               </div>
@@ -355,7 +355,7 @@ export function BackendPayroll() {
                   { date: 'Apr 25', label: 'Timesheet Submission Deadline', type: 'deadline' },
                   { date: 'May 1', label: 'Semi-Monthly Payroll', type: 'pay' },
                 ].map(item => (
-                  <div key={item.date + item.label} className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-[6px]">
+                  <div key={item.date + item.label} className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-[8px]">
                     <Calendar className={`w-4 h-4 shrink-0 ${item.type === 'pay' ? 'text-brand' : 'text-amber-500'}`} />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{item.label}</p>
@@ -395,7 +395,7 @@ export function BackendPayroll() {
                     { name: 'Michael Chen', deals: 2, amount: 3800 },
                     { name: 'James Miller', deals: 2, amount: 5100 },
                   ].map(agent => (
-                    <div key={agent.name} className="flex items-center justify-between text-sm px-3 py-2 bg-gray-50 rounded-[6px]">
+                    <div key={agent.name} className="flex items-center justify-between text-sm px-3 py-2 bg-gray-50 rounded-[8px]">
                       <span className="text-gray-700 font-medium">{agent.name}</span>
                       <div className="flex items-center gap-4">
                         <span className="text-xs text-gray-500">{agent.deals} deals</span>
@@ -440,17 +440,17 @@ export function BackendPayroll() {
                       <td className="px-5 py-3 text-sm text-gray-600 text-center">{run.employeesPaid}</td>
                       <td className="px-5 py-3 text-sm text-gray-600 text-center">{run.agentsPaid}</td>
                       <td className="px-5 py-3 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${runStatusCls(run.status)}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] text-xs font-medium border ${runStatusCls(run.status)}`}>
                           {runStatusIcon(run.status)}
                           {run.status}
                         </span>
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="View Detail">
+                          <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors" title="View Detail">
                             <Eye className="w-4 h-4 text-gray-500" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Download Report">
+                          <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors" title="Download Report">
                             <Download className="w-4 h-4 text-gray-500" />
                           </button>
                         </div>

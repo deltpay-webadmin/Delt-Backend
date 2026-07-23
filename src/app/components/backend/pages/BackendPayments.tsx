@@ -135,10 +135,10 @@ export function BackendPayments() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
             <RefreshCw className="w-3.5 h-3.5" /> Retry Failed
           </button>
         </div>
@@ -170,7 +170,7 @@ export function BackendPayments() {
       <div className="flex items-center gap-1 bg-gray-100 rounded-[8px] p-1 w-fit">
         {(['transactions', 'collections'] as const).map(tab => (
           <button key={tab} onClick={() => { setActiveTab(tab); setSearch(''); setStatusFilter('all'); setCollectionStatusFilter('all'); }}
-            className={`px-4 py-2 rounded-[6px] text-xs font-medium transition-all ${activeTab === tab ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            className={`px-4 py-2 rounded-[8px] text-xs font-medium transition-all ${activeTab === tab ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
             {tab === 'transactions' ? 'Transactions' : 'Collection Accounts'}
           </button>
         ))}
@@ -183,12 +183,12 @@ export function BackendPayments() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search transactions..."
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1">
               {(['all', 'success', 'failed', 'pending', 'returned', 'scheduled'] as const).map(s => (
                 <button key={s} onClick={() => setStatusFilter(s)}
-                  className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                     statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${PAYMENT_STATUS_CONFIG[s].bg} ${PAYMENT_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? 'All' : PAYMENT_STATUS_CONFIG[s].label}</button>
               ))}
@@ -246,12 +246,12 @@ export function BackendPayments() {
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search accounts..."
-                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="flex items-center gap-1">
               {(['all', 'current', 'slow_pay', 'default', 'workout', 'paid_off'] as const).map(s => (
                 <button key={s} onClick={() => setCollectionStatusFilter(s)}
-                  className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                     collectionStatusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${COLLECTION_STATUS_CONFIG[s].bg} ${COLLECTION_STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                   }`}>{s === 'all' ? 'All' : COLLECTION_STATUS_CONFIG[s].label}</button>
               ))}

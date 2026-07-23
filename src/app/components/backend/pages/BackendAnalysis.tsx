@@ -263,7 +263,7 @@ export function BackendAnalysis() {
                 {files.length > 0 && (
                   <div className="mt-4 space-y-2">
                     {files.map((f, i) => (
-                      <div key={`${f.name}-${i}`} className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-[6px]">
+                      <div key={`${f.name}-${i}`} className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-[8px]">
                         <File className="w-4 h-4 text-gray-400 shrink-0" />
                         <span className="text-sm text-gray-700 truncate flex-1">{f.name}</span>
                         <span className="text-xs text-gray-400 shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
@@ -280,7 +280,7 @@ export function BackendAnalysis() {
                   <button
                     onClick={analyze}
                     disabled={!files.length || status === 'uploading' || status === 'analyzing'}
-                    className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {status === 'uploading' || status === 'analyzing' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -316,7 +316,7 @@ export function BackendAnalysis() {
                 {leadBannerVisible && autoLeadCreated && (
                   <div className="bg-brand/5 border border-brand/20 rounded-[8px] px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-[8px] bg-brand/10 flex items-center justify-center shrink-0">
                         <UserPlus className="w-4.5 h-4.5 text-brand" />
                       </div>
                       <div>
@@ -331,7 +331,7 @@ export function BackendAnalysis() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => navigate('/leads')}
-                        className="px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
                       >
                         View in Pipeline
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -370,7 +370,7 @@ export function BackendAnalysis() {
                       {/* Fee breakdown */}
                       <div>
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Fee Breakdown</p>
-                        <div className="border border-gray-200 rounded-[6px] overflow-hidden">
+                        <div className="border border-gray-200 rounded-[8px] overflow-hidden">
                           <table className="w-full">
                             <thead>
                               <tr className="bg-gray-50">
@@ -409,7 +409,7 @@ export function BackendAnalysis() {
 
                     <div className="px-5 py-4 flex-1 flex flex-col">
                       {/* Comparison table */}
-                      <div className="border border-gray-200 rounded-[6px] overflow-hidden">
+                      <div className="border border-gray-200 rounded-[8px] overflow-hidden">
                         <table className="w-full">
                           <thead>
                             <tr className="bg-gray-50">
@@ -449,20 +449,20 @@ export function BackendAnalysis() {
 
                       {/* CTA buttons */}
                       <div className="mt-auto pt-5 flex items-center gap-3">
-                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+                        <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
                           <Download className="w-4 h-4" />
                           Generate Proposal PDF
                         </button>
                         {autoLeadCreated ? (
                           <button
                             onClick={() => navigate('/leads')}
-                            className="flex-1 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-[6px] border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-[8px] border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
                           >
                             <CheckCircle2 className="w-4 h-4" />
                             Lead Created — View
                           </button>
                         ) : (
-                          <button className="flex-1 px-4 py-2.5 bg-white text-brand text-sm font-medium rounded-[6px] border border-brand hover:bg-brand/5 transition-colors flex items-center justify-center gap-2">
+                          <button className="flex-1 px-4 py-2.5 bg-white text-brand text-sm font-medium rounded-[8px] border border-brand hover:bg-brand/5 transition-colors flex items-center justify-center gap-2">
                             <UserPlus className="w-4 h-4" />
                             Create Lead
                           </button>
@@ -529,7 +529,7 @@ export function BackendAnalysis() {
 
 function MetaField({ label, value, highlight, warn }: { label: string; value: string; highlight?: boolean; warn?: boolean }) {
   return (
-    <div className="bg-gray-50 rounded-[6px] px-3 py-2.5">
+    <div className="bg-gray-50 rounded-[8px] px-3 py-2.5">
       <p className="text-[11px] text-gray-500 font-medium mb-0.5">{label}</p>
       <p className={`text-sm font-semibold ${
         highlight ? 'text-brand' : warn ? 'text-amber-600' : 'text-gray-900'

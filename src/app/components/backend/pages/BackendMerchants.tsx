@@ -55,7 +55,7 @@ const industries = [...new Set(merchants.map(m => m.industry))];
 function ProductIcon({ active, children, color, label, onClick }: { active: boolean; children: React.ReactNode; color: string; label: string; onClick?: (e: React.MouseEvent) => void }) {
   return (
     <span
-      className={`relative inline-flex items-center justify-center w-6 h-6 rounded-[5px] transition-colors group/icon ${active ? `${color} cursor-pointer` : 'bg-gray-100 text-gray-300'}`}
+      className={`relative inline-flex items-center justify-center w-6 h-6 rounded-[8px] transition-colors group/icon ${active ? `${color} cursor-pointer` : 'bg-gray-100 text-gray-300'}`}
       onClick={active ? onClick : undefined}
       title={label}
     >
@@ -75,7 +75,7 @@ function PlanLetter({ plan }: { plan: PlanTier }) {
     Custom: { letter: 'C', cls: 'bg-purple-50 text-purple-600 border-purple-200' },
   }[plan];
   return (
-    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-[5px] border text-[10px] font-bold ${cfg.cls}`}>
+    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-[8px] border text-[10px] font-bold ${cfg.cls}`}>
       {cfg.letter}
     </span>
   );
@@ -182,7 +182,7 @@ export function BackendMerchants() {
         </div>
         <button
           onClick={() => setNewMerchantOpen(true)}
-          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add Merchant
@@ -210,7 +210,7 @@ export function BackendMerchants() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search merchants..."
-              className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+              className="w-full pl-8 pr-3 py-[7px] bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
             />
           </div>
 
@@ -256,7 +256,7 @@ export function BackendMerchants() {
                 {/* Merchant */}
                 <td className="pl-6 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center shrink-0 group-hover:bg-brand/10 transition-colors">
+                    <div className="w-8 h-8 rounded-[8px] bg-brand/5 flex items-center justify-center shrink-0 group-hover:bg-brand/10 transition-colors">
                       <Building2 className="w-4 h-4 text-brand" />
                     </div>
                     <div className="min-w-0">
@@ -269,7 +269,7 @@ export function BackendMerchants() {
                 {/* Products */}
                 <td className="py-3">
                   <div className="flex items-center gap-1">
-                    <ProductIcon active={m.products.processing} color="bg-indigo-100 text-indigo-600" label="Payments" onClick={(e) => { e.stopPropagation(); navigate(`/merchants/${m.id}/payments`); }}>
+                    <ProductIcon active={m.products.processing} color="bg-brand-100 text-brand" label="Payments" onClick={(e) => { e.stopPropagation(); navigate(`/merchants/${m.id}/payments`); }}>
                       <CreditCard className="w-3 h-3" />
                     </ProductIcon>
                     <ProductIcon active={m.products.capital} color="bg-emerald-100 text-emerald-600" label="Capital" onClick={(e) => { e.stopPropagation(); navigate(`/merchants/${m.id}/capital`); }}>
@@ -293,14 +293,14 @@ export function BackendMerchants() {
 
                 {/* Plan */}
                 <td className="py-3">
-                  <span className={`inline-block px-2 py-0.5 rounded-[4px] text-xs font-medium ${planBadgeCls(m.plan)}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-[8px] text-xs font-medium ${planBadgeCls(m.plan)}`}>
                     {m.plan}
                   </span>
                 </td>
 
                 {/* Score */}
                 <td className="py-3 text-center">
-                  <span className={`inline-block px-2 py-0.5 rounded-[4px] text-xs font-bold tabular-nums ${scoreColor(m.healthScore)}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-[8px] text-xs font-bold tabular-nums ${scoreColor(m.healthScore)}`}>
                     {m.healthScore}
                   </span>
                 </td>
@@ -329,8 +329,8 @@ export function BackendMerchants() {
           Showing <span className="font-medium text-gray-700">{filtered.length}</span> of <span className="font-medium text-gray-700">{total}</span> merchants
         </p>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40" disabled>Previous</button>
-          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[6px] hover:bg-gray-50 disabled:opacity-40" disabled>Next</button>
+          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[8px] hover:bg-gray-50 disabled:opacity-40" disabled>Previous</button>
+          <button className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm rounded-[8px] hover:bg-gray-50 disabled:opacity-40" disabled>Next</button>
         </div>
       </div>
 
@@ -404,7 +404,7 @@ function Dropdown({ value, onChange, options, label }: { value: string; onChange
     <select
       value={value}
       onChange={e => onChange(e.target.value)}
-      className="px-2.5 py-[7px] bg-white border border-gray-200 rounded-[6px] text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand appearance-none pr-7"
+      className="px-2.5 py-[7px] bg-white border border-gray-200 rounded-[8px] text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand appearance-none pr-7"
       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
     >
       {options.map(o => (

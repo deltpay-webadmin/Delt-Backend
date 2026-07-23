@@ -184,7 +184,7 @@ function getStatusStyle(status: DealStatus) {
 function getTypeStyle(type: DealType) {
   switch (type) {
     case 'MCA':
-      return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      return 'bg-brand-50 text-brand-hover border-brand-200';
     case 'Lease':
       return 'bg-sky-50 text-sky-700 border-sky-200';
     case 'Residual':
@@ -231,13 +231,13 @@ export function BackendDeals() {
           <p className="text-sm text-gray-500 mt-1">Capital deployment and deal management across all merchants.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[8px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
             <Download className="w-4 h-4" />
             Export Portfolio
           </button>
           <button
             onClick={() => setNewDealOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-[6px] text-sm hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white rounded-[8px] text-sm hover:bg-brand-hover transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Deal
@@ -264,7 +264,7 @@ export function BackendDeals() {
               placeholder="Search borrowers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[6px] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             />
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -280,7 +280,7 @@ export function BackendDeals() {
               onChange={setTypeFilter}
               options={['All', 'MCA', 'Lease', 'Residual']}
             />
-            <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-[6px] text-sm text-gray-600 bg-white cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-[8px] text-sm text-gray-600 bg-white cursor-pointer hover:bg-gray-50">
               <Calendar className="w-4 h-4" />
               <span>Date Range</span>
             </div>
@@ -305,7 +305,7 @@ export function BackendDeals() {
               {filtered.map((deal) => (
                 <tr key={deal.id} className="hover:bg-gray-50/50 transition-colors cursor-pointer" onClick={() => navigate(`/deals/${deal.id}`)}>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs border rounded-md whitespace-nowrap ${getStatusStyle(deal.status)}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs border rounded-[8px] whitespace-nowrap ${getStatusStyle(deal.status)}`}>
                       {deal.status}
                       {deal.delinquencyLabel && (
                         <span className="ml-0.5 opacity-80">· {deal.delinquencyLabel}</span>
@@ -313,7 +313,7 @@ export function BackendDeals() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 text-xs border rounded-md ${getTypeStyle(deal.type)}`}>
+                    <span className={`inline-flex px-2 py-1 text-xs border rounded-[8px] ${getTypeStyle(deal.type)}`}>
                       {deal.type}
                     </span>
                   </td>
@@ -328,7 +328,7 @@ export function BackendDeals() {
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{deal.dueDate}</td>
                   <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{deal.agent}</td>
                   <td className="px-4 py-3">
-                    <button className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                    <button className="p-1.5 rounded-[8px] hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
                   </td>
@@ -412,7 +412,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+        className="appearance-none pl-3 pr-8 py-2 border border-gray-300 rounded-[8px] text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
       >
         {options.map((o) => (
           <option key={o} value={o}>

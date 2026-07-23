@@ -44,7 +44,7 @@ const STATUS_CONFIG: Record<SiteStatus, { color: string; bg: string; label: stri
 
 const PLAN_CONFIG: Record<PlanTier, { color: string; bg: string; label: string; price: string }> = {
   starter: { color: 'text-gray-600', bg: 'bg-gray-50', label: 'Starter', price: '$29/mo' },
-  business: { color: 'text-brand', bg: 'bg-indigo-50', label: 'Business', price: '$79/mo' },
+  business: { color: 'text-brand', bg: 'bg-brand-50', label: 'Business', price: '$79/mo' },
   premium: { color: 'text-amber-700', bg: 'bg-amber-50', label: 'Premium', price: '$149/mo' },
 };
 
@@ -80,14 +80,14 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
 
           {/* URLs */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-[6px] border border-gray-200">
+            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-[8px] border border-gray-200">
               <Globe className="w-4 h-4 text-gray-400 shrink-0" />
               <span className="text-xs text-gray-600 flex-1 truncate">{site.domain}</span>
               <button className="p-1 hover:bg-gray-200 rounded"><Copy className="w-3 h-3 text-gray-400" /></button>
               <button className="p-1 hover:bg-gray-200 rounded"><ExternalLink className="w-3 h-3 text-gray-400" /></button>
             </div>
             {site.customDomain && (
-              <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-[6px] border border-emerald-200">
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-[8px] border border-emerald-200">
                 <Link2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="text-xs text-emerald-700 flex-1 truncate">{site.customDomain}</span>
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
@@ -108,7 +108,7 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
                 ].map((s, i) => {
                   const Icon = s.icon;
                   return (
-                    <div key={i} className="bg-white rounded-[6px] border border-gray-200 p-3">
+                    <div key={i} className="bg-white rounded-[8px] border border-gray-200 p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Icon className="w-3 h-3 text-gray-400" />
                         <span className="text-[10px] text-gray-500">{s.label}</span>
@@ -125,7 +125,7 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
           <div>
             <h4 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Health</h4>
             <div className="space-y-2">
-              <div className="flex items-center justify-between p-3 bg-white rounded-[6px] border border-gray-200">
+              <div className="flex items-center justify-between p-3 bg-white rounded-[8px] border border-gray-200">
                 <span className="text-xs text-gray-600">SEO Score</span>
                 <div className="flex items-center gap-2">
                   <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -134,7 +134,7 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
                   <span className="text-xs font-semibold text-gray-900">{site.seoScore}/100</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-white rounded-[6px] border border-gray-200">
+              <div className="flex items-center justify-between p-3 bg-white rounded-[8px] border border-gray-200">
                 <span className="text-xs text-gray-600">SSL Certificate</span>
                 <span className="text-xs font-medium text-emerald-600">Expires {site.sslExpiry}</span>
               </div>
@@ -168,24 +168,24 @@ function SiteDetailPanel({ site, onClose }: { site: Website; onClose: () => void
         {/* Actions */}
         <div className="px-5 py-3 border-t border-gray-200 flex items-center gap-2">
           {site.status === 'live' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
               <Edit3 className="w-3.5 h-3.5" /> Edit Site
             </button>
           )}
           {site.status === 'building' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
               <Layers className="w-3.5 h-3.5" /> Continue Building
             </button>
           )}
           {site.status === 'draft' && (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
               <Zap className="w-3.5 h-3.5" /> Start Build
             </button>
           )}
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
             <Eye className="w-3.5 h-3.5" /> Preview
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[6px] hover:bg-gray-50">
+          <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-[8px] hover:bg-gray-50">
             <Settings className="w-3.5 h-3.5" /> Domain Settings
           </button>
         </div>
@@ -230,7 +230,7 @@ export function BackendWebsites() {
             <p className="text-sm text-gray-500">Manage merchant websites, domains, and analytics</p>
           </div>
         </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover">
+        <button className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">
           <Plus className="w-3.5 h-3.5" /> New Site
         </button>
       </div>
@@ -262,12 +262,12 @@ export function BackendWebsites() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search sites..."
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
         </div>
         <div className="flex items-center gap-1">
           {(['all', 'live', 'building', 'draft', 'suspended'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap transition-colors ${
                 statusFilter === s ? (s === 'all' ? 'bg-brand/5 text-brand border-brand/20' : `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color}`) : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
               }`}>{s === 'all' ? 'All' : STATUS_CONFIG[s].label}</button>
           ))}

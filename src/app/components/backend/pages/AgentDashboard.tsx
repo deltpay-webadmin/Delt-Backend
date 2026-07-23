@@ -39,7 +39,7 @@ const summaryCards = [
 ];
 
 const variantMap = {
-  indigo: { bg: 'bg-indigo-50 border-indigo-100', icon: 'text-indigo-600' },
+  indigo: { bg: 'bg-brand-50 border-brand-100', icon: 'text-brand' },
   emerald: { bg: 'bg-emerald-50 border-emerald-100', icon: 'text-emerald-600' },
   purple: { bg: 'bg-purple-50 border-purple-100', icon: 'text-purple-600' },
   blue: { bg: 'bg-blue-50 border-blue-100', icon: 'text-blue-600' },
@@ -49,7 +49,7 @@ const pipeline = [
   { stage: 'New', count: 8, color: 'bg-blue-500' },
   { stage: 'In Review', count: 5, color: 'bg-amber-500' },
   { stage: 'Approved', count: 3, color: 'bg-emerald-500' },
-  { stage: 'Funded', count: 2, color: 'bg-indigo-600' },
+  { stage: 'Funded', count: 2, color: 'bg-brand' },
   { stage: 'Declined', count: 1, color: 'bg-red-500' },
 ];
 
@@ -57,7 +57,7 @@ const pipelineTotal = pipeline.reduce((s, p) => s + p.count, 0);
 
 const activity = [
   { icon: CheckCircle, iconColor: 'text-emerald-500', text: 'Metro Diner Group funded — $75,000 MCA', time: '2 hours ago' },
-  { icon: Send, iconColor: 'text-indigo-500', text: 'Submitted Sunrise Cafe application to underwriting', time: '5 hours ago' },
+  { icon: Send, iconColor: 'text-brand-500', text: 'Submitted Sunrise Cafe application to underwriting', time: '5 hours ago' },
   { icon: Phone, iconColor: 'text-blue-500', text: 'Follow-up call with Peak Construction — docs pending', time: 'Yesterday' },
   { icon: UserCheck, iconColor: 'text-purple-500', text: 'New lead assigned: Riverdale Dental Care', time: '2 days ago' },
   { icon: XCircle, iconColor: 'text-red-500', text: 'Greenfield Markets application declined — low credit', time: '3 days ago' },

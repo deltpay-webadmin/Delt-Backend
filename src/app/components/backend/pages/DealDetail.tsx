@@ -155,7 +155,7 @@ export function DealDetail() {
                 <span>{deal.type}</span>
                 <span>-</span>
                 <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
-                  deal.channel === 'self' ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-600'
+                  deal.channel === 'self' ? 'bg-brand-50 text-brand' : 'bg-orange-50 text-orange-600'
                 }`}>
                   {deal.channel === 'self' ? 'Self-Funded' : 'Fundomate'}
                 </span>
@@ -164,10 +164,10 @@ export function DealDetail() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
+              <button className="px-3.5 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
                 <Download className="w-4 h-4" /> Export
               </button>
-              <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+              <button className="px-3.5 py-2 bg-brand text-white rounded-[8px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
                 <ExternalLink className="w-4 h-4" /> View Merchant
               </button>
             </div>
@@ -355,7 +355,7 @@ export function DealDetail() {
                     )}
                   </div>
                   {deal.stackCount > 0 && (
-                    <div className="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-[6px]">
+                    <div className="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-[8px]">
                       <p className="text-xs text-amber-700">
                         DataMerch shows {deal.stackCount} concurrent MCA position{deal.stackCount > 1 ? 's' : ''}. Higher stack counts increase default risk.
                       </p>
@@ -399,7 +399,7 @@ export function DealDetail() {
                           </div>
                         )}
                         {daysToBreakeven === 0 && (
-                          <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-[6px]">
+                          <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-[8px]">
                             <p className="text-xs text-emerald-700 font-medium">Principal recovered - now operating on house money.</p>
                           </div>
                         )}
@@ -414,7 +414,7 @@ export function DealDetail() {
                           <span className="text-sm text-gray-500">Commission Earned</span>
                           <span className="text-sm font-semibold text-orange-600">{fmt(deal.referralCommission)}</span>
                         </div>
-                        <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-[6px]">
+                        <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-[8px]">
                           <p className="text-xs text-emerald-700">Fundomate bears all credit risk. This is pure fee income with zero capital exposure.</p>
                         </div>
                       </>
@@ -444,7 +444,7 @@ export function DealDetail() {
                       />
                     </div>
                     {deal.renewalEligible ? (
-                      <div className="p-2.5 bg-violet-50 border border-violet-100 rounded-[6px]">
+                      <div className="p-2.5 bg-violet-50 border border-violet-100 rounded-[8px]">
                         <p className="text-xs text-violet-700">
                           {deal.channel === 'self' ? 'Eligible for renewal. New advance opportunity once 50%+ collected.' : 'Eligible for new Fundomate referral - additional commission opportunity.'}
                         </p>
@@ -565,8 +565,8 @@ export function DealDetail() {
                       <FinancialRow label="Net Profit After COC" value={fmt(netProfit)} type={netProfit >= 0 ? 'positive' : 'negative'} bold />
                     </div>
                     {outstanding > 0 && (
-                      <div className="bg-indigo-50 border border-indigo-100 rounded-[6px] p-3 mt-2">
-                        <p className="text-xs text-indigo-700">
+                      <div className="bg-brand-50 border border-brand-100 rounded-[8px] p-3 mt-2">
+                        <p className="text-xs text-brand-hover">
                           <strong>Projected total return:</strong> {fmt(deal.totalOwed - deal.fundedAmt)} gross profit on {fmt(deal.fundedAmt)} deployed ({((deal.factor - 1) * 100).toFixed(0)}% return), less estimated COC of {fmt(costOfCapitalAccrued)}.
                         </p>
                       </div>
@@ -591,7 +591,7 @@ export function DealDetail() {
                       <FinancialRow label="Commission Earned" value={fmt(deal.referralCommission)} type="positive" bold />
                     </div>
                     <FinancialRow label="Payment Status" value={deal.commissionPaid ? 'Paid Out' : 'Awaiting Payout'} type={deal.commissionPaid ? 'positive' : 'neutral'} />
-                    <div className="bg-orange-50 border border-orange-100 rounded-[6px] p-3 mt-2">
+                    <div className="bg-orange-50 border border-orange-100 rounded-[8px] p-3 mt-2">
                       <p className="text-xs text-orange-700">
                         This is a Fundomate referral deal. Capital is deployed and serviced by Fundomate. Delt earns a {((deal.commissionRate || 0) * 100).toFixed(0)}% referral commission on the funded amount.
                       </p>

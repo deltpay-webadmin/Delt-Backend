@@ -54,7 +54,7 @@ const fmtFull = (n: number) =>
 
 function getTypeStyle(type: string) {
   switch (type) {
-    case 'MCA': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'MCA': return 'bg-brand-50 text-brand-hover border-brand-200';
     case 'Lease': return 'bg-sky-50 text-sky-700 border-sky-200';
     case 'Residual': return 'bg-teal-50 text-teal-700 border-teal-200';
     default: return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -70,7 +70,7 @@ export function AgentCommissions() {
           <h1 className="text-2xl font-bold text-gray-900">Commissions</h1>
           <p className="text-sm text-gray-500 mt-1">Track your earnings and download statements.</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[6px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+        <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-[8px] text-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
           <Download className="w-4 h-4" />
           Export All
         </button>
@@ -80,7 +80,7 @@ export function AgentCommissions() {
       <div className="bg-white rounded-[8px] border border-gray-200">
         <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Current Period</h2>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-[8px]">
             <Clock className="w-3.5 h-3.5" />
             {currentPeriod.status}
           </span>
@@ -133,7 +133,7 @@ export function AgentCommissions() {
                   <td className="px-4 py-3 text-right text-gray-700">{fmtFull(c.deltCut)}</td>
                   <td className="px-4 py-3 text-right font-medium text-emerald-600">{fmtFull(c.agentShare)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex px-2 py-1 text-xs border rounded-md ${getTypeStyle(c.type)}`}>
+                    <span className={`inline-flex px-2 py-1 text-xs border rounded-[8px] ${getTypeStyle(c.type)}`}>
                       {c.type}
                     </span>
                   </td>
@@ -179,7 +179,7 @@ export function AgentCommissions() {
                     {s.status}
                   </span>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-md text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
+                <button className="p-2 hover:bg-gray-100 rounded-[8px] text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
                   <Download className="w-4 h-4" />
                 </button>
               </div>

@@ -184,7 +184,7 @@ const employees: Employee[] = [
 // ── Helpers ──
 const empTypeCls = (t: EmploymentType) => {
   switch (t) {
-    case 'Full-Time': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'Full-Time': return 'bg-brand-50 text-brand-hover border-brand-200';
     case 'Part-Time': return 'bg-amber-50 text-amber-700 border-amber-200';
     case 'Contractor': return 'bg-purple-50 text-purple-700 border-purple-200';
   }
@@ -241,14 +241,14 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 <p className="text-sm text-gray-500">{employee.role}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${statusCls(employee.status)}`}>{employee.status}</span>
-            <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${empTypeCls(employee.employmentType)}`}>{employee.employmentType}</span>
-            <span className={`px-2.5 py-1 rounded-md text-xs font-medium ${deptCls(employee.department)}`}>{employee.department}</span>
+            <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium border ${statusCls(employee.status)}`}>{employee.status}</span>
+            <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium border ${empTypeCls(employee.employmentType)}`}>{employee.employmentType}</span>
+            <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium ${deptCls(employee.department)}`}>{employee.department}</span>
           </div>
         </div>
 
@@ -338,7 +338,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
               {employee.documents.map((doc, i) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-[8px]">
                   <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${doc.status === 'Complete' ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                    <div className={`w-9 h-9 rounded-[8px] flex items-center justify-center ${doc.status === 'Complete' ? 'bg-emerald-50' : 'bg-red-50'}`}>
                       <FileText className={`w-4 h-4 ${doc.status === 'Complete' ? 'text-emerald-600' : 'text-red-500'}`} />
                     </div>
                     <div>
@@ -353,7 +353,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                       <span className="flex items-center gap-1 text-xs text-red-500 font-medium"><AlertCircle className="w-3.5 h-3.5" /> Missing</span>
                     )}
                     {doc.status === 'Complete' && (
-                      <button className="p-1.5 hover:bg-gray-100 rounded-[6px]"><Download className="w-4 h-4 text-gray-400" /></button>
+                      <button className="p-1.5 hover:bg-gray-100 rounded-[8px]"><Download className="w-4 h-4 text-gray-400" /></button>
                     )}
                   </div>
                 </div>
@@ -374,7 +374,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                 </div>
               ))}
               <textarea placeholder="Add a note..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand resize-none" rows={3} />
-              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Add Note</button>
+              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Add Note</button>
             </div>
           )}
 
@@ -389,7 +389,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                       <p className="text-sm font-semibold text-gray-900">Q1 2026 Review</p>
                       <p className="text-xs text-gray-500">Reviewed by {employee.manager} &middot; Mar 28, 2026</p>
                     </div>
-                    <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-xs font-semibold">
+                    <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[8px] text-xs font-semibold">
                       {employee.department === 'Engineering' ? 'Exceeds Expectations' : employee.status === 'On Leave' ? 'Meets Expectations' : 'Exceeds Expectations'}
                     </span>
                   </div>
@@ -400,7 +400,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                       { label: 'Teamwork', score: employee.department === 'Sales' ? 5 : 4 },
                       { label: 'Initiative', score: employee.department === 'Engineering' ? 5 : 3 },
                     ].map(metric => (
-                      <div key={metric.label} className="flex items-center justify-between bg-gray-50 rounded-[6px] px-3 py-2">
+                      <div key={metric.label} className="flex items-center justify-between bg-gray-50 rounded-[8px] px-3 py-2">
                         <span className="text-xs text-gray-600">{metric.label}</span>
                         <div className="flex gap-0.5">
                           {[1,2,3,4,5].map(n => (
@@ -410,7 +410,7 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                       </div>
                     ))}
                   </div>
-                  <div className="bg-blue-50 rounded-[6px] p-3">
+                  <div className="bg-blue-50 rounded-[8px] p-3">
                     <p className="text-xs text-blue-800">
                       <span className="font-medium">Manager Notes:</span> {employee.name.split(' ')[0]} has consistently demonstrated strong performance this quarter.
                       {employee.department === 'Engineering' ? ' Key contributions to the Lens AI module and merchant portal.' : employee.department === 'Sales' ? ' Exceeded all sales targets and mentored junior agents effectively.' : ' Reliable operations leadership with excellent process improvements.'}
@@ -432,23 +432,23 @@ function EmployeeDetailPanel({ employee, onClose }: { employee: Employee; onClos
                         <p className="text-sm font-medium text-gray-900">{review.period}</p>
                         <p className="text-xs text-gray-500">{review.date}</p>
                       </div>
-                      <span className={`px-2.5 py-1 rounded-md text-xs font-medium ${review.rating === 'Exceeds Expectations' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{review.rating}</span>
+                      <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium ${review.rating === 'Exceeds Expectations' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{review.rating}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <button className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Start New Review</button>
+              <button className="w-full px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Start New Review</button>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center gap-3">
-          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
+          <button className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2">
             <Edit className="w-4 h-4" /> Edit Employee
           </button>
-          <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">
             Manage Leave
           </button>
         </div>
@@ -484,7 +484,7 @@ export function BackendEmployees() {
             <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
             <p className="text-sm text-gray-600 mt-1">{totalEmployees} active employees across all departments</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Employee
           </button>
         </div>
@@ -556,22 +556,22 @@ export function BackendEmployees() {
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-700">{emp.role}</td>
                     <td className="px-5 py-4">
-                      <span className={`px-2.5 py-1 rounded-md text-xs font-medium ${deptCls(emp.department)}`}>{emp.department}</span>
+                      <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium ${deptCls(emp.department)}`}>{emp.department}</span>
                     </td>
                     <td className="px-5 py-4">
-                      <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${empTypeCls(emp.employmentType)}`}>{emp.employmentType}</span>
+                      <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium border ${empTypeCls(emp.employmentType)}`}>{emp.employmentType}</span>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-600">{emp.startDate}</td>
                     <td className="px-5 py-4 text-sm font-semibold text-gray-900">{emp.compensation}</td>
                     <td className="px-5 py-4">
-                      <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${statusCls(emp.status)}`}>{emp.status}</span>
+                      <span className={`px-2.5 py-1 rounded-[8px] text-xs font-medium border ${statusCls(emp.status)}`}>{emp.status}</span>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => setSelectedEmployee(emp)} className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="View">
+                        <button onClick={() => setSelectedEmployee(emp)} className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors" title="View">
                           <Eye className="w-4 h-4 text-gray-500" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors" title="Edit">
+                        <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors" title="Edit">
                           <Edit className="w-4 h-4 text-gray-500" />
                         </button>
                       </div>

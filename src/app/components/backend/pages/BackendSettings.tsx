@@ -237,11 +237,11 @@ export function BackendSettings() {
                               <Toggle value={f.value} />
                             ) : f.type === 'color' ? (
                               <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-[6px] border border-gray-200" style={{ background: f.value }} />
+                                <div className="w-7 h-7 rounded-[8px] border border-gray-200" style={{ background: f.value }} />
                                 <span className="text-sm font-mono text-gray-600">{f.value}</span>
                               </div>
                             ) : f.type === 'select' ? (
-                              <select defaultValue={f.value} className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-900 bg-white focus:outline-none focus:border-brand">
+                              <select defaultValue={f.value} className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-900 bg-white focus:outline-none focus:border-brand">
                                 {f.options?.map(o => <option key={o}>{o}</option>)}
                               </select>
                             ) : (
@@ -249,14 +249,14 @@ export function BackendSettings() {
                                 type="text"
                                 defaultValue={f.value}
                                 readOnly={f.readonly}
-                                className={`w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm font-mono text-gray-900 focus:outline-none focus:border-brand ${f.readonly ? 'bg-gray-50 text-gray-500' : 'bg-white'}`}
+                                className={`w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm font-mono text-gray-900 focus:outline-none focus:border-brand ${f.readonly ? 'bg-gray-50 text-gray-500' : 'bg-white'}`}
                               />
                             )}
                           </div>
                         </div>
                       ))}
                       <div className="flex justify-end pt-4 mt-2 border-t border-gray-100">
-                        <button className="px-5 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
+                        <button className="px-5 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover transition-colors">Save Changes</button>
                       </div>
                     </div>
                   )}
@@ -298,11 +298,11 @@ export function BackendSettings() {
                 <div className="flex gap-2 mt-1">
                   {int.status === 'connected' ? (
                     <>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-brand bg-brand/5 border border-brand/15 rounded-[6px] hover:bg-brand/10 transition-colors">Configure</button>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Disconnect</button>
+                      <button className="px-3 py-1.5 text-[11px] font-medium text-brand bg-brand/5 border border-brand/15 rounded-[8px] hover:bg-brand/10 transition-colors">Configure</button>
+                      <button className="px-3 py-1.5 text-[11px] font-medium text-red-500 bg-red-50/50 border border-red-200/40 rounded-[8px] hover:bg-red-50 transition-colors">Disconnect</button>
                     </>
                   ) : (
-                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[6px] hover:bg-brand-hover transition-colors">Connect</button>
+                    <button className="px-4 py-1.5 text-[11px] font-semibold text-white bg-brand rounded-[8px] hover:bg-brand-hover transition-colors">Connect</button>
                   )}
                 </div>
               </div>
@@ -318,7 +318,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Roles</h2>
                 <p className="text-sm text-gray-400 mt-0.5">System roles define baseline access. Permissions enforced across all modules.</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
+              <button className="px-4 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Custom Role
               </button>
             </div>
@@ -399,7 +399,7 @@ export function BackendSettings() {
                 <h2 className="text-lg font-bold text-gray-900">Users & Access</h2>
                 <p className="text-sm text-gray-400 mt-0.5">{USERS.length} users across {ROLES.length} roles</p>
               </div>
-              <button className="px-4 py-2 bg-brand text-white rounded-[6px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
+              <button className="px-4 py-2 bg-brand text-white rounded-[8px] text-sm font-semibold hover:bg-brand-hover inline-flex items-center gap-1.5 transition-colors">
                 <Plus className="w-4 h-4" /> Invite User
               </button>
             </div>
@@ -434,7 +434,7 @@ export function BackendSettings() {
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-[6px] border" style={{ background: `${role.color}10`, color: role.color, borderColor: `${role.color}25` }}>
+                            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-[8px] border" style={{ background: `${role.color}10`, color: role.color, borderColor: `${role.color}25` }}>
                               {role.name}
                             </span>
                           </td>
@@ -473,9 +473,9 @@ export function BackendSettings() {
                                   <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b border-gray-200">Actions</h4>
                                   <div className="flex flex-col gap-1.5">
                                     {['Edit Profile', 'Change Role', ...(user.role === 'agent' ? ['Edit Split', 'Reassign Portfolio'] : []), 'Reset Password'].map(a => (
-                                      <button key={a} className="text-left px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors">{a}</button>
+                                      <button key={a} className="text-left px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors">{a}</button>
                                     ))}
-                                    <button className="text-left px-3 py-2 text-xs font-medium text-red-500 bg-white border border-red-200/40 rounded-[6px] hover:bg-red-50 transition-colors">Deactivate</button>
+                                    <button className="text-left px-3 py-2 text-xs font-medium text-red-500 bg-white border border-red-200/40 rounded-[8px] hover:bg-red-50 transition-colors">Deactivate</button>
                                   </div>
                                 </div>
                               </div>

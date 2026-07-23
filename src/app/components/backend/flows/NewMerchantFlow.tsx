@@ -205,7 +205,7 @@ export function NewMerchantFlow({ open, onClose, onCreated }: NewMerchantFlowPro
                         key={key}
                         type="button"
                         onClick={() => toggleProduct(key)}
-                        className={`flex items-center justify-between px-3 py-2 rounded-[6px] border text-[13px] font-medium transition-colors ${
+                        className={`flex items-center justify-between px-3 py-2 rounded-[8px] border text-[13px] font-medium transition-colors ${
                           on
                             ? 'border-brand bg-brand/[0.04] text-gray-900'
                             : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
@@ -213,7 +213,7 @@ export function NewMerchantFlow({ open, onClose, onCreated }: NewMerchantFlowPro
                       >
                         <span>{label}</span>
                         <span
-                          className={`w-4 h-4 rounded-[3px] border flex items-center justify-center ${
+                          className={`w-4 h-4 rounded-[8px] border flex items-center justify-center ${
                             on ? 'bg-brand border-brand' : 'border-gray-300'
                           }`}
                         >

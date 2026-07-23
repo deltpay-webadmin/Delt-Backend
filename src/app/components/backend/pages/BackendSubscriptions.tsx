@@ -217,7 +217,7 @@ export function BackendSubscriptions() {
               onClick={() => setTopTab(t.key)}
               className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
                 topTab === t.key
-                  ? 'border-indigo-600 text-indigo-600'
+                  ? 'border-brand text-brand'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -260,7 +260,7 @@ export function BackendSubscriptions() {
                   placeholder="Search merchants..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-[8px] focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
               </div>
 
@@ -272,9 +272,9 @@ export function BackendSubscriptions() {
                     <button
                       key={p}
                       onClick={() => setPlanFilter(p)}
-                      className={`px-2.5 py-1.5 text-xs font-medium rounded-[6px] border transition-colors ${
+                      className={`px-2.5 py-1.5 text-xs font-medium rounded-[8px] border transition-colors ${
                         planFilter === p
-                          ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                          ? 'bg-brand-50 text-brand-hover border-brand-200'
                           : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                       }`}
                     >
@@ -293,9 +293,9 @@ export function BackendSubscriptions() {
                     <button
                       key={s}
                       onClick={() => setStatusFilter(s)}
-                      className={`px-2.5 py-1.5 text-xs font-medium rounded-[6px] border transition-colors ${
+                      className={`px-2.5 py-1.5 text-xs font-medium rounded-[8px] border transition-colors ${
                         statusFilter === s
-                          ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                          ? 'bg-brand-50 text-brand-hover border-brand-200'
                           : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                       }`}
                     >
@@ -312,7 +312,7 @@ export function BackendSubscriptions() {
                   <select
                     value={agentFilter}
                     onChange={e => setAgentFilter(e.target.value)}
-                    className="appearance-none pl-3 pr-8 py-1.5 text-xs font-medium border border-gray-200 rounded-[6px] bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer"
+                    className="appearance-none pl-3 pr-8 py-1.5 text-xs font-medium border border-gray-200 rounded-[8px] bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent cursor-pointer"
                   >
                     {allAgents.map(a => (
                       <option key={a} value={a}>{a}</option>
@@ -354,7 +354,7 @@ export function BackendSubscriptions() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${planBadge(sub.plan)}`}>
+                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${planBadge(sub.plan)}`}>
                             {sub.plan}
                           </span>
                         </td>
@@ -362,7 +362,7 @@ export function BackendSubscriptions() {
                           {sub.monthlyFee === 0 ? <span className="text-gray-400">Free</span> : `$${sub.monthlyFee}`}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-md ${billing.cls}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${billing.cls}`}>
                             <BillingIcon className="w-3 h-3" />
                             {sub.billingStatus}
                           </span>
@@ -375,7 +375,7 @@ export function BackendSubscriptions() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-md ${websiteBadge(sub.websiteStatus)}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${websiteBadge(sub.websiteStatus)}`}>
                             {sub.websiteStatus === 'Live' && <Globe className="w-3 h-3" />}
                             {sub.websiteStatus}
                           </span>
@@ -393,13 +393,13 @@ export function BackendSubscriptions() {
                         <td className="px-4 py-3 text-xs text-gray-500">{sub.nextBilling}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-1">
-                            <button className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors" title="View">
+                            <button className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors" title="View">
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Change Plan">
+                            <button className="p-1.5 hover:bg-blue-50 rounded-[8px] text-gray-400 hover:text-blue-600 transition-colors" title="Change Plan">
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Cancel">
+                            <button className="p-1.5 hover:bg-red-50 rounded-[8px] text-gray-400 hover:text-red-600 transition-colors" title="Cancel">
                               <XCircle className="w-4 h-4" />
                             </button>
                           </div>
@@ -432,7 +432,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
   variant: 'indigo' | 'emerald' | 'blue' | 'purple';
 }) {
   const map = {
-    indigo: { bg: 'bg-indigo-50', icon: 'text-indigo-600' },
+    indigo: { bg: 'bg-brand-50', icon: 'text-brand' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600' },
     blue: { bg: 'bg-blue-50', icon: 'text-blue-600' },
     purple: { bg: 'bg-purple-50', icon: 'text-purple-600' },
@@ -442,7 +442,7 @@ function SummaryCard({ icon: Icon, label, value, sub, variant }: {
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 sm:p-5">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-gray-600">{label}</p>
-        <div className={`w-9 h-9 ${v.bg} rounded-lg flex items-center justify-center`}>
+        <div className={`w-9 h-9 ${v.bg} rounded-[8px] flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${v.icon}`} />
         </div>
       </div>
@@ -487,7 +487,7 @@ function PlanDistribution({ starter, growth, intelligence, total }: {
         {plans.map(p => (
           <div key={p.name} className="border border-gray-200 rounded-[8px] p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-md ${p.badgeColor}`}>
+              <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-[8px] ${p.badgeColor}`}>
                 {p.name}
               </span>
               <span className="text-xs text-gray-500">{p.price}</span>
@@ -519,7 +519,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
           <h1 className="text-2xl font-bold text-gray-900">ISO Tenants</h1>
           <p className="text-sm text-gray-500 mt-1">Manage ISOs licensing the Delt platform</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors">
+        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
           <Plus className="w-4 h-4" />
           Onboard ISO
         </button>
@@ -561,7 +561,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
                   <tr key={t.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: t.primaryColor }}>
+                        <div className="w-9 h-9 rounded-[8px] flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ background: t.primaryColor }}>
                           {t.logo}
                         </div>
                         <div>
@@ -571,7 +571,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${isoTierBadge(t.tier)}`}>
+                      <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${isoTierBadge(t.tier)}`}>
                         {t.tier}
                       </span>
                     </td>
@@ -583,7 +583,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
                     <td className="px-4 py-3 text-center text-gray-700">{t.agents}</td>
                     <td className="px-4 py-3 text-center text-gray-700">{t.merchants}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-md ${sBadge.cls}`}>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium border rounded-[8px] ${sBadge.cls}`}>
                         <SIcon className="w-3 h-3" />
                         {t.status}
                       </span>
@@ -591,13 +591,13 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
                     <td className="px-4 py-3 text-xs text-gray-500">{t.onboardDate}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => onViewTenant(t)} className="p-1.5 hover:bg-indigo-50 rounded-md text-gray-400 hover:text-indigo-600 transition-colors" title="View">
+                        <button onClick={() => onViewTenant(t)} className="p-1.5 hover:bg-brand-50 rounded-[8px] text-gray-400 hover:text-brand transition-colors" title="View">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 hover:bg-blue-50 rounded-md text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
+                        <button className="p-1.5 hover:bg-blue-50 rounded-[8px] text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-600 transition-colors" title="Suspend">
+                        <button className="p-1.5 hover:bg-red-50 rounded-[8px] text-gray-400 hover:text-red-600 transition-colors" title="Suspend">
                           <ShieldAlert className="w-4 h-4" />
                         </button>
                       </div>
@@ -643,7 +643,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
   ] as const;
 
   const colorMap: Record<string, { bg: string; text: string }> = {
-    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600' },
+    indigo: { bg: 'bg-brand-50', text: 'text-brand' },
     emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
     blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
     purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
@@ -661,17 +661,17 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
         </button>
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-white text-lg font-bold shrink-0" style={{ background: tenant.primaryColor }}>
+            <div className="w-14 h-14 rounded-[12px] flex items-center justify-center text-white text-lg font-bold shrink-0" style={{ background: tenant.primaryColor }}>
               {tenant.logo}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-bold text-gray-900">{tenant.name}</h1>
-                <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium border rounded-md ${sBadge.cls}`}>
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium border rounded-[8px] ${sBadge.cls}`}>
                   <SIcon className="w-3 h-3" />
                   {tenant.status}
                 </span>
-                <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-md ${isoTierBadge(tenant.tier)}`}>
+                <span className={`inline-flex px-2.5 py-1 text-xs font-medium border rounded-[8px] ${isoTierBadge(tenant.tier)}`}>
                   {tenant.tier}
                 </span>
               </div>
@@ -679,10 +679,10 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-[6px] text-gray-600 hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-[8px] text-gray-600 hover:bg-gray-50 transition-colors">
               Edit Tenant
             </button>
-            <button className="px-4 py-2 text-sm font-medium border border-red-200 rounded-[6px] text-red-600 hover:bg-red-50 transition-colors">
+            <button className="px-4 py-2 text-sm font-medium border border-red-200 rounded-[8px] text-red-600 hover:bg-red-50 transition-colors">
               Suspend
             </button>
           </div>
@@ -718,7 +718,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
           <div className="space-y-3">
             <div className="flex items-center justify-between py-1">
               <span className="text-sm text-gray-500">Logo</span>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ background: tenant.primaryColor }}>
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center text-white text-sm font-bold" style={{ background: tenant.primaryColor }}>
                 {tenant.logo}
               </div>
             </div>
@@ -726,11 +726,11 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
               <span className="text-sm text-gray-500">Brand Colors</span>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-md border border-gray-200" style={{ background: tenant.primaryColor }} />
+                  <div className="w-6 h-6 rounded-[8px] border border-gray-200" style={{ background: tenant.primaryColor }} />
                   <span className="text-xs text-gray-500 font-mono">{tenant.primaryColor}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-md border border-gray-200" style={{ background: tenant.secondaryColor }} />
+                  <div className="w-6 h-6 rounded-[8px] border border-gray-200" style={{ background: tenant.secondaryColor }} />
                   <span className="text-xs text-gray-500 font-mono">{tenant.secondaryColor}</span>
                 </div>
               </div>
@@ -739,14 +739,14 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
               <span className="text-sm text-gray-500">Custom Domain</span>
               {tenant.customDomain !== '—' ? (
                 <div className="flex items-center gap-1.5">
-                  <Link className="w-3.5 h-3.5 text-indigo-500" />
-                  <span className="text-sm font-medium text-indigo-600">{tenant.customDomain}</span>
+                  <Link className="w-3.5 h-3.5 text-brand-500" />
+                  <span className="text-sm font-medium text-brand">{tenant.customDomain}</span>
                 </div>
               ) : (
                 <span className="text-sm text-gray-400">Not configured</span>
               )}
             </div>
-            <div className="mt-1 rounded-lg overflow-hidden border border-gray-200">
+            <div className="mt-1 rounded-[8px] overflow-hidden border border-gray-200">
               <div className="h-10 flex items-center px-4 gap-2" style={{ background: tenant.primaryColor }}>
                 <div className="w-5 h-5 rounded flex items-center justify-center text-white text-[9px] font-bold" style={{ background: tenant.secondaryColor }}>
                   {tenant.logo[0]}
@@ -772,7 +772,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
               <div key={rc.label} className="bg-white rounded-[8px] border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs text-gray-500">{rc.label}</p>
-                  <div className={`w-8 h-8 ${c.bg} rounded-lg flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${c.bg} rounded-[8px] flex items-center justify-center`}>
                     <RcIcon className={`w-4 h-4 ${c.text}`} />
                   </div>
                 </div>
@@ -787,8 +787,8 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
       {/* Counts */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-[8px] border border-gray-200 p-5 flex items-center gap-4">
-          <div className="w-11 h-11 bg-indigo-50 rounded-lg flex items-center justify-center">
-            <Users className="w-5 h-5 text-indigo-600" />
+          <div className="w-11 h-11 bg-brand-50 rounded-[8px] flex items-center justify-center">
+            <Users className="w-5 h-5 text-brand" />
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">{tenant.agents}</p>
@@ -796,7 +796,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
           </div>
         </div>
         <div className="bg-white rounded-[8px] border border-gray-200 p-5 flex items-center gap-4">
-          <div className="w-11 h-11 bg-emerald-50 rounded-lg flex items-center justify-center">
+          <div className="w-11 h-11 bg-emerald-50 rounded-[8px] flex items-center justify-center">
             <Store className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
@@ -815,7 +815,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
         <div className="p-5">
           <div className="flex items-center gap-5 mb-5">
             {[
-              { label: 'SaaS Fee', color: 'bg-indigo-500' },
+              { label: 'SaaS Fee', color: 'bg-brand-500' },
               { label: 'Residual Override', color: 'bg-emerald-500' },
               { label: 'MCA Commission', color: 'bg-blue-500' },
               { label: 'Lens AI', color: 'bg-purple-500' },
@@ -842,7 +842,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
                     <div className="bg-purple-500" style={{ height: `${lensH}px` }} />
                     <div className="bg-blue-500" style={{ height: `${mcaH}px` }} />
                     <div className="bg-emerald-500" style={{ height: `${resH}px` }} />
-                    <div className="bg-indigo-500" style={{ height: `${saasH}px` }} />
+                    <div className="bg-brand-500" style={{ height: `${saasH}px` }} />
                   </div>
                   <span className="text-xs text-gray-500">{d.month}</span>
                 </div>

@@ -161,7 +161,7 @@ export function TemplateEditor() {
     p === 'payments' ? 'Payments' : p === 'capital' ? 'Capital' : p === 'website' ? 'Website' : 'General';
 
   const productColor = (p: TemplateProduct) =>
-    p === 'payments' ? 'bg-indigo-50 text-indigo-700' : p === 'capital' ? 'bg-emerald-50 text-emerald-700' : p === 'website' ? 'bg-sky-50 text-sky-700' : 'bg-gray-100 text-gray-600';
+    p === 'payments' ? 'bg-brand-50 text-brand-hover' : p === 'capital' ? 'bg-emerald-50 text-emerald-700' : p === 'website' ? 'bg-sky-50 text-sky-700' : 'bg-gray-100 text-gray-600';
 
   return (
     <div className="h-full flex flex-col bg-canvas">
@@ -170,7 +170,7 @@ export function TemplateEditor() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(returnPath)}
-            className="p-1.5 hover:bg-gray-100 rounded-[6px] transition-colors"
+            className="p-1.5 hover:bg-gray-100 rounded-[8px] transition-colors"
           >
             <ArrowLeft className="w-4 h-4 text-gray-600" />
           </button>
@@ -192,25 +192,25 @@ export function TemplateEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Undo">
+          <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors text-gray-500" title="Undo">
             <Undo2 className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Redo">
+          <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors text-gray-500" title="Redo">
             <Redo2 className="w-4 h-4" />
           </button>
           <div className="w-px h-6 bg-gray-200 mx-1" />
-          <button className="p-2 hover:bg-gray-100 rounded-[6px] transition-colors text-gray-500" title="Duplicate Template">
+          <button className="p-2 hover:bg-gray-100 rounded-[8px] transition-colors text-gray-500" title="Duplicate Template">
             <Copy className="w-4 h-4" />
           </button>
           <button
             onClick={() => navigate(returnPath)}
-            className="px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-[6px] hover:bg-gray-50 transition-colors"
+            className="px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-[8px] hover:bg-gray-50 transition-colors"
           >
             Discard
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+            className="px-4 py-1.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5"
           >
             <Save className="w-3.5 h-3.5" />
             Save Template
@@ -255,7 +255,7 @@ export function TemplateEditor() {
                       <button
                         key={ch}
                         onClick={() => setChannelFilter(ch)}
-                        className={`flex-1 py-1 text-[11px] font-medium rounded-[4px] transition-colors ${
+                        className={`flex-1 py-1 text-[11px] font-medium rounded-[8px] transition-colors ${
                           channelFilter === ch ? 'bg-brand text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                         }`}
                       >
@@ -266,7 +266,7 @@ export function TemplateEditor() {
                   <select
                     value={productFilter}
                     onChange={e => setProductFilter(e.target.value as any)}
-                    className="w-full text-xs border border-gray-200 rounded-[6px] px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20"
+                    className="w-full text-xs border border-gray-200 rounded-[8px] px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20"
                   >
                     <option value="all">All Products</option>
                     <option value="payments">Payments</option>
@@ -281,7 +281,7 @@ export function TemplateEditor() {
                     <button
                       key={t.id}
                       onClick={() => handleSelectTemplate(t)}
-                      className={`w-full text-left px-3 py-2.5 rounded-[6px] transition-colors ${
+                      className={`w-full text-left px-3 py-2.5 rounded-[8px] transition-colors ${
                         selectedTemplateId === t.id
                           ? 'bg-brand/5 border border-brand/20'
                           : 'hover:bg-gray-50 border border-transparent'
@@ -312,7 +312,7 @@ export function TemplateEditor() {
 
                 {/* Create New */}
                 <div className="px-3 py-3 border-t border-gray-100">
-                  <button className="w-full py-2 text-xs text-brand font-medium border border-dashed border-brand/30 rounded-[6px] hover:bg-brand/5 transition-colors flex items-center justify-center gap-1.5">
+                  <button className="w-full py-2 text-xs text-brand font-medium border border-dashed border-brand/30 rounded-[8px] hover:bg-brand/5 transition-colors flex items-center justify-center gap-1.5">
                     <Plus className="w-3.5 h-3.5" />
                     Create New Template
                   </button>
@@ -332,7 +332,7 @@ export function TemplateEditor() {
                           <button
                             key={preset.name}
                             onClick={() => setSelectedColorPreset(i)}
-                            className={`flex flex-col items-center gap-1 p-2 rounded-[6px] border transition-colors ${
+                            className={`flex flex-col items-center gap-1 p-2 rounded-[8px] border transition-colors ${
                               selectedColorPreset === i ? 'border-brand bg-brand/5' : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
@@ -351,7 +351,7 @@ export function TemplateEditor() {
                           {['Rounded', 'Pill', 'Square'].map(style => (
                             <button
                               key={style}
-                              className={`flex-1 py-1.5 text-[11px] font-medium border rounded-[4px] transition-colors ${
+                              className={`flex-1 py-1.5 text-[11px] font-medium border rounded-[8px] transition-colors ${
                                 style === 'Rounded' ? 'bg-brand/5 border-brand/20 text-brand' : 'border-gray-200 text-gray-500 hover:border-gray-300'
                               }`}
                             >
@@ -365,7 +365,7 @@ export function TemplateEditor() {
                     {/* Font */}
                     <div>
                       <label className="text-xs font-semibold text-gray-900 block mb-2">Font Family</label>
-                      <select className="w-full text-xs border border-gray-200 rounded-[6px] px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20">
+                      <select className="w-full text-xs border border-gray-200 rounded-[8px] px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20">
                         <option>DM Sans (Default)</option>
                         <option>Inter</option>
                         <option>Arial</option>
@@ -377,7 +377,7 @@ export function TemplateEditor() {
                     {/* Header Image */}
                     <div>
                       <label className="text-xs font-semibold text-gray-900 block mb-2">Header Image</label>
-                      <div className="border border-dashed border-gray-300 rounded-[6px] p-4 flex flex-col items-center text-center">
+                      <div className="border border-dashed border-gray-300 rounded-[8px] p-4 flex flex-col items-center text-center">
                         <Image className="w-5 h-5 text-gray-400 mb-1" />
                         <span className="text-[11px] text-gray-500">Drop an image or click to upload</span>
                         <span className="text-[10px] text-gray-400 mt-0.5">600px wide recommended</span>
@@ -391,7 +391,7 @@ export function TemplateEditor() {
                         {['Single Column', 'Two Column'].map(layout => (
                           <button
                             key={layout}
-                            className={`py-2 text-[11px] font-medium border rounded-[6px] transition-colors ${
+                            className={`py-2 text-[11px] font-medium border rounded-[8px] transition-colors ${
                               layout === 'Single Column' ? 'bg-brand/5 border-brand/20 text-brand' : 'border-gray-200 text-gray-500 hover:border-gray-300'
                             }`}
                           >
@@ -406,7 +406,7 @@ export function TemplateEditor() {
                       <label className="text-xs font-semibold text-gray-900 block mb-2">Footer Text</label>
                       <textarea
                         defaultValue="Delt Pay | 123 Business Ave, Suite 100 | Unsubscribe"
-                        className="w-full text-xs border border-gray-200 rounded-[6px] px-2 py-1.5 text-gray-600 resize-none h-16 focus:outline-none focus:ring-2 focus:ring-brand/20"
+                        className="w-full text-xs border border-gray-200 rounded-[8px] px-2 py-1.5 text-gray-600 resize-none h-16 focus:outline-none focus:ring-2 focus:ring-brand/20"
                       />
                     </div>
                   </>
@@ -428,7 +428,7 @@ export function TemplateEditor() {
                     <button
                       key={mt.tag}
                       onClick={() => insertMergeTag(mt.tag)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-[6px] hover:bg-gray-50 transition-colors group"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] hover:bg-gray-50 transition-colors group"
                     >
                       <div className="text-left">
                         <p className="text-xs font-medium text-gray-700">{mt.label}</p>
@@ -460,22 +460,22 @@ export function TemplateEditor() {
               <ToolBtn icon={<Image className="w-3.5 h-3.5" />} label="Insert Image" />
               <ToolBtn icon={<Type className="w-3.5 h-3.5" />} label="Heading" />
               <div className="w-px h-5 bg-gray-200 mx-1" />
-              <button className="flex items-center gap-1 px-2 py-1 text-[11px] text-gray-600 hover:bg-gray-100 rounded-[4px] transition-colors">
+              <button className="flex items-center gap-1 px-2 py-1 text-[11px] text-gray-600 hover:bg-gray-100 rounded-[8px] transition-colors">
                 <Sparkles className="w-3.5 h-3.5 text-purple-500" />
                 AI Assist
               </button>
               <div className="flex-1" />
               {/* Preview Mode Toggle */}
-              <div className="flex items-center gap-1 bg-gray-100 rounded-[6px] p-0.5">
+              <div className="flex items-center gap-1 bg-gray-100 rounded-[8px] p-0.5">
                 <button
                   onClick={() => setPreviewMode('desktop')}
-                  className={`p-1.5 rounded-[4px] transition-colors ${previewMode === 'desktop' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400'}`}
+                  className={`p-1.5 rounded-[8px] transition-colors ${previewMode === 'desktop' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400'}`}
                 >
                   <Monitor className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setPreviewMode('mobile')}
-                  className={`p-1.5 rounded-[4px] transition-colors ${previewMode === 'mobile' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400'}`}
+                  className={`p-1.5 rounded-[8px] transition-colors ${previewMode === 'mobile' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400'}`}
                 >
                   <Smartphone className="w-3.5 h-3.5" />
                 </button>
@@ -494,7 +494,7 @@ export function TemplateEditor() {
                     <input
                       value={editSubject}
                       onChange={e => { setEditSubject(e.target.value); setHasUnsavedChanges(true); }}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                       placeholder="Enter email subject..."
                     />
                   </div>
@@ -506,7 +506,7 @@ export function TemplateEditor() {
                   <textarea
                     value={editBody}
                     onChange={e => { setEditBody(e.target.value); setHasUnsavedChanges(true); }}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 font-mono resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-[8px] text-sm text-gray-700 font-mono resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
                     style={{ minHeight: selectedTemplate.channel === 'email' ? '400px' : '200px' }}
                     spellCheck={false}
                   />
@@ -519,7 +519,7 @@ export function TemplateEditor() {
                       <button
                         key={mt.tag}
                         onClick={() => insertMergeTag(mt.tag)}
-                        className="px-2 py-1 text-[10px] font-mono text-purple-700 bg-purple-50 rounded-[4px] hover:bg-purple-100 transition-colors"
+                        className="px-2 py-1 text-[10px] font-mono text-purple-700 bg-purple-50 rounded-[8px] hover:bg-purple-100 transition-colors"
                       >
                         {mt.tag}
                       </button>
@@ -547,7 +547,7 @@ export function TemplateEditor() {
                 </div>
 
                 {selectedTemplate.channel === 'email' ? (
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden">
                     {/* Email Header */}
                     <div className="px-5 py-4 border-b border-gray-100" style={{ backgroundColor: colorPresets[selectedColorPreset].bg }}>
                       <div className="flex items-center gap-2 mb-2">
@@ -604,7 +604,7 @@ export function TemplateEditor() {
 
       {/* Save Toast */}
       {showSaveToast && (
-        <div className="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-3 rounded-[8px] shadow-lg flex items-center gap-2 z-50 animate-[slideUp_0.3s_ease-out]">
           <CheckCircle className="w-4 h-4 text-emerald-400" />
           <span className="text-sm font-medium">Template saved successfully</span>
         </div>
@@ -618,7 +618,7 @@ function ToolBtn({ icon, label, active }: { icon: React.ReactNode; label: string
   return (
     <button
       title={label}
-      className={`p-1.5 rounded-[4px] transition-colors ${active ? 'bg-gray-200 text-gray-900' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
+      className={`p-1.5 rounded-[8px] transition-colors ${active ? 'bg-gray-200 text-gray-900' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
     >
       {icon}
     </button>

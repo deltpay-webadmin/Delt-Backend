@@ -269,7 +269,7 @@ export function MerchantResidualDetail() {
           <div>
             <div className="flex items-center gap-3 flex-wrap mb-1.5">
               <h1 className="text-2xl font-bold text-gray-900">{M.name}</h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-600">{M.industry.split('/')[0].trim()}</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand">{M.industry.split('/')[0].trim()}</span>
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {M.status}
               </span>
@@ -282,10 +282,10 @@ export function MerchantResidualDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 border border-gray-200 rounded-[6px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
+            <button className="px-3.5 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 font-medium transition-colors">
               <Edit3 className="w-4 h-4" /> Edit
             </button>
-            <button className="px-3.5 py-2 bg-brand text-white rounded-[6px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
+            <button className="px-3.5 py-2 bg-brand text-white rounded-[8px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
               <Download className="w-4 h-4" /> Export Statement
             </button>
           </div>
@@ -337,23 +337,23 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="bg-emerald-50 rounded-[6px] p-3 text-center">
+                  <div className="bg-emerald-50 rounded-[8px] p-3 text-center">
                     <p className="text-xs text-gray-500 mb-0.5">Approved</p>
                     <p className="text-xl font-bold text-emerald-700">{APPROVAL_DECLINE.approved}</p>
                     <p className="text-[10px] text-emerald-600">{((APPROVAL_DECLINE.approved / APPROVAL_DECLINE.total) * 100).toFixed(1)}%</p>
                   </div>
-                  <div className="bg-red-50 rounded-[6px] p-3 text-center">
+                  <div className="bg-red-50 rounded-[8px] p-3 text-center">
                     <p className="text-xs text-gray-500 mb-0.5">Declined</p>
                     <p className="text-xl font-bold text-red-600">{APPROVAL_DECLINE.declined}</p>
                     <p className="text-[10px] text-red-500">{((APPROVAL_DECLINE.declined / APPROVAL_DECLINE.total) * 100).toFixed(1)}%</p>
                   </div>
-                  <div className="bg-amber-50 rounded-[6px] p-3 text-center">
+                  <div className="bg-amber-50 rounded-[8px] p-3 text-center">
                     <p className="text-xs text-gray-500 mb-0.5">Referred</p>
                     <p className="text-xl font-bold text-amber-600">{APPROVAL_DECLINE.referred}</p>
                     <p className="text-[10px] text-amber-500">{((APPROVAL_DECLINE.referred / APPROVAL_DECLINE.total) * 100).toFixed(1)}%</p>
                   </div>
                 </div>
-                <div className="bg-red-50/50 border border-red-100 rounded-[6px] px-3 py-2 flex items-center gap-2">
+                <div className="bg-red-50/50 border border-red-100 rounded-[8px] px-3 py-2 flex items-center gap-2">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />
                   <p className="text-xs text-red-700"><span className="font-semibold">{fmt(TOTAL_DECLINED_REVENUE)}</span> estimated lost revenue from declines this month</p>
                 </div>
@@ -393,7 +393,7 @@ export function MerchantResidualDetail() {
                   </thead>
                   <tbody>
                     {residuals.map((r, i) => (
-                      <tr key={i} className={`border-b border-gray-50 hover:bg-gray-50/50 ${i === 0 ? 'bg-indigo-50/30' : ''}`}>
+                      <tr key={i} className={`border-b border-gray-50 hover:bg-gray-50/50 ${i === 0 ? 'bg-brand-50/30' : ''}`}>
                         <td className={`px-3 py-2.5 text-sm font-semibold ${i === 0 ? 'text-brand' : 'text-gray-900'}`}>{r.month}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-900">{fmt0(r.volume)}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-600">{fmtNum(r.txns)}</td>
@@ -459,7 +459,7 @@ export function MerchantResidualDetail() {
               {/* Agent Commission */}
               <Card title="Agent Commission Structure">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-[8px] bg-indigo-50 flex items-center justify-center text-sm font-bold text-brand">
+                  <div className="w-9 h-9 rounded-[8px] bg-brand-50 flex items-center justify-center text-sm font-bold text-brand">
                     {M.agent.split(' ').map(w => w[0]).join('')}
                   </div>
                   <div>
@@ -496,7 +496,7 @@ export function MerchantResidualDetail() {
                 </div>
                 <button
                   onClick={() => { setVerifyMode(!verifyMode); setExpandedVerifyRow(null); setShowSchedule(false); }}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-[6px] text-sm font-medium transition-all ${
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] text-sm font-medium transition-all ${
                     verifyMode
                       ? 'bg-brand text-white shadow-sm'
                       : 'border border-gray-200 text-gray-600 bg-white hover:bg-gray-50'
@@ -542,7 +542,7 @@ export function MerchantResidualDetail() {
                     <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-200/60">
                       <button
                         onClick={() => setShowSchedule(!showSchedule)}
-                        className="px-3 py-1.5 rounded-[6px] text-xs font-semibold bg-white border border-gray-200 text-brand hover:bg-indigo-50 transition-colors"
+                        className="px-3 py-1.5 rounded-[8px] text-xs font-semibold bg-white border border-gray-200 text-brand hover:bg-brand-50 transition-colors"
                       >
                         {showSchedule ? 'Hide' : 'View'} Published Rates
                       </button>
@@ -555,12 +555,12 @@ export function MerchantResidualDetail() {
 
                 {/* Published Rates Reference */}
                 {verifyMode && showSchedule && (
-                  <div className="mb-4 border border-indigo-100 bg-indigo-50/30 rounded-[8px] p-4">
+                  <div className="mb-4 border border-brand-100 bg-brand-50/30 rounded-[8px] p-4">
                     <h4 className="text-sm font-semibold text-gray-900 mb-1">Published Interchange Reference — {IC_SCHEDULE.version}</h4>
                     <p className="text-xs text-gray-500 mb-3">Source: Visa USA & Mastercard US fee schedules · Effective {IC_SCHEDULE.effectiveDate}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {Object.entries(PUBLISHED_RATES).map(([cat, ref]) => (
-                        <div key={cat} className="bg-white border border-gray-200 rounded-[6px] p-3">
+                        <div key={cat} className="bg-white border border-gray-200 rounded-[8px] p-3">
                           <div className="flex items-center gap-2 mb-1.5">
                             <span className="w-2 h-2 rounded-full shrink-0" style={{ background: ref.network === 'Visa' ? '#1a1f71' : ref.network === 'Mastercard' ? '#eb001b' : ref.network === 'Amex' ? '#006fcf' : '#ff6000' }} />
                             <span className="text-xs font-semibold text-gray-900">{cat}</span>
@@ -857,7 +857,7 @@ export function MerchantResidualDetail() {
         {activeTab === 'equipment' && (
           <div className="space-y-6">
             <Card title="Terminal & Equipment Inventory" sub={`${equipment.length} active devices`}
-              right={<span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-600">Platform: {M.platform.split('+')[0].trim()}</span>}
+              right={<span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-brand-50 text-brand">Platform: {M.platform.split('+')[0].trim()}</span>}
             >
               <div className="space-y-3">
                 {equipment.map((eq, i) => (
@@ -917,7 +917,7 @@ export function MerchantResidualDetail() {
                   </thead>
                   <tbody>
                     {CHARGEBACKS.map((cb, i) => (
-                      <tr key={i} className="border-b border-gray-50 hover:bg-indigo-50/40 cursor-pointer group transition-colors" onClick={() => setDisputeModal({ open: true, chargeback: cb })}>
+                      <tr key={i} className="border-b border-gray-50 hover:bg-brand-50/40 cursor-pointer group transition-colors" onClick={() => setDisputeModal({ open: true, chargeback: cb })}>
                         <td className="px-3 py-2.5 text-sm tabular-nums text-gray-700">{new Date(cb.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                         <td className="px-3 py-2.5 text-sm tabular-nums font-semibold text-gray-900">{fmt(cb.amount)}</td>
                         <td className="px-3 py-2.5 text-sm text-gray-700">{cb.reason}</td>
@@ -1062,15 +1062,15 @@ export function MerchantResidualDetail() {
                     <h2 className="text-lg font-bold text-gray-900">Dispute Workflow</h2>
                     <p className="text-xs text-gray-500">Chargeback {fmt(cb.amount)} &mdash; {new Date(cb.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                   </div>
-                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="p-2 hover:bg-gray-100 rounded-[6px]"><span className="text-gray-500 text-lg">&times;</span></button>
+                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="p-2 hover:bg-gray-100 rounded-[8px]"><span className="text-gray-500 text-lg">&times;</span></button>
                 </div>
                 <div className="px-6 py-5 space-y-5">
                   {/* Dispute Details */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 rounded-[6px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Reason Code</p><p className="text-sm font-bold text-gray-900">{reasonCode}</p><p className="text-xs text-gray-500">{reasonDesc}</p></div>
-                    <div className="bg-gray-50 rounded-[6px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Amount</p><p className="text-sm font-bold text-gray-900">{fmt(cb.amount)}</p><p className="text-xs text-gray-500">Original transaction</p></div>
-                    <div className="bg-gray-50 rounded-[6px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Status</p><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cb.status === 'Won' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>{cb.status}</span></div>
-                    <div className="bg-gray-50 rounded-[6px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Response Deadline</p><p className="text-sm font-bold text-gray-900">30 days from filing</p></div>
+                    <div className="bg-gray-50 rounded-[8px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Reason Code</p><p className="text-sm font-bold text-gray-900">{reasonCode}</p><p className="text-xs text-gray-500">{reasonDesc}</p></div>
+                    <div className="bg-gray-50 rounded-[8px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Amount</p><p className="text-sm font-bold text-gray-900">{fmt(cb.amount)}</p><p className="text-xs text-gray-500">Original transaction</p></div>
+                    <div className="bg-gray-50 rounded-[8px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Status</p><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cb.status === 'Won' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>{cb.status}</span></div>
+                    <div className="bg-gray-50 rounded-[8px] p-3"><p className="text-[10px] text-gray-500 uppercase tracking-wide font-semibold mb-1">Response Deadline</p><p className="text-sm font-bold text-gray-900">30 days from filing</p></div>
                   </div>
 
                   {/* Evidence Builder */}
@@ -1120,8 +1120,8 @@ export function MerchantResidualDetail() {
                   </div>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-3 sticky bottom-0 bg-white">
-                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[6px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
-                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors">Close</button>
+                  {cb.status !== 'Won' && <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Submit Representment</button>}
+                  <button onClick={() => setDisputeModal({ open: false, chargeback: null })} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Close</button>
                 </div>
               </div>
             </div>

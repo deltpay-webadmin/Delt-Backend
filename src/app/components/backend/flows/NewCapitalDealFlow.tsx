@@ -186,7 +186,7 @@ export function NewCapitalDealFlow({
                 )}
               </div>
 
-              <div className="rounded-[10px] border border-gray-200 bg-gray-50/60 px-4 py-3">
+              <div className="rounded-[8px] border border-gray-200 bg-gray-50/60 px-4 py-3">
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
                   Computed terms
                 </div>

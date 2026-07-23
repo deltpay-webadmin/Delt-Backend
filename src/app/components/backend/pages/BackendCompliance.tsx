@@ -71,7 +71,7 @@ function ControlRibbon({ controls, onControlClick, activeControl }: {
         const isActive = activeControl === c.key;
         return (
           <button key={c.key} onClick={() => onControlClick(c.key)} title={c.label}
-            className={`flex items-center gap-1 px-2 py-1 rounded-[4px] text-[10px] font-semibold transition-all border ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-[8px] text-[10px] font-semibold transition-all border ${
               isActive ? `${s.bg} ${s.border} ${s.text} ring-1 ring-offset-1 ring-current` : `bg-white border-gray-200 hover:${s.bg}`
             }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
@@ -384,7 +384,7 @@ const tagCfg: Record<string, { bg: string; text: string }> = {
   compliance: { bg: 'bg-cyan-50', text: 'text-cyan-700' },
   track: { bg: 'bg-gray-100', text: 'text-gray-600' },
   audit: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  generate: { bg: 'bg-indigo-50', text: 'text-brand' },
+  generate: { bg: 'bg-brand-50', text: 'text-brand' },
 };
 
 function Tag({ type }: { type: string }) {
@@ -529,7 +529,7 @@ export function BackendCompliance() {
                     {DEADLINES.filter(d => d.daysLeft <= 7).slice(0, 10).map((item, i) => {
                       const sevColors = { critical: 'bg-red-500', warning: 'bg-amber-500', info: 'bg-blue-400' };
                       return (
-                        <div key={item.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-[6px] border transition-colors ${
+                        <div key={item.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-[8px] border transition-colors ${
                           item.daysLeft <= 0 ? 'bg-red-50/50 border-red-200' : item.daysLeft <= 2 ? 'bg-amber-50/30 border-amber-200' : 'bg-white border-gray-100 hover:border-gray-200'
                         }`}>
                           <span className="text-sm font-bold text-gray-900 w-5 text-right">{i + 1}</span>
@@ -582,7 +582,7 @@ export function BackendCompliance() {
                       const barColor = r.status === 'green' ? 'bg-emerald-500' : r.status === 'yellow' ? 'bg-amber-500' : 'bg-red-500';
                       const TrendIcon = r.trend === 'up' ? TrendingUp : r.trend === 'down' ? TrendingDown : ArrowRight;
                       return (
-                        <div key={i} className="bg-white rounded-[6px] border border-gray-100 px-3 py-2.5">
+                        <div key={i} className="bg-white rounded-[8px] border border-gray-100 px-3 py-2.5">
                           <div className="flex items-center justify-between mb-1.5">
                             <div className="flex items-center gap-2">
                               <Icon className="w-3.5 h-3.5 text-gray-400" />
@@ -613,7 +613,7 @@ export function BackendCompliance() {
                     {CHANGES.map(ch => {
                       const typeColors = { regulatory: 'bg-purple-50 text-purple-700', network: 'bg-blue-50 text-blue-700', vendor: 'bg-gray-100 text-gray-600' };
                       return (
-                        <div key={ch.id} className="bg-white rounded-[6px] border border-gray-100 px-3 py-2.5 hover:border-gray-200 transition-colors">
+                        <div key={ch.id} className="bg-white rounded-[8px] border border-gray-100 px-3 py-2.5 hover:border-gray-200 transition-colors">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-[10px] text-gray-400 font-mono">{ch.date}</span>
                             <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${typeColors[ch.type]}`}>{ch.type}</span>
@@ -637,7 +637,7 @@ export function BackendCompliance() {
             <div>
               {/* Pipeline summary */}
               <div className="flex items-center gap-3 mb-5">
-                <div className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold ${dealsBlocked > 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                <div className={`px-3 py-1.5 rounded-[8px] text-xs font-semibold ${dealsBlocked > 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
                   {dealsBlocked > 0 ? `${dealsBlocked} deal${dealsBlocked > 1 ? 's' : ''} blocked` : 'No blocks'}
                 </div>
                 <span className="text-xs text-gray-400">{DEALS.length} active deals across {MERCHANTS.length} merchants</span>
@@ -672,7 +672,7 @@ export function BackendCompliance() {
 
                       {/* Block reason */}
                       {deal.blocked && (
-                        <div className="bg-red-50 rounded-[6px] border border-red-200 px-3 py-2 mb-3 flex items-center gap-2">
+                        <div className="bg-red-50 rounded-[8px] border border-red-200 px-3 py-2 mb-3 flex items-center gap-2">
                           <Ban className="w-4 h-4 text-red-500 shrink-0" />
                           <p className="text-xs font-semibold text-red-800">{deal.blockReason}</p>
                         </div>
@@ -716,7 +716,7 @@ export function BackendCompliance() {
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-[10px] font-mono text-gray-400">{m.id}</span>
                             <span className="font-mono font-bold text-[10px] text-brand">{m.state}</span>
-                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${m.type === 'mca' ? 'bg-purple-50 text-purple-700' : m.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'}`}>{m.type === 'both' ? 'MCA + Processing' : m.type === 'mca' ? 'MCA' : 'Processing'}</span>
+                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${m.type === 'mca' ? 'bg-purple-50 text-purple-700' : m.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-brand-50 text-brand-hover'}`}>{m.type === 'both' ? 'MCA + Processing' : m.type === 'mca' ? 'MCA' : 'Processing'}</span>
                           </div>
                           <h4 className="text-sm font-bold text-gray-900">{m.name}</h4>
                           <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
@@ -752,7 +752,7 @@ export function BackendCompliance() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] font-mono text-gray-400">{activeMerchant.id}</span>
                     <span className="font-mono font-bold text-xs text-brand">{activeMerchant.state}</span>
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${activeMerchant.type === 'mca' ? 'bg-purple-50 text-purple-700' : activeMerchant.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'}`}>{activeMerchant.type === 'both' ? 'MCA + Processing' : activeMerchant.type === 'mca' ? 'MCA' : 'Processing'}</span>
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${activeMerchant.type === 'mca' ? 'bg-purple-50 text-purple-700' : activeMerchant.type === 'processing' ? 'bg-blue-50 text-blue-700' : 'bg-brand-50 text-brand-hover'}`}>{activeMerchant.type === 'both' ? 'MCA + Processing' : activeMerchant.type === 'mca' ? 'MCA' : 'Processing'}</span>
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">{activeMerchant.name}</h2>
                   <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
@@ -804,7 +804,7 @@ export function BackendCompliance() {
                   {EVIDENCE.filter(e => e.merchant === activeMerchant.name).map(e => {
                     const ctrl = CONTROLS.find(c => c.key === e.control);
                     return (
-                      <div key={e.id} className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-[6px] border border-gray-100">
+                      <div key={e.id} className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-[8px] border border-gray-100">
                         <span className="text-[10px] font-mono text-gray-400 w-32 shrink-0">{e.date}</span>
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ctrl ? statusColors[MERCHANTS.find(m => m.name === e.merchant)?.controls[e.control]?.status || 'gray'].dot : 'bg-gray-300'}`} />
                         <span className="text-xs font-medium text-gray-700 flex-1">{e.type}</span>
@@ -823,7 +823,7 @@ export function BackendCompliance() {
               ═══════════════════════════════ */}
           {tab === 'monitoring' && (
             <div>
-              <div className="flex items-center gap-1 mb-5 bg-gray-50 rounded-[6px] p-0.5 w-fit">
+              <div className="flex items-center gap-1 mb-5 bg-gray-50 rounded-[8px] p-0.5 w-fit">
                 {([
                   { key: 'deadlines' as const, label: 'Deadlines & Expirations', icon: Calendar },
                   { key: 'thresholds' as const, label: 'Threshold Drift', icon: Activity },
@@ -832,7 +832,7 @@ export function BackendCompliance() {
                   const Icon = t.icon;
                   return (
                     <button key={t.key} onClick={() => setMonitoringView(t.key)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-colors ${
                         monitoringView === t.key ? 'bg-white text-brand shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
                       }`}>
                       <Icon className="w-3.5 h-3.5" />
@@ -846,7 +846,7 @@ export function BackendCompliance() {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     {(['all', 'critical', 'warning', 'info'] as const).map(f => (
-                      <button key={f} onClick={() => setDeadlineFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${deadlineFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                      <button key={f} onClick={() => setDeadlineFilter(f)} className={`px-3 py-1.5 rounded-[8px] text-xs font-semibold border transition-colors ${deadlineFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                         {f === 'all' ? `All (${DEADLINES.length})` : `${f.charAt(0).toUpperCase() + f.slice(1)} (${DEADLINES.filter(d => d.severity === f).length})`}
                       </button>
                     ))}
@@ -947,17 +947,17 @@ export function BackendCompliance() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input value={auditSearch} onChange={e => setAuditSearch(e.target.value)}
                     placeholder="Search evidence records..."
-                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-[8px] text-xs focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setAuditControl(null)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${!auditControl ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
+                  <button onClick={() => setAuditControl(null)} className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap ${!auditControl ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>All</button>
                   {CONTROLS.map(c => (
-                    <button key={c.key} onClick={() => setAuditControl(auditControl === c.key ? null : c.key)} className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-semibold border whitespace-nowrap ${auditControl === c.key ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                    <button key={c.key} onClick={() => setAuditControl(auditControl === c.key ? null : c.key)} className={`px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold border whitespace-nowrap ${auditControl === c.key ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                       {c.shortLabel}
                     </button>
                   ))}
                 </div>
-                <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[6px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
+                <button className="ml-auto px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover flex items-center gap-1.5 shrink-0">
                   <Download className="w-3 h-3" /> Export All
                 </button>
               </div>
@@ -1004,7 +1004,7 @@ export function BackendCompliance() {
                         </div>
                         <div className="space-y-1 ml-5">
                           {cat.docs.map((d, di) => (
-                            <div key={di} className="flex items-center gap-3 px-3 py-2 bg-white rounded-[6px] border border-gray-100 hover:border-gray-200 transition-colors group">
+                            <div key={di} className="flex items-center gap-3 px-3 py-2 bg-white rounded-[8px] border border-gray-100 hover:border-gray-200 transition-colors group">
                               <FileText className="w-3 h-3 text-gray-400 shrink-0" />
                               <span className="text-xs text-gray-700 flex-1">{d}</span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1027,7 +1027,7 @@ export function BackendCompliance() {
               ═══════════════════════════════ */}
           {tab === 'rules' && (
             <div>
-              <div className="flex items-center gap-1 mb-5 bg-gray-50 rounded-[6px] p-0.5 w-fit">
+              <div className="flex items-center gap-1 mb-5 bg-gray-50 rounded-[8px] p-0.5 w-fit">
                 {([
                   { key: 'states' as const, label: 'State Rules', icon: Landmark },
                   { key: 'networks' as const, label: 'Card Networks & PCI', icon: CreditCard },
@@ -1038,7 +1038,7 @@ export function BackendCompliance() {
                   const Icon = t.icon;
                   return (
                     <button key={t.key} onClick={() => setRulesTab(t.key)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-medium transition-colors ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-colors ${
                         rulesTab === t.key ? 'bg-white text-brand shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-700'
                       }`}>
                       <Icon className="w-3.5 h-3.5" />
@@ -1053,7 +1053,7 @@ export function BackendCompliance() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     {(['all', 'enforced', 'pending'] as const).map(f => (
-                      <button key={f} onClick={() => setStateFilter(f)} className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors ${stateFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                      <button key={f} onClick={() => setStateFilter(f)} className={`px-3 py-1.5 rounded-[8px] text-xs font-semibold border transition-colors ${stateFilter === f ? 'bg-brand/5 text-brand border-brand/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
                         {f === 'all' ? `All (${STATES.length})` : f === 'enforced' ? `Enforced (${STATES.filter(s => s.status === 'enforced').length})` : `Pending (${STATES.filter(s => s.status === 'pending').length})`}
                       </button>
                     ))}
@@ -1072,7 +1072,7 @@ export function BackendCompliance() {
                                   <span className={`px-1.5 py-0.5 text-[9px] font-semibold rounded ${s.status === 'enforced' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{s.status}</span>
                                   {s.aprReq && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-red-50 text-red-700">APR req</span>}
                                   {s.regReq && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-cyan-50 text-cyan-700">registration</span>}
-                                  {s.contractMod && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-indigo-50 text-brand">addendum</span>}
+                                  {s.contractMod && <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-brand-50 text-brand">addendum</span>}
                                 </div>
                                 <div className="flex gap-4 mt-1 text-[11px] text-gray-500">
                                   <span><span className="text-gray-400">Law:</span> {s.law}</span>
@@ -1086,7 +1086,7 @@ export function BackendCompliance() {
                           {isExpanded && (
                             <div className="px-4 pb-4 border-t border-gray-100 pt-4 ml-11 space-y-4">
                               {s.contractMod && (
-                                <div className="bg-indigo-50 rounded-[6px] p-3 border border-indigo-100">
+                                <div className="bg-brand-50 rounded-[8px] p-3 border border-brand-100">
                                   <p className="text-[10px] font-mono font-bold text-brand mb-1">CONTRACT MODIFICATION REQUIRED</p>
                                   <p className="text-xs text-gray-700 leading-relaxed">{s.contractNote}</p>
                                 </div>
@@ -1140,7 +1140,7 @@ export function BackendCompliance() {
                       </div>
                       <div className="space-y-2 ml-6">
                         {sec.items.map((it, ii) => (
-                          <div key={ii} className="bg-gray-50 rounded-[6px] border border-gray-100 p-3 hover:border-gray-200 transition-colors">
+                          <div key={ii} className="bg-gray-50 rounded-[8px] border border-gray-100 p-3 hover:border-gray-200 transition-colors">
                             <div className="flex items-center gap-2 mb-1.5">
                               <span className="text-sm font-semibold text-gray-900">{it.item}</span>
                               <Tag type={it.type} />
@@ -1176,7 +1176,7 @@ export function BackendCompliance() {
                         <div className="flex gap-2">
                           {([['safe', f.safe], ['mid', f.mid], ['risk', f.risk]] as const).map(([lv, lb]) => (
                             <button key={lv} onClick={() => setHealthState(p => ({ ...p, [f.id]: p[f.id] === lv ? undefined as any : lv }))}
-                              className={`px-3 py-1.5 rounded-[6px] text-xs font-medium border transition-all ${healthState[f.id] === lv ? lv === 'safe' ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : lv === 'risk' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
+                              className={`px-3 py-1.5 rounded-[8px] text-xs font-medium border transition-all ${healthState[f.id] === lv ? lv === 'safe' ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : lv === 'risk' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
                               {lv === 'safe' && <CheckCircle className="w-3 h-3 inline mr-1 -mt-px" />}
                               {lv === 'mid' && <MinusCircle className="w-3 h-3 inline mr-1 -mt-px" />}
                               {lv === 'risk' && <XCircle className="w-3 h-3 inline mr-1 -mt-px" />}
@@ -1202,7 +1202,7 @@ export function BackendCompliance() {
                       </div>
                       <div className="space-y-2 ml-6">
                         {v.obligations.map((ob, i) => (
-                          <div key={i} className="bg-gray-50 rounded-[6px] border border-gray-100 p-3 hover:border-gray-200 transition-colors">
+                          <div key={i} className="bg-gray-50 rounded-[8px] border border-gray-100 p-3 hover:border-gray-200 transition-colors">
                             <div className="flex items-center gap-2 mb-1.5">
                               <span className="text-sm font-semibold text-gray-900">{ob.item}</span>
                               <Tag type={ob.type} />
@@ -1226,7 +1226,7 @@ export function BackendCompliance() {
                         <h4 className="text-xs font-bold text-brand uppercase tracking-wide mb-2 flex items-center gap-2"><Icon className="w-3.5 h-3.5" />{r.topic}</h4>
                         <div className="space-y-1 ml-6">
                           {r.sources.map((s, si) => (
-                            <div key={si} className="flex items-start gap-2 px-3 py-2 bg-white rounded-[6px] border border-gray-100 hover:border-gray-200 transition-colors group">
+                            <div key={si} className="flex items-start gap-2 px-3 py-2 bg-white rounded-[8px] border border-gray-100 hover:border-gray-200 transition-colors group">
                               <span className="text-[10px] text-gray-300 font-mono mt-0.5 shrink-0">{String(si + 1).padStart(2, '0')}</span>
                               <span className="text-xs text-gray-700 leading-relaxed flex-1">{s}</span>
                               <ExternalLink className="w-3 h-3 text-gray-300 mt-0.5 shrink-0 group-hover:text-brand transition-colors" />

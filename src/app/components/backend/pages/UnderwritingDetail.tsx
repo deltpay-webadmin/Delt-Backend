@@ -62,7 +62,7 @@ function NumField({
     <div>
       <div className="flex items-center justify-between mb-1">
         <label className="text-xs text-gray-600">{label}</label>
-        {impact && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600">{impact}</span>}
+        {impact && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 text-brand">{impact}</span>}
       </div>
       <div className="relative">
         <input
@@ -71,7 +71,7 @@ function NumField({
           step={step}
           min={min}
           onChange={e => onChange(parseFloat(e.target.value))}
-          className="w-full px-2.5 py-1.5 border border-gray-200 rounded-[6px] text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+          className="w-full px-2.5 py-1.5 border border-gray-200 rounded-[8px] text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
         />
         {suffix && <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-gray-400">{suffix}</span>}
       </div>
@@ -88,7 +88,7 @@ function SelectField<T extends string>({
       <select
         value={value}
         onChange={e => onChange(e.target.value as T)}
-        className="w-full px-2.5 py-1.5 border border-gray-200 rounded-[6px] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+        className="w-full px-2.5 py-1.5 border border-gray-200 rounded-[8px] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
       >
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
@@ -303,11 +303,11 @@ export function UnderwritingDetail() {
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/underwriting')} className="p-1.5 hover:bg-gray-100 rounded-[6px]">
+            <button onClick={() => navigate('/underwriting')} className="p-1.5 hover:bg-gray-100 rounded-[8px]">
               <ArrowLeft className="w-4 h-4 text-gray-500" />
             </button>
-            <div className="w-10 h-10 rounded-[8px] bg-indigo-50 flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-indigo-600" />
+            <div className="w-10 h-10 rounded-[8px] bg-brand-50 flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-brand" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">{app.businessName}</h1>
@@ -329,7 +329,7 @@ export function UnderwritingDetail() {
               title="Plaid Cash Flow Inputs"
               open={openPlaid}
               onToggle={() => setOpenPlaid(o => !o)}
-              score={<span className="text-xs font-semibold text-indigo-600">{result.p.total}/100</span>}
+              score={<span className="text-xs font-semibold text-brand">{result.p.total}/100</span>}
             >
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <NumField label="Avg Daily Balance" value={plaid.avgDailyBalance} step={500} min={0} suffix="$"
@@ -364,7 +364,7 @@ export function UnderwritingDetail() {
               title="CRS Credit Inputs"
               open={openCrs}
               onToggle={() => setOpenCrs(o => !o)}
-              score={<span className="text-xs font-semibold text-indigo-600">{result.c.total}/100</span>}
+              score={<span className="text-xs font-semibold text-brand">{result.c.total}/100</span>}
             >
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <NumField label="Personal FICO" value={crs.fico} step={5} min={300}
@@ -393,7 +393,7 @@ export function UnderwritingDetail() {
               title="DataMerch MCA Inputs"
               open={openDm}
               onToggle={() => setOpenDm(o => !o)}
-              score={<span className="text-xs font-semibold text-indigo-600">{result.d.total}/100</span>}
+              score={<span className="text-xs font-semibold text-brand">{result.d.total}/100</span>}
             >
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <NumField label="Prior MCA positions" value={dm.priorPositions} step={1} min={0}
@@ -436,7 +436,7 @@ export function UnderwritingDetail() {
                   </div>
                 </div>
                 <div className="mt-5 space-y-3">
-                  <ScoreBar label="Plaid Cash Flow" raw={result.p.total} weightPct={WEIGHTS.plaid * 100} color="bg-indigo-500" />
+                  <ScoreBar label="Plaid Cash Flow" raw={result.p.total} weightPct={WEIGHTS.plaid * 100} color="bg-brand-500" />
                   <ScoreBar label="CRS Credit" raw={result.c.total} weightPct={WEIGHTS.crs * 100} color="bg-violet-500" />
                   <ScoreBar label="DataMerch MCA" raw={result.d.total} weightPct={WEIGHTS.dataMerch * 100} color="bg-cyan-500" />
                 </div>
@@ -486,7 +486,7 @@ export function UnderwritingDetail() {
                 <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Income-to-Holdback Stress Test</h3>
                 <NumField label="Proposed advance $" value={proposedAdvance} step={5000} min={0} suffix="$"
                   onChange={n => setProposedAdvance(n)} />
-                <div className={`mt-3 flex items-center gap-2 px-3 py-2 rounded-[6px] ${stress.passes ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                <div className={`mt-3 flex items-center gap-2 px-3 py-2 rounded-[8px] ${stress.passes ? 'bg-emerald-50' : 'bg-red-50'}`}>
                   {stress.passes ? <ShieldCheck className="w-4 h-4 text-emerald-600" /> : <AlertTriangle className="w-4 h-4 text-red-600" />}
                   <span className={`text-xs font-bold ${stress.passes ? 'text-emerald-700' : 'text-red-700'}`}>
                     {stress.passes ? 'PASSES' : 'FAILS'}
@@ -544,16 +544,16 @@ export function UnderwritingDetail() {
             Composite <strong className="text-gray-900">{result.composite}</strong> · <span className={ts.text}>{tierLabel}</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => saveDraft()} className="px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-[6px] hover:bg-gray-50">
+            <button onClick={() => saveDraft()} className="px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-[8px] hover:bg-gray-50">
               Save Draft
             </button>
             {!stageDone && (
-              <button onClick={moveToReview} className="px-3 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-[6px] hover:bg-indigo-50">
+              <button onClick={moveToReview} className="px-3 py-2 text-sm font-medium text-brand border border-brand-200 rounded-[8px] hover:bg-brand-50">
                 Move to Review
               </button>
             )}
             {!stageDone && (
-              <button onClick={() => setDeclineOpen(true)} className="px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-[6px] hover:bg-red-50">
+              <button onClick={() => setDeclineOpen(true)} className="px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-[8px] hover:bg-red-50">
                 Decline
               </button>
             )}
@@ -562,13 +562,13 @@ export function UnderwritingDetail() {
                 onClick={() => setApproveOpen(true)}
                 disabled={!canApprove}
                 title={canApprove ? '' : 'Requires Tier ≤ 3, no disqualifiers, passing stress test'}
-                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-[6px] hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-[8px] hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
               >
                 <Check className="w-4 h-4" /> Approve &amp; Fund
               </button>
             )}
             {stageDone && (
-              <span className={`px-3 py-2 text-sm font-semibold rounded-[6px] ${app.stage === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+              <span className={`px-3 py-2 text-sm font-semibold rounded-[8px] ${app.stage === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
                 {app.stage}
               </span>
             )}
@@ -579,7 +579,7 @@ export function UnderwritingDetail() {
       {/* Approve confirmation modal */}
       {approveOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setApproveOpen(false)}>
-          <div className="bg-white rounded-[10px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-[8px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
             <div className="px-5 py-4 border-b border-gray-200">
               <h3 className="text-base font-semibold text-gray-900">Approve &amp; Fund</h3>
               <p className="text-xs text-gray-500 mt-0.5">A Capital deal will be created from this application.</p>
@@ -593,9 +593,9 @@ export function UnderwritingDetail() {
               <div className="flex justify-between"><span className="text-gray-500">Tier</span><span className="font-medium">{tierLabel}</span></div>
             </div>
             <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
-              <button onClick={() => setApproveOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[6px]">Cancel</button>
+              <button onClick={() => setApproveOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[8px]">Cancel</button>
               <button onClick={confirmApprove} disabled={approving}
-                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-[6px] hover:bg-emerald-700 disabled:opacity-50">
+                className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-[8px] hover:bg-emerald-700 disabled:opacity-50">
                 {approving ? 'Funding…' : 'Confirm & Create Deal'}
               </button>
             </div>
@@ -606,18 +606,18 @@ export function UnderwritingDetail() {
       {/* Decline modal */}
       {declineOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setDeclineOpen(false)}>
-          <div className="bg-white rounded-[10px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-[8px] shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
             <div className="px-5 py-4 border-b border-gray-200">
               <h3 className="text-base font-semibold text-gray-900">Decline Application</h3>
             </div>
             <div className="px-5 py-4">
               <label className="block text-xs font-medium text-gray-600 mb-1">Reason</label>
               <textarea value={declineReason} onChange={e => setDeclineReason(e.target.value)} rows={3} placeholder="Why is this being declined?"
-                className="w-full px-3 py-2 border border-gray-200 rounded-[6px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
+                className="w-full px-3 py-2 border border-gray-200 rounded-[8px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand" />
             </div>
             <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
-              <button onClick={() => setDeclineOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[6px]">Cancel</button>
-              <button onClick={confirmDecline} className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-[6px] hover:bg-red-700">Confirm Decline</button>
+              <button onClick={() => setDeclineOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-[8px]">Cancel</button>
+              <button onClick={confirmDecline} className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-[8px] hover:bg-red-700">Confirm Decline</button>
             </div>
           </div>
         </div>
