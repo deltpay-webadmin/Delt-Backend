@@ -15,6 +15,7 @@ import {
   Banknote,
   FileText,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type PayeeCategory = 'Employee' | 'Agent Commission';
@@ -140,9 +141,7 @@ export function BackendPayroll() {
             <h1 className="text-2xl font-bold text-gray-900">Payroll</h1>
             <p className="text-sm text-gray-600 mt-1">Manage employee and agent commission payouts</p>
           </div>
-          <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-            <Banknote className="w-4 h-4" /> Run Payroll
-          </button>
+          <Button icon={<Banknote />}>Run Payroll</Button>
         </div>
       </div>
 
@@ -156,19 +155,15 @@ export function BackendPayroll() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 border-b border-gray-200">
-          {(['upcoming', 'history', 'calendar'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
-                tab === t ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          active={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'upcoming', label: 'Upcoming' },
+            { id: 'history', label: 'History' },
+            { id: 'calendar', label: 'Calendar' },
+          ]}
+        />
 
         {/* ── Upcoming Tab ── */}
         {tab === 'upcoming' && (
@@ -290,9 +285,7 @@ export function BackendPayroll() {
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                   Review all line items before approving. Approved payroll is final.
                 </div>
-                <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" /> Approve & Run
-                </button>
+                <Button size="lg" icon={<CheckCircle />}>Approve & Run</Button>
               </div>
             </div>
           </div>

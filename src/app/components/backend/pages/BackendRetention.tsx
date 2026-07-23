@@ -21,6 +21,7 @@ import {
   Megaphone,
   ExternalLink,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 import { useAppNavigate } from '../NavigationContext';
 
 // ── Types ──
@@ -295,7 +296,7 @@ export function BackendRetention() {
             <p className="text-xs text-gray-500 mt-0.5">6 of 8 engaged merchants show rising health scores — 2 disengaged merchants are declining. <span className="font-medium text-gray-700">Merchants who open &amp; respond to outreach churn 42% less.</span></p>
           </div>
         </div>
-        <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0">View Outreach <ExternalLink className="w-3 h-3" /></button>
+        <Button size="sm" className="shrink-0" trailingIcon={<ExternalLink />} onClick={() => navigate('/outreach')}>View Outreach</Button>
       </div>
 
       {/* Table */}

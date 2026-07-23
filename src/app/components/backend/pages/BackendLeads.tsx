@@ -523,26 +523,16 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
         )}
 
         {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <div className="flex px-6">
-            {(['activity', 'notes', 'tasks'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab ? 'border-brand text-brand' : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {tab === 'activity' && <Clock className="w-4 h-4" />}
-                  {tab === 'notes' && <MessageSquare className="w-4 h-4" />}
-                  {tab === 'tasks' && <CheckSquare className="w-4 h-4" />}
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs
+          className="px-6"
+          active={activeTab}
+          onChange={setActiveTab}
+          tabs={[
+            { id: 'activity', label: 'Activity', icon: <Clock /> },
+            { id: 'notes', label: 'Notes', icon: <MessageSquare /> },
+            { id: 'tasks', label: 'Tasks', icon: <CheckSquare /> },
+          ]}
+        />
 
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
@@ -597,12 +587,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                 className="w-full px-4 py-3 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                 rows={4}
               />
-              <button
-                onClick={handleAddNote}
-                className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors"
-              >
-                Add Note
-              </button>
+              <Button onClick={handleAddNote}>Add Note</Button>
             </div>
           )}
           {activeTab === 'tasks' && (
@@ -632,12 +617,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                   placeholder="New task title..."
                   className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-[8px] text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
-                <button
-                  onClick={handleAddTask}
-                  className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors whitespace-nowrap"
-                >
+                <Button className="whitespace-nowrap" onClick={handleAddTask}>
                   Add Task
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -646,24 +628,15 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
         {/* Action Buttons */}
         <div className="bg-white border-t border-gray-200 px-6 py-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={handleAdvanceStage}
-              className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors"
-            >
+            <Button className="flex-1" onClick={handleAdvanceStage}>
               Next Stage
-            </button>
-            <button
-              onClick={handleSubmitApp}
-              className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[8px] hover:bg-emerald-700 transition-colors"
-            >
+            </Button>
+            <Button variant="success" className="flex-1" onClick={handleSubmitApp}>
               Submit Application
-            </button>
-            <button
-              onClick={handleMarkLost}
-              className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleMarkLost}>
               Mark Lost
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -852,8 +825,8 @@ function ReferralsTab() {
               </div>
             </div>
             <div className="flex items-center gap-3 mt-5">
-              <button onClick={saveProgram} className="flex-1 px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Save Changes</button>
-              <button onClick={() => setEditModalOpen(false)} className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors">Cancel</button>
+              <Button className="flex-1" icon={<Save />} onClick={saveProgram}>Save Changes</Button>
+              <Button variant="secondary" onClick={() => setEditModalOpen(false)}>Cancel</Button>
             </div>
           </div>
         </div>

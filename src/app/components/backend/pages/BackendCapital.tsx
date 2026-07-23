@@ -5,6 +5,7 @@ import {
   Shield, RefreshCw, Clock, ChevronRight, Upload,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button, Tabs } from '../ui';
 import { NewCapitalDealFlow } from '../flows/NewCapitalDealFlow';
 import { AchImportFlow } from '../flows/AchImportFlow';
 import { useCapital, capitalActions, type CapitalDeal, type CapitalDealStatus, type CapitalChannel, type LoanPaymentCategory } from '../capitalStore';
@@ -226,12 +227,7 @@ export function BackendCapital() {
           </div>
           <div className="flex items-center gap-3">
             <ModeIndicator isLoading={isLoading} isOnline={isOnline} lastError={lastError} dealCount={DEALS.length} />
-            <button
-              onClick={() => setNewDealOpen(true)}
-              className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" /> New Deal
-            </button>
+            <Button onClick={() => setNewDealOpen(true)} icon={<Plus />}>New Deal</Button>
           </div>
         </div>
 

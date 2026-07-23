@@ -6,6 +6,7 @@ import {
   Send, Edit3, Plus, X, ChevronDown, Activity, Eye,
   Banknote, RefreshCw, GitBranch, Heart, Calendar,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type ActivityType = 'call' | 'email' | 'sms' | 'note' | 'status_change' | 'deal' | 'payment' | 'task' | 'document' | 'alert' | 'system';
@@ -119,8 +120,7 @@ function QuickNoteModal({ onClose, onSave }: { onClose: () => void; onSave: (not
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-gray-200 bg-gray-50 rounded-b-[8px]">
           <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-[8px]">Cancel</button>
-          <button onClick={() => { onSave({ merchant, content, type }); onClose(); }}
-            className="px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover">Log Activity</button>
+          <Button size="sm" onClick={() => { onSave({ merchant, content, type }); onClose(); }}>Log Activity</Button>
         </div>
       </div>
     </div>
@@ -187,10 +187,7 @@ export function BackendActivityTimeline() {
             <p className="text-sm text-gray-500">Every interaction across all merchants and deals</p>
           </div>
         </div>
-        <button onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
-          <Plus className="w-3.5 h-3.5" /> Log Activity
-        </button>
+        <Button size="sm" icon={<Plus />} onClick={() => setShowModal(true)}>Log Activity</Button>
       </div>
 
       {/* Filters */}

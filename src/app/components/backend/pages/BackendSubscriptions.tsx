@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   BarChart3,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 type PlanTier = 'Free' | 'Growth' | 'Custom';
@@ -206,26 +207,14 @@ export function BackendSubscriptions() {
   return (
     <div className="px-6 py-6 space-y-6">
       {/* Top Tab Bar */}
-      <div className="border-b border-gray-200">
-        <div className="flex gap-0">
-          {([
-            { key: 'plans' as const, label: 'Merchant Plans' },
-            { key: 'iso' as const, label: 'ISO Tenants' },
-          ]).map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTopTab(t.key)}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                topTab === t.key
-                  ? 'border-brand text-brand'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Tabs
+        active={topTab}
+        onChange={setTopTab}
+        tabs={[
+          { id: 'plans', label: 'Merchant Plans' },
+          { id: 'iso', label: 'ISO Tenants' },
+        ]}
+      />
 
       {topTab === 'iso' ? (
         selectedISO ? (
@@ -519,10 +508,7 @@ function ISOTenantsTab({ onViewTenant }: { onViewTenant: (t: ISOTenant) => void 
           <h1 className="text-2xl font-bold text-gray-900">ISO Tenants</h1>
           <p className="text-sm text-gray-500 mt-1">Manage ISOs licensing the Delt platform</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">
-          <Plus className="w-4 h-4" />
-          Onboard ISO
-        </button>
+        <Button icon={<Plus />}>Onboard ISO</Button>
       </div>
 
       {/* Summary Cards */}
@@ -679,9 +665,7 @@ function ISOTenantDetail({ tenant, onBack }: { tenant: ISOTenant; onBack: () => 
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-[8px] text-gray-600 hover:bg-gray-50 transition-colors">
-              Edit Tenant
-            </button>
+            <Button variant="secondary">Edit Tenant</Button>
             <button className="px-4 py-2 text-sm font-medium border border-red-200 rounded-[8px] text-red-600 hover:bg-red-50 transition-colors">
               Suspend
             </button>

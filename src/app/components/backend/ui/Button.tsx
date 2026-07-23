@@ -14,7 +14,7 @@
 import React from 'react';
 import { cn } from '../../ui/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -31,6 +31,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-white hover:bg-brand-hover',
   secondary: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700',
   danger: 'bg-red-600 text-white hover:bg-red-700',
   ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, TrendingDown, Edit, Plus, Download, FileText, FileCheck, File, Receipt, CalendarDays, CreditCard, Banknote, Globe, AlertCircle, Mail, MessageSquare, Monitor, Eye, MousePointerClick, ChevronDown, Send, PlusCircle, ToggleLeft, ToggleRight, CheckCircle, Settings, Clock, Percent, XCircle, ExternalLink, Gauge, Smartphone, Activity, Brain, Zap, Shield, BarChart3, Key, Package, Gift, Copy, Users, Truck, Link2, X, ShieldAlert, StickyNote, Flag, Calendar, Megaphone, Trash2 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
+import { Button, Tabs } from '../ui';
 
 /* ─── Shared sub-components ─── */
 
@@ -147,7 +148,7 @@ function OutreachTemplateCard({ name, desc, tplId, onPreview }: { name: string; 
       <div className="min-w-0 flex-1"><p className="text-sm font-medium text-gray-900">{name}</p><p className="text-xs text-gray-500 mt-0.5">{desc}</p></div>
       <div className="flex items-center gap-2 ml-3 shrink-0">
         <button onClick={() => onPreview(tplId)} className="text-xs text-brand hover:underline">Preview</button>
-        <button className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1"><Send className="w-3 h-3" />Send</button>
+        <Button size="sm" icon={<Send />}>Send</Button>
       </div>
     </div>
   );
@@ -240,8 +241,8 @@ export function MerchantDetail() {
               <p className="text-sm text-gray-600">Assigned to: <span className="font-medium text-gray-900">Sarah Johnson</span></p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors flex items-center gap-2"><Edit className="w-4 h-4" />Edit</button>
-              <button className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2"><Plus className="w-4 h-4" />New MCA Application</button>
+              <Button variant="secondary" icon={<Edit />}>Edit</Button>
+              <Button icon={<Plus />}>New MCA Application</Button>
             </div>
           </div>
         </div>
@@ -308,7 +309,7 @@ export function MerchantDetail() {
                     ))}</div>
                     <div className="flex items-center gap-2 mt-2">
                       <input type="text" value={newTask} onChange={e => setNewTask(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && newTask.trim()) { setTasks(p => [...p, { id: `t-${Date.now()}`, text: newTask.trim(), due: 'Set date...', done: false }]); setNewTask(''); } }} placeholder="Add a task..." className="flex-1 text-sm border border-gray-200 rounded-[8px] px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand placeholder:text-gray-400" />
-                      <button onClick={() => { if (newTask.trim()) { setTasks(p => [...p, { id: `t-${Date.now()}`, text: newTask.trim(), due: 'Set date...', done: false }]); setNewTask(''); } }} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Add</button>
+                      <Button size="sm" onClick={() => { if (newTask.trim()) { setTasks(p => [...p, { id: `t-${Date.now()}`, text: newTask.trim(), due: 'Set date...', done: false }]); setNewTask(''); } }}>Add</Button>
                     </div>
                   </div>
                   <div className="border-t border-gray-100 pt-4">
@@ -322,7 +323,7 @@ export function MerchantDetail() {
                     ))}</div>
                     <div className="flex items-start gap-2 mt-2">
                       <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Add a note..." rows={2} className="flex-1 text-sm border border-gray-200 rounded-[8px] px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand placeholder:text-gray-400 resize-none" />
-                      <button onClick={() => { if (newNote.trim()) { setNotes(p => [{ id: `n-${Date.now()}`, text: newNote.trim(), author: 'You', date: 'Just now' }, ...p]); setNewNote(''); } }} className="px-3 py-1.5 bg-brand text-white text-xs font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Add</button>
+                      <Button size="sm" onClick={() => { if (newNote.trim()) { setNotes(p => [{ id: `n-${Date.now()}`, text: newNote.trim(), author: 'You', date: 'Just now' }, ...p]); setNewNote(''); } }}>Add</Button>
                     </div>
                   </div>
                 </div>
@@ -417,7 +418,7 @@ export function MerchantDetail() {
                   <p className="text-xs text-gray-500 mt-0.5">Use the dedicated Outreach page for bulk sends, automation rules, and template management</p>
                 </div>
               </div>
-              <button onClick={() => navigate('/outreach')} className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0"><Send className="w-3.5 h-3.5" />Go to Outreach</button>
+              <Button onClick={() => navigate('/outreach')} icon={<Send />} className="shrink-0">Go to Outreach</Button>
             </div>
 
             {/* Outreach History */}
@@ -503,7 +504,7 @@ export function MerchantDetail() {
         {activeTab === 'lens' && (
           <div className="space-y-6">
             {merchantProducts.lens === 'inactive' ? (
-              <div className="bg-white rounded-[8px] border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><button className="px-5 py-2.5 bg-brand text-white text-sm font-medium rounded-[8px] hover:bg-brand-hover transition-colors">Activate Lens AI</button></div></div>
+              <div className="bg-white rounded-[8px] border border-gray-200"><div className="py-16 flex flex-col items-center justify-center text-center px-6"><div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center mb-4"><Brain className="w-7 h-7 text-purple-400" /></div><h3 className="text-lg font-semibold text-gray-900 mb-1">Lens AI Not Active</h3><p className="text-sm text-gray-500 mb-5 max-w-sm">Activate to unlock AI-powered insights.</p><Button size="lg">Activate Lens AI</Button></div></div>
             ) : (
               <>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

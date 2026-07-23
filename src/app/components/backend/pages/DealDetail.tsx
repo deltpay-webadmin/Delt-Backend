@@ -5,6 +5,7 @@ import {
   Download, ExternalLink, CreditCard, Activity, Zap, RotateCcw, Eye,
   ArrowUpRight, ArrowDownRight, Ban, RefreshCw, Info,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 import { useAppNavigate } from '../NavigationContext';
 
 // ── Helpers ──
@@ -164,31 +165,22 @@ export function DealDetail() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3.5 py-2 border border-gray-200 rounded-[8px] text-sm text-gray-600 bg-white hover:bg-gray-50 inline-flex items-center gap-2 transition-colors">
-                <Download className="w-4 h-4" /> Export
-              </button>
-              <button className="px-3.5 py-2 bg-brand text-white rounded-[8px] text-sm font-medium hover:bg-brand-hover inline-flex items-center gap-2 transition-colors">
-                <ExternalLink className="w-4 h-4" /> View Merchant
-              </button>
+              <Button variant="secondary" icon={<Download />}>Export</Button>
+              <Button icon={<ExternalLink />}>View Merchant</Button>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-1 mt-5 -mb-[1px]">
-            {(['overview', 'payments', 'financials'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2.5 text-sm font-medium rounded-t-[6px] transition-colors border-b-2 ${
-                  activeTab === tab
-                    ? 'text-brand border-brand bg-canvas'
-                    : 'text-gray-500 border-transparent hover:text-gray-700'
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            className="mt-5"
+            active={activeTab}
+            onChange={setActiveTab}
+            tabs={[
+              { id: 'overview', label: 'Overview' },
+              { id: 'payments', label: 'Payments' },
+              { id: 'financials', label: 'Financials' },
+            ]}
+          />
         </div>
       </div>
 

@@ -19,6 +19,7 @@ import {
   ClipboardList,
   Landmark,
 } from 'lucide-react';
+import { Button, Tabs } from '../ui';
 
 // ── Types ──
 interface ArticleCard {
@@ -306,14 +307,8 @@ export function HelpCenter({ onClose }: { onClose: () => void }) {
                     Can't find what you're looking for? Our support team is available Monday–Friday, 9 AM–6 PM EST.
                   </p>
                   <div className="flex items-center justify-center gap-3">
-                    <button className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[8px] hover:bg-brand-hover transition-colors flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4" />
-                      Contact Support
-                    </button>
-                    <button className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[8px] hover:bg-gray-50 transition-colors flex items-center gap-2">
-                      <Ticket className="w-4 h-4" />
-                      Submit a Ticket
-                    </button>
+                    <Button size="lg" icon={<MessageCircle />}>Contact Support</Button>
+                    <Button variant="secondary" size="lg" icon={<Ticket />}>Submit a Ticket</Button>
                   </div>
                 </div>
               </section>
