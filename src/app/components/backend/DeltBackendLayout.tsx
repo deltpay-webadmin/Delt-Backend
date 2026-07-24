@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useAuth } from '../../auth/AuthContext';
 import { NavigationContext } from './NavigationContext';
 import { SyncIndicator } from './SyncIndicator';
 import { BackendDashboard } from './pages/BackendDashboard';
@@ -270,17 +271,26 @@ const allCommands: CommandItem[] = [
   { label: 'General Settings', path: '/settings', group: 'Settings', icon: Wrench },
 ];
 
-const adminUser = { name: 'John Doe', initials: 'JD', email: 'john.doe@delt.com', role: 'Operations Manager' };
-const agentUser = { name: 'Marcus Johnson', initials: 'MJ', email: 'marcus.j@delt.com', role: 'Senior Sales Agent' };
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Administrator',
+  manager: 'Manager',
+  agent: 'Sales Agent',
+  employee: 'Employee',
+};
 
 // ════════════════════════════════════════
 // Main Layout
 // ════════════════════════════════════════
 export function DeltBackendLayout() {
+  const { profile, signOut } = useAuth();
+  const profileRole = profile?.role ?? 'agent';
+  // Admins/managers get the full backend view and may switch to the agent
+  // view; agents/employees are locked to the agent view.
+  const canSwitchView = profileRole === 'admin' || profileRole === 'manager';
   const [currentPage, setCurrentPage] = useState('/');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole>('admin');
+  const [userRole, setUserRole] = useState<UserRole>(canSwitchView ? 'admin' : 'agent');
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const [cmdQuery, setCmdQuery] = useState('');
   const [helpCenterOpen, setHelpCenterOpen] = useState(false);
@@ -436,7 +446,12 @@ export function DeltBackendLayout() {
     }
   };
 
-  const user = userRole === 'admin' ? adminUser : agentUser;
+  const user = {
+    name: profile?.name ?? 'User',
+    initials: profile?.initials ?? 'U',
+    email: profile?.email ?? '',
+    role: ROLE_LABELS[profileRole] ?? profileRole,
+  };
 
   return (
     <NavigationContext.Provider value={{ navigate: handleNavigate, currentPage }}>
@@ -596,15 +611,22 @@ export function DeltBackendLayout() {
                       <p className="text-[11px] text-gray-500">{user.email}</p>
                     </div>
                     <button className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50">Profile Settings</button>
-                    <button
-                      onClick={toggleRole}
-                      className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <ArrowLeftRight className="w-3.5 h-3.5" />
-                      Switch to {userRole === 'admin' ? 'Agent' : 'Admin'} View
-                    </button>
+                    {canSwitchView && (
+                      <button
+                        onClick={toggleRole}
+                        className="w-full px-4 py-2 text-left text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <ArrowLeftRight className="w-3.5 h-3.5" />
+                        Switch to {userRole === 'admin' ? 'Agent' : 'Admin'} View
+                      </button>
+                    )}
                     <div className="border-t border-gray-100 mt-1 pt-1">
-                      <button className="w-full px-4 py-2 text-left text-[13px] text-red-600 hover:bg-red-50">Log Out</button>
+                      <button
+                        onClick={() => void signOut()}
+                        className="w-full px-4 py-2 text-left text-[13px] text-red-600 hover:bg-red-50"
+                      >
+                        Log Out
+                      </button>
                     </div>
                   </div>
                 </>
@@ -661,15 +683,17 @@ export function DeltBackendLayout() {
                   <SyncIndicator />
                 </div>
 
-                {/* Role Toggle */}
-                <button
-                  onClick={toggleRole}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[6px] border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
-                  title="Switch view"
-                >
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                  {userRole === 'admin' ? 'Agent' : 'Admin'}
-                </button>
+                {/* Role Toggle (admins/managers only) */}
+                {canSwitchView && (
+                  <button
+                    onClick={toggleRole}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-[6px] border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                    title="Switch view"
+                  >
+                    <ArrowLeftRight className="w-3.5 h-3.5" />
+                    {userRole === 'admin' ? 'Agent' : 'Admin'}
+                  </button>
+                )}
 
                 {/* Notifications */}
                 <button className="relative p-2 hover:bg-gray-100 rounded-[8px] transition-colors">

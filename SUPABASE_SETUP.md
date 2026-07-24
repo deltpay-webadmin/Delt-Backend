@@ -75,6 +75,35 @@ In your Vercel project: **Settings → Environment Variables** and add the same 
 - Realtime events from other clients flow into `applyRealtime()` and reconcile the local cache without a refetch.
 - When Supabase is not configured, the store returns a small fallback seed so dev/preview environments still render screens.
 
-## Tightening security later
+## Authentication (migration `0005_auth_profiles.sql`)
 
-The current RLS policies are permissive because there's no user system yet. When you add Supabase Auth (or any other auth), replace the policies in `0001_init.sql` with per-user / per-org rules. The three columns most likely to be involved are `assigned_agent`, `reviewer`, and `referring_merchant` — add them to the `USING (...)` clause.
+The app now requires a real Supabase Auth sign-in. Migration `0005`:
+
+- Creates a `profiles` table (`id` → `auth.users`, `full_name`, `role` ∈ `admin | manager | agent | employee`), auto-populated by a trigger whenever an auth user is created.
+- **Removes all `anon` access** — every app table now requires an authenticated session. It also revokes `anon` table grants outright.
+- Lets users edit their own profile, but only admins change roles.
+
+### Rollout order (important)
+
+Applying `0005` before deploying the new frontend will make the old deployed app show empty data (it used the anon key with no login). Do it in this order:
+
+1. Deploy the frontend from this branch (it includes the login screen).
+2. Run `supabase/migrations/0005_auth_profiles.sql` in the SQL Editor.
+3. Create your first users: **Authentication → Users → Add user** (email + password, and optionally set `{"full_name": "...", "role": "admin"}` in user metadata), or promote an existing user:
+
+   ```sql
+   UPDATE public.profiles SET role = 'admin' WHERE email = 'you@company.com';
+   ```
+
+4. **Rotate the anon key** (Project Settings → API → "Reset" on the anon key). The previous key was committed to this repo's git history in `src/app/utils/supabase/info.tsx`, so treat it as public. Update `VITE_SUPABASE_ANON_KEY` locally and in Vercel afterwards.
+
+### Roles
+
+| Role | View |
+|---|---|
+| `admin`, `manager` | Full backend view, can switch to the agent view |
+| `agent`, `employee` | Agent view only |
+
+### Tightening further later
+
+The table policies are still all-or-nothing per authenticated user. Next step is per-role scoping: agents restricted to rows where `assigned_agent` matches their profile, reviewers to `reviewer`, etc. — add those to the `USING (...)` clauses with `public.current_user_role()`.
