@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { NewLeadFlow } from '../flows/NewLeadFlow';
+import { QuickLeadFlow } from '../flows/QuickLeadFlow';
 import {
   Plus,
   Search,
@@ -874,6 +875,7 @@ export function BackendLeads() {
   const [stageFilter, setStageFilter] = useState<string>('All');
   const [agentFilter, setAgentFilter] = useState<string>('All');
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [fullApplicationOpen, setFullApplicationOpen] = useState(false);
 
   const leads = useLeads();
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
@@ -1215,10 +1217,21 @@ export function BackendLeads() {
       {/* Lead Detail Panel */}
       {selectedLead && <LeadDetailPanel lead={selectedLead} onClose={() => setSelectedLead(null)} />}
 
-      {/* New Lead Flow (Stripe-style slide-over) */}
-      <NewLeadFlow
+      {/* Quick add (default) — full KYB intake one click away */}
+      <QuickLeadFlow
         open={newLeadOpen}
         onClose={() => setNewLeadOpen(false)}
+        onCreated={created => {
+          setSelectedLeadId(created.id);
+        }}
+        onOpenFullApplication={() => {
+          setNewLeadOpen(false);
+          setFullApplicationOpen(true);
+        }}
+      />
+      <NewLeadFlow
+        open={fullApplicationOpen}
+        onClose={() => setFullApplicationOpen(false)}
         onCreated={created => {
           setSelectedLeadId(created.id);
           toast.success(`Lead "${created.businessName}" created`);
@@ -1228,116 +1241,3 @@ export function BackendLeads() {
   );
 }
 
-// ────────────────────────────────────────────────
-// New Lead Modal
-// ────────────────────────────────────────────────
-function NewLeadModal({ onClose, onCreate }: { onClose: () => void; onCreate: (lead: Lead) => void }) {
-  const [form, setForm] = useState({
-    businessName: '',
-    industry: '',
-    contactName: '',
-    contactEmail: '',
-    contactPhone: '',
-    type: 'MCA' as Lead['type'],
-    source: 'Website Inquiry',
-    monthlySales: '',
-    amountRequested: '',
-    assignedAgent: 'Sarah Johnson',
-    priority: 'Medium' as Lead['priority'],
-    notes: '',
-  });
-
-  const update = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
-
-  const handleSubmit = () => {
-    if (!form.businessName.trim()) {
-      toast.error('Business name is required');
-      return;
-    }
-    const created = leadActions.create(form as any);
-    onCreate(created);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">New Lead</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-md">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-        <div className="px-6 py-5 grid grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto">
-          <FormInput label="Business Name *" value={form.businessName} onChange={v => update('businessName', v)} full />
-          <FormInput label="Industry" value={form.industry} onChange={v => update('industry', v)} />
-          <FormInput label="Contact Name" value={form.contactName} onChange={v => update('contactName', v)} />
-          <FormInput label="Contact Email" value={form.contactEmail} onChange={v => update('contactEmail', v)} />
-          <FormInput label="Contact Phone" value={form.contactPhone} onChange={v => update('contactPhone', v)} />
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
-            <select
-              value={form.type}
-              onChange={e => update('type', e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option>MCA</option><option>Residual</option><option>Leasing</option>
-            </select>
-          </div>
-          <FormInput label="Source" value={form.source} onChange={v => update('source', v)} />
-          <FormInput label="Monthly Sales" value={form.monthlySales} onChange={v => update('monthlySales', v)} placeholder="$50,000" />
-          <FormInput label="Amount Requested" value={form.amountRequested} onChange={v => update('amountRequested', v)} placeholder="$100,000" />
-          <FormInput label="Assigned Agent" value={form.assignedAgent} onChange={v => update('assignedAgent', v)} />
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Priority</label>
-            <select
-              value={form.priority}
-              onChange={e => update('priority', e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option>High</option><option>Medium</option><option>Low</option>
-            </select>
-          </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={e => update('notes', e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-            />
-          </div>
-        </div>
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50">Cancel</button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4" /> Create Lead
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FormInput({
-  label,
-  value,
-  onChange,
-  full,
-  placeholder,
-}: { label: string; value: string; onChange: (v: string) => void; full?: boolean; placeholder?: string }) {
-  return (
-    <div className={full ? 'col-span-2' : ''}>
-      <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
-      <input
-        value={value}
-        placeholder={placeholder}
-        onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
-    </div>
-  );
-}
