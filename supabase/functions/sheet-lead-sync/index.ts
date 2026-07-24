@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       industry: pick(fields, ['industry']) || 'General',
       contact_name: contactName,
       contact_email: pick(fields, ['email', 'emailaddress']),
-      contact_phone: pick(fields, ['phonenumber', 'phone', 'mobile']),
+      contact_phone: pick(fields, ['phonenumber', 'phone', 'mobile']).replace(/^p:/, ''),
       type: 'Processing',
       source: 'Meta Ads',
       monthly_sales: monthlySales ? `$${monthlySales.replace(/^\$/, '')}` : '',

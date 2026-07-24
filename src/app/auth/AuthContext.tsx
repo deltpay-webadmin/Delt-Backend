@@ -106,18 +106,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // NOTE: keep this callback synchronous — supabase-js holds a cross-tab
+    // navigator.lock while dispatching auth events, so awaiting auth calls
+    // (or anything slow) in here deadlocks every tab of the app.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setProfile(null);
         setStatus('signedOut');
       } else if (event === 'SIGNED_IN' && session?.user) {
-        const p = await fetchProfile(session.user.id, session.user.email ?? '');
-        if (p) {
-          setProfile(p);
-          setStatus('signedIn');
-        } else {
-          await supabase!.auth.signOut();
-        }
+        const { id, email } = session.user;
+        setTimeout(async () => {
+          const p = await fetchProfile(id, email ?? '');
+          if (p) {
+            setProfile(p);
+            setStatus('signedIn');
+          } else {
+            await supabase!.auth.signOut();
+          }
+        }, 0);
       }
     });
 
