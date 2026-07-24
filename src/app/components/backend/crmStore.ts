@@ -36,31 +36,21 @@ import { capitalActions } from './capitalStore';
 // Types (unchanged — pages depend on this exact shape)
 // ══════════════════════════════════════════════════════════════
 
-export type LeadStage =
-  | 'New'
-  | 'Contacted'
-  | 'Qualified'
-  | 'Application Submitted'
-  | 'Bank Verification'
-  | 'Identity Verification'
-  | 'Underwriting'
-  | 'Docs & E-Sign'
-  | 'Funded';
+// Leads cover pre-application ground only; once an application starts
+// (elsewhere — onboarding/underwriting), the lead is simply Converted.
+export type LeadStage = 'New' | 'Contacted' | 'Qualified' | 'Converted';
 
-export const LEAD_STAGES: LeadStage[] = [
-  'New',
-  'Contacted',
-  'Qualified',
-  'Application Submitted',
-  'Bank Verification',
-  'Identity Verification',
-  'Underwriting',
-  'Docs & E-Sign',
-  'Funded',
-];
+export const LEAD_STAGES: LeadStage[] = ['New', 'Contacted', 'Qualified', 'Converted'];
+
+/** Legacy stage values (from the old 9-stage pipeline) → current stages. */
+export function normalizeLeadStage(stage: string): LeadStage {
+  if (stage === 'New' || stage === 'Contacted' || stage === 'Qualified' || stage === 'Converted') return stage;
+  return 'Converted'; // Application Submitted / Bank / ID / UW / Docs / Funded
+}
 
 export interface LeadStepDetail {
-  stage: LeadStage;
+  // Application-flow step name (application lives outside the lead pipeline).
+  stage: string;
   completedAt: string | null;
 }
 
@@ -533,7 +523,7 @@ function fromDbLead(r: any): Lead {
     priority: r.priority,
     lastActivity: r.last_activity ?? '',
     assignedAgent: r.assigned_agent ?? '',
-    stage: r.stage,
+    stage: normalizeLeadStage(r.stage ?? 'New'),
     timeline: r.timeline ?? [],
     notes: r.notes ?? '',
     extraNotes: r.extra_notes ?? [],
@@ -1055,7 +1045,7 @@ export const leadActions = {
     if (idx < 0 || idx >= LEAD_STAGES.length - 1) return;
     const next = LEAD_STAGES[idx + 1];
     const patch: Partial<Lead> = { stage: next, lastActivity: 'just now' };
-    if (next === 'Funded') patch.status = 'Won';
+    if (next === 'Converted') patch.status = 'Won';
     else if (lead.status === 'New') patch.status = 'In Progress';
     leadActions.update(id, patch);
     leadActions.addTimeline(id, { title: `Advanced to ${next}`, description: 'Pipeline stage promoted', user: 'You', timestamp: 'just now' });
@@ -1064,21 +1054,18 @@ export const leadActions = {
   submitApplication(id: string) {
     const lead = state.leads.find(l => l.id === id);
     if (!lead) return;
-    const patch: Partial<Lead> = {
-      stage: 'Application Submitted',
-      status: 'In Progress',
-      lastActivity: 'just now',
-      stepDetails: lead.stepDetails || [
-        { stage: 'Application Submitted', completedAt: nowStamp() },
-        { stage: 'Bank Verification', completedAt: null },
-        { stage: 'Identity Verification', completedAt: null },
-        { stage: 'Underwriting', completedAt: null },
-        { stage: 'Docs & E-Sign', completedAt: null },
-        { stage: 'Funded', completedAt: null },
-      ],
-    };
-    leadActions.update(id, patch);
-    leadActions.addTimeline(id, { title: 'Application submitted', description: 'Handed off to onboarding', user: 'You', timestamp: 'just now' });
+    leadActions.update(id, { stage: 'Converted', status: 'Won', lastActivity: 'just now' });
+    leadActions.addTimeline(id, { title: 'Lead converted', description: 'Application started — handled outside the lead pipeline', user: 'You', timestamp: 'just now' });
+  },
+
+  remove(id: string) {
+    const prev = state.leads;
+    persist(
+      'lead',
+      () => set({ leads: state.leads.filter(l => l.id !== id) }),
+      () => set({ leads: prev }),
+      () => supabase!.from('pipeline_leads').delete().eq('id', id).then(r => ({ error: r.error })),
+    );
   },
 
   markLost(id: string) {
