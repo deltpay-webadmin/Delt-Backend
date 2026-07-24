@@ -52,22 +52,32 @@ const DEMO_PROFILE: Profile = {
   initials: 'DU',
 };
 
-async function fetchProfile(userId: string, email: string): Promise<Profile> {
+/**
+ * CRM access requires a row in staff_profiles. Customer-portal accounts
+ * (public.profiles) share the same auth.users pool but have no staff row,
+ * so they are denied here — returns null for non-staff.
+ */
+async function fetchProfile(userId: string, email: string): Promise<Profile | null> {
   const { data } = await supabase!
-    .from('profiles')
+    .from('staff_profiles')
     .select('id, email, full_name, role')
     .eq('id', userId)
     .maybeSingle();
 
-  const name = data?.full_name || email.split('@')[0];
+  if (!data) return null;
+
+  const name = data.full_name || email.split('@')[0];
   return {
     id: userId,
-    email: data?.email || email,
+    email: data.email || email,
     name,
-    role: (data?.role as ProfileRole) || 'agent',
+    role: (data.role as ProfileRole) || 'agent',
     initials: initialsOf(name, email),
   };
 }
+
+const NO_ACCESS_MESSAGE =
+  'This account does not have CRM access. Ask an administrator to add you as staff.';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>(isSupabaseConfigured ? 'loading' : 'signedOut');
@@ -83,9 +93,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       if (session?.user) {
         const p = await fetchProfile(session.user.id, session.user.email ?? '');
-        if (!cancelled) {
+        if (cancelled) return;
+        if (p) {
           setProfile(p);
           setStatus('signedIn');
+        } else {
+          await supabase!.auth.signOut();
+          setStatus('signedOut');
         }
       } else {
         setStatus('signedOut');
@@ -98,8 +112,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStatus('signedOut');
       } else if (event === 'SIGNED_IN' && session?.user) {
         const p = await fetchProfile(session.user.id, session.user.email ?? '');
-        setProfile(p);
-        setStatus('signedIn');
+        if (p) {
+          setProfile(p);
+          setStatus('signedIn');
+        } else {
+          await supabase!.auth.signOut();
+        }
       }
     });
 
@@ -111,9 +129,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     if (!supabase) return { error: 'Supabase is not configured in this environment.' };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       return { error: error.message === 'Invalid login credentials' ? 'Invalid email or password' : error.message };
+    }
+    // Valid credentials but no staff record → not a CRM user.
+    const p = data.user ? await fetchProfile(data.user.id, data.user.email ?? '') : null;
+    if (!p) {
+      await supabase.auth.signOut();
+      return { error: NO_ACCESS_MESSAGE };
     }
     return { error: null };
   }, []);

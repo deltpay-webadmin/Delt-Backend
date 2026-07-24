@@ -75,27 +75,40 @@ In your Vercel project: **Settings → Environment Variables** and add the same 
 - Realtime events from other clients flow into `applyRealtime()` and reconcile the local cache without a refetch.
 - When Supabase is not configured, the store returns a small fallback seed so dev/preview environments still render screens.
 
-## Authentication (migration `0005_auth_profiles.sql`)
+## Live deployment: "Delt Pay Database" project
 
-The app now requires a real Supabase Auth sign-in. Migration `0005`:
+The production Supabase project (`ytemrmpnwmzqeradbeoa`, **Delt Pay Database**) is shared with the Delt Pay / Delt Capital websites and the customer portal. The CRM schema was applied to it directly (as migrations `crm_staff_access`, `crm_core_tables`, `crm_leads_mirror`) — equivalent to this repo's `0001`–`0007` without demo seed data. Two naming facts to know:
 
-- Creates a `profiles` table (`id` → `auth.users`, `full_name`, `role` ∈ `admin | manager | agent | employee`), auto-populated by a trigger whenever an auth user is created.
-- **Removes all `anon` access** — every app table now requires an authenticated session. It also revokes `anon` table grants outright.
-- Lets users edit their own profile, but only admins change roles.
+- The CRM's lead table is **`pipeline_leads`** (not `leads`) — `public.leads` was already taken by a view over the Capital site's raw leads.
+- CRM staff live in **`staff_profiles`** (not `profiles`) — `public.profiles` belongs to the customer portal. Portal customers share `auth.users` but have no staff row, so the CRM rejects them at login and RLS blocks them from all CRM tables.
 
-### Rollout order (important)
+### Lead ingestion (all automatic, deduplicated by `external_id`)
 
-Applying `0005` before deploying the new frontend will make the old deployed app show empty data (it used the anon key with no login). Do it in this order:
+| Source | Path |
+|---|---|
+| Delt Pay website forms | `submit-lead` edge fn → `crm_leads` → mirror trigger → `pipeline_leads` |
+| Delt Capital site | `delt_capital.leads` → `crm_leads` → mirror trigger → `pipeline_leads` |
+| Meta lead ads | Google Sheet → Apps Script → `sheet-lead-sync` edge fn → `pipeline_leads` |
+| Manual / Quick Add / KYB intake | app UI → `pipeline_leads` |
 
-1. Deploy the frontend from this branch (it includes the login screen).
-2. Run `supabase/migrations/0005_auth_profiles.sql` in the SQL Editor.
-3. Create your first users: **Authentication → Users → Add user** (email + password, and optionally set `{"full_name": "...", "role": "admin"}` in user metadata), or promote an existing user:
+### Adding CRM staff
 
-   ```sql
-   UPDATE public.profiles SET role = 'admin' WHERE email = 'you@company.com';
-   ```
+Create the auth user (**Authentication → Users → Add user**), then:
 
-4. **Rotate the anon key** (Project Settings → API → "Reset" on the anon key). The previous key was committed to this repo's git history in `src/app/utils/supabase/info.tsx`, so treat it as public. Update `VITE_SUPABASE_ANON_KEY` locally and in Vercel afterwards.
+```sql
+INSERT INTO public.staff_profiles (id, email, full_name, role)
+SELECT id, email, 'Full Name', 'admin'   -- role: admin | manager | agent | employee
+FROM auth.users WHERE email = 'you@company.com';
+```
+
+There is deliberately **no** auto-provisioning trigger — website signups must not become staff.
+
+### Frontend env vars (local `.env.local` and Vercel)
+
+```bash
+VITE_SUPABASE_URL=https://ytemrmpnwmzqeradbeoa.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon / publishable key from Project Settings → API>
+```
 
 ### Roles
 
@@ -106,4 +119,4 @@ Applying `0005` before deploying the new frontend will make the old deployed app
 
 ### Tightening further later
 
-The table policies are still all-or-nothing per authenticated user. Next step is per-role scoping: agents restricted to rows where `assigned_agent` matches their profile, reviewers to `reviewer`, etc. — add those to the `USING (...)` clauses with `public.current_user_role()`.
+CRM table policies are all-or-nothing per staff member. Next step is per-role scoping: agents restricted to rows where `assigned_agent` matches their profile, reviewers to `reviewer`, etc. — add those to the `USING (...)` clauses with `public.current_staff_role()`.

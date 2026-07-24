@@ -14,8 +14,8 @@
  */
 
 var CONFIG = {
-  // Your Supabase project ref, e.g. https://abcd1234.supabase.co
-  WEBHOOK_URL: 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/sheet-lead-sync',
+  // Delt Pay Database project (already deployed).
+  WEBHOOK_URL: 'https://ytemrmpnwmzqeradbeoa.supabase.co/functions/v1/sheet-lead-sync',
   // Must match the SHEET_SYNC_SECRET function secret in Supabase.
   SYNC_SECRET: 'PASTE-YOUR-SECRET-HERE',
   // Name of the tab holding Meta leads. Leave '' to use the first tab.

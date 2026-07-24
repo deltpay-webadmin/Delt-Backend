@@ -10,12 +10,12 @@
 -- legacy leads without KYB data keep working (column is nullable).
 -- ════════════════════════════════════════════════════════════════════
 
-ALTER TABLE public.leads
+ALTER TABLE public.pipeline_leads
   ADD COLUMN IF NOT EXISTS kyb JSONB;
 
-COMMENT ON COLUMN public.leads.kyb IS
+COMMENT ON COLUMN public.pipeline_leads.kyb IS
   'Full KYB onboarding payload (business, reps, owners, processing, bank, docs, attestation). See src/app/components/backend/crmStore.ts -> KybIntake.';
 
 -- Optional index for querying by MCC or monthly volume (disabled by default).
 -- CREATE INDEX IF NOT EXISTS leads_kyb_mcc_idx
---   ON public.leads ((kyb -> 'business' ->> 'mcc'));
+--   ON public.pipeline_leads ((kyb -> 'business' ->> 'mcc'));

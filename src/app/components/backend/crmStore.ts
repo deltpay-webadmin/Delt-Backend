@@ -777,7 +777,7 @@ async function maybeHydrate() {
 
   try {
     const [leadsRes, onbRes, uwRes, refRes, progRes] = await Promise.all([
-      supabase.from('leads').select('*').order('id', { ascending: true }),
+      supabase.from('pipeline_leads').select('*').order('id', { ascending: true }),
       supabase.from('onboarding_apps').select('*').order('id', { ascending: true }),
       supabase.from('underwriting_apps').select('*').order('id', { ascending: true }),
       supabase.from('referrals').select('*').order('id', { ascending: true }),
@@ -819,7 +819,7 @@ function subscribeRealtime() {
     .channel('crm-sync')
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'leads' },
+      { event: '*', schema: 'public', table: 'pipeline_leads' },
       payload => applyRealtime('leads', payload),
     )
     .on(
@@ -1026,7 +1026,7 @@ export const leadActions = {
       'lead',
       () => set({ leads: [created, ...state.leads] }),
       () => set({ leads: prev }),
-      () => supabase!.from('leads').insert(toDbLead(created)).then(r => ({ error: r.error })),
+      () => supabase!.from('pipeline_leads').insert(toDbLead(created)).then(r => ({ error: r.error })),
     );
     return created;
   },
@@ -1039,7 +1039,7 @@ export const leadActions = {
       'lead',
       () => set({ leads: state.leads.map(l => (l.id === id ? { ...l, ...patch } : l)) }),
       () => set({ leads: prev }),
-      () => supabase!.from('leads').update(toDbLead(patch)).eq('id', id).then(r => ({ error: r.error })),
+      () => supabase!.from('pipeline_leads').update(toDbLead(patch)).eq('id', id).then(r => ({ error: r.error })),
     );
   },
 

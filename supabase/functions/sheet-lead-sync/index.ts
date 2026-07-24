@@ -1,7 +1,7 @@
 /**
  * sheet-lead-sync — receives Meta lead rows pushed from the Google Sheet
  * (via the Apps Script in integrations/meta-leads/) and inserts them into
- * the `leads` table, deduplicated by external_id.
+ * the `pipeline_leads` table, deduplicated by external_id.
  *
  * Auth: requests must send header `x-sync-secret` matching the
  * SHEET_SYNC_SECRET function secret. Fails closed if the secret is unset.
@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
   const ids = [...byId.keys()];
 
   const { data: existing, error: selErr } = await supabase
-    .from('leads')
+    .from('pipeline_leads')
     .select('external_id')
     .in('external_id', ids);
   if (selErr) return json(500, { error: `Lookup failed: ${selErr.message}` });
@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
   });
 
   if (rows.length > 0) {
-    const { error: insErr } = await supabase.from('leads').insert(rows);
+    const { error: insErr } = await supabase.from('pipeline_leads').insert(rows);
     if (insErr) return json(500, { error: `Insert failed: ${insErr.message}` });
   }
 

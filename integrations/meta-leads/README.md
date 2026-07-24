@@ -1,10 +1,19 @@
 # Meta Leads → Google Sheet → Delt Backend
 
-Meta lead ads land in your Google Sheet; this integration pushes each new row into the Delt Backend `leads` table in Supabase automatically, deduplicated so nothing imports twice. Imported leads appear live in the Leads pipeline (source **"Meta Ads"**, stage **New**, unassigned) in both the admin and agent views.
+Meta lead ads land in your Google Sheet; this integration pushes each new row into the Delt Backend `pipeline_leads` table in Supabase automatically, deduplicated so nothing imports twice. Imported leads appear live in the Leads pipeline (source **"Meta Ads"**, stage **New**, unassigned) in both the admin and agent views.
 
 ```
 Meta lead ad → Google Sheet → Apps Script (every 5 min) → sheet-lead-sync edge function → Supabase leads table → CRM (realtime)
 ```
+
+## Deployment status
+
+Already live on the **Delt Pay Database** project (`ytemrmpnwmzqeradbeoa`):
+
+- ✅ `sheet-lead-sync` edge function deployed: `https://ytemrmpnwmzqeradbeoa.supabase.co/functions/v1/sheet-lead-sync`
+- ✅ `pipeline_leads` table with unique `external_id` (dedupe) applied
+- ⬜ `SHEET_SYNC_SECRET` — must be set before the function accepts anything (step 1)
+- ⬜ Apps Script installed in the Google Sheet (step 2)
 
 ## One-time setup (~10 minutes)
 
@@ -17,24 +26,12 @@ Generate a long random string (e.g. `openssl rand -hex 32`) and set it as a func
 
 The function rejects every request until this is set.
 
-### 2. Deploy the edge function (if not already deployed)
-
-```bash
-supabase functions deploy sheet-lead-sync --no-verify-jwt
-```
-
-(`--no-verify-jwt` because the Apps Script authenticates with the secret header, not a Supabase JWT.)
-
-### 3. Apply migration `0006_lead_external_id.sql`
-
-Run it in the Supabase SQL Editor. It adds a unique `external_id` column to `leads` — this is what makes re-syncs duplicate-proof.
-
-### 4. Install the Apps Script in the Google Sheet
+### 2. Install the Apps Script in the Google Sheet
 
 1. Open the Meta leads sheet → **Extensions → Apps Script**.
 2. Paste the contents of [`Code.gs`](./Code.gs) into the editor.
 3. Fill in `CONFIG` at the top:
-   - `WEBHOOK_URL` — `https://<your-project-ref>.supabase.co/functions/v1/sheet-lead-sync`
+   - `WEBHOOK_URL` — already filled in (`https://ytemrmpnwmzqeradbeoa.supabase.co/functions/v1/sheet-lead-sync`)
    - `SYNC_SECRET` — the same value from step 1
    - `SHEET_NAME` — the tab name, or leave `''` for the first tab
 4. Run **`syncNewLeads`** once from the toolbar. Authorize when prompted. This backfills every existing row.
