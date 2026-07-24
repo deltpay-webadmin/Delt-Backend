@@ -38,6 +38,7 @@ import {
   UserPlus,
   Truck,
   XCircle,
+  Trash2,
 } from 'lucide-react';
 import {
   useLeads,
@@ -49,24 +50,13 @@ import {
   type Lead as StoreLead,
 } from '../crmStore';
 
-// ── Full pipeline stages ──
-const ALL_STAGES = [
-  'New',
-  'Contacted',
-  'Qualified',
-  'Application Submitted',
-  'Bank Verification',
-  'Identity Verification',
-  'Underwriting',
-  'Docs & E-Sign',
-  'Funded',
-] as const;
+// ── Lead pipeline stages (pre-application only — applications are
+// started and completed elsewhere; a lead that starts one is Converted) ──
+const ALL_STAGES = ['New', 'Contacted', 'Qualified', 'Converted'] as const;
 type StageName = (typeof ALL_STAGES)[number];
 
-const ONBOARDING_STAGES: StageName[] = ['Application Submitted', 'Bank Verification', 'Identity Verification', 'Underwriting', 'Docs & E-Sign', 'Funded'];
-
 interface StepDetail {
-  stage: StageName;
+  stage: string;
   completedAt: string | null;
 }
 
@@ -85,11 +75,6 @@ interface Referral {
 }
 
 // ── Helpers ──
-function isPostApplication(stage: StageName): boolean {
-  const idx = ALL_STAGES.indexOf(stage);
-  return idx >= 3; // Application Submitted or later
-}
-
 function stageIndex(stage: StageName): number {
   return ALL_STAGES.indexOf(stage);
 }
@@ -273,21 +258,15 @@ function StatCard({ label, value, trend, icon, variant = 'default' }: StatCardPr
   );
 }
 
-// ── Stage Progress (updated for full journey) ──
-function StageProgress({ stage, stepDetails }: { stage: StageName; stepDetails?: StepDetail[] }) {
+// ── Stage Progress ──
+function StageProgress({ stage }: { stage: StageName; stepDetails?: StepDetail[] }) {
   const currentIdx = stageIndex(stage);
 
-  // Short labels for compact display
   const shortLabels: Record<StageName, string> = {
     'New': 'New',
-    'Contacted': 'Contact',
-    'Qualified': 'Qualify',
-    'Application Submitted': 'App Sub',
-    'Bank Verification': 'Bank',
-    'Identity Verification': 'ID',
-    'Underwriting': 'UW',
-    'Docs & E-Sign': 'Docs',
-    'Funded': 'Funded',
+    'Contacted': 'Contacted',
+    'Qualified': 'Qualified',
+    'Converted': 'Converted',
   };
 
   return (
@@ -295,8 +274,8 @@ function StageProgress({ stage, stepDetails }: { stage: StageName; stepDetails?:
       <p className="text-xs text-gray-500 mb-3">Pipeline Stage</p>
       <div className="flex items-center gap-1">
         {ALL_STAGES.map((s, index) => {
-          const isComplete = index < currentIdx || (index === currentIdx && s === 'Funded');
-          const isCurrent = index === currentIdx && s !== 'Funded';
+          const isComplete = index < currentIdx || (index === currentIdx && s === 'Converted');
+          const isCurrent = index === currentIdx && s !== 'Converted';
 
           return (
             <React.Fragment key={s}>
@@ -352,13 +331,20 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
     toast.success(`Advanced to ${ALL_STAGES[idx + 1]}`);
   };
 
-  const handleSubmitApp = () => {
-    if (ALL_STAGES.indexOf(lead.stage) >= ALL_STAGES.indexOf('Application Submitted')) {
-      toast.info('Application already submitted');
+  const handleConvert = () => {
+    if (lead.stage === 'Converted') {
+      toast.info('Lead already converted');
       return;
     }
     leadActions.submitApplication(lead.id);
-    toast.success('Application submitted — routed to onboarding');
+    toast.success('Lead converted — application handled outside the pipeline');
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm(`Delete lead "${lead.businessName}"? This cannot be undone.`)) return;
+    leadActions.remove(lead.id);
+    toast.success('Lead deleted');
+    onClose();
   };
 
   const handleMarkLost = () => {
@@ -383,11 +369,9 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
     toast.success('Task added');
   };
 
-  const postApp = isPostApplication(lead.stage);
-  const currentIdx = stageIndex(lead.stage);
-  // For merchant-facing preview, count only onboarding steps
-  const onboardingIdx = ONBOARDING_STAGES.indexOf(lead.stage);
-  const onboardingStepNum = onboardingIdx >= 0 ? onboardingIdx + 1 : null;
+  // Legacy application-progress details (application flow lives elsewhere).
+  const appSteps = lead.stepDetails && lead.stepDetails.length > 0 ? lead.stepDetails : null;
+  const firstIncompleteStep = appSteps ? appSteps.findIndex(s => s.completedAt === null) : -1;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -453,18 +437,16 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
           <WelcomeBundleSection lead={lead} />
         )}
 
-        {/* Post-Application: Step Progress + Blocker + Merchant Preview */}
-        {postApp && lead.stepDetails && (
+        {/* Application progress (tracked outside the lead pipeline) */}
+        {appSteps && (
           <div className="px-6 py-5 border-b border-gray-200 space-y-5">
-            {/* Step-by-step progress */}
             <div>
-              <p className="text-xs text-gray-500 mb-3 font-medium">Onboarding Progress</p>
+              <p className="text-xs text-gray-500 mb-3 font-medium">Application Progress</p>
               <div className="space-y-0">
-                {lead.stepDetails.map((step, i) => {
+                {appSteps.map((step, i) => {
                   const isCompleted = step.completedAt !== null;
-                  const thisStageIdx = ALL_STAGES.indexOf(step.stage);
-                  const isCurrent = thisStageIdx === currentIdx && !isCompleted;
-                  const isFuture = thisStageIdx > currentIdx;
+                  const isCurrent = i === firstIncompleteStep;
+                  const isFuture = firstIncompleteStep >= 0 && i > firstIncompleteStep;
 
                   return (
                     <div key={step.stage} className="flex gap-3">
@@ -482,7 +464,7 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                             <Circle className="w-3 h-3 text-gray-300" />
                           </div>
                         )}
-                        {i < lead.stepDetails!.length - 1 && (
+                        {i < appSteps.length - 1 && (
                           <div className={`w-0.5 flex-1 min-h-[18px] ${isCompleted ? 'bg-emerald-200' : 'bg-gray-200'}`} />
                         )}
                       </div>
@@ -506,17 +488,6 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
                     <p className="text-xs font-medium text-gray-800">Blocking: {lead.blocker}</p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Merchant-facing preview line */}
-            {onboardingStepNum !== null && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50 rounded-[6px] border border-indigo-200">
-                <Smartphone className="w-4 h-4 text-indigo-500 shrink-0" />
-                <p className="text-xs text-indigo-700">
-                  <span className="font-medium">Applicant sees:</span> Step {onboardingStepNum} of {ONBOARDING_STAGES.length}
-                  {lead.stage !== 'Funded' && ` — ${lead.stage} — Estimated ${stageIndex(lead.stage) < 6 ? '24' : '48'}hrs`}
-                </p>
               </div>
             )}
           </div>
@@ -653,16 +624,23 @@ function LeadDetailPanel({ lead, onClose }: { lead: Lead | null; onClose: () => 
               Next Stage
             </button>
             <button
-              onClick={handleSubmitApp}
+              onClick={handleConvert}
               className="flex-1 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-[6px] hover:bg-emerald-700 transition-colors"
             >
-              Submit Application
+              Mark Converted
             </button>
             <button
               onClick={handleMarkLost}
               className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-[6px] hover:bg-gray-50 transition-colors"
             >
               Mark Lost
+            </button>
+            <button
+              onClick={handleDelete}
+              title="Delete lead"
+              className="px-3 py-2.5 bg-white border border-red-200 text-red-600 text-sm font-medium rounded-[6px] hover:bg-red-50 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -911,7 +889,7 @@ export function BackendLeads() {
   const inProgressLeads = leads.filter(l => l.status === 'In Progress').length;
   const wonLeads = leads.filter(l => l.status === 'Won').length;
   const conversionRate = totalLeads > 0 ? ((wonLeads / totalLeads) * 100).toFixed(1) : '0.0';
-  const avgTimeToFunded = 5.2;
+  const convertedLeads = leads.filter(l => l.stage === 'Converted').length;
 
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
@@ -944,17 +922,13 @@ export function BackendLeads() {
   };
 
   const stageBadgeCls = (stage: StageName) => {
-    if (isPostApplication(stage)) {
-      switch (stage) {
-        case 'Application Submitted': return 'bg-gray-100 text-gray-700 border-gray-200';
-        case 'Bank Verification': return 'bg-blue-50 text-blue-700 border-blue-200';
-        case 'Identity Verification': return 'bg-violet-50 text-violet-700 border-violet-200';
-        case 'Underwriting': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-        case 'Docs & E-Sign': return 'bg-amber-50 text-amber-700 border-amber-200';
-        case 'Funded': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      }
+    switch (stage) {
+      case 'New': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'Contacted': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'Qualified': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      case 'Converted': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
-    return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   return (
@@ -984,7 +958,7 @@ export function BackendLeads() {
           <StatCard label="In Progress" value={inProgressLeads.toString()} icon={<Clock className="w-5 h-5" />} />
           <StatCard label="Won" value={wonLeads.toString()} trend={{ value: '+1 this week', isPositive: true }} icon={<CheckCircle className="w-5 h-5" />} />
           <StatCard label="Conversion Rate" value={`${conversionRate}%`} icon={<TrendingUp className="w-5 h-5" />} />
-          <StatCard label="Avg Time to Funded" value={`${avgTimeToFunded} days`} icon={<Calendar className="w-5 h-5" />} />
+          <StatCard label="Converted" value={convertedLeads.toString()} icon={<Calendar className="w-5 h-5" />} />
         </div>
 
         {/* Tabs: Leads / Referrals */}
@@ -1199,9 +1173,23 @@ export function BackendLeads() {
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <button onClick={() => setSelectedLead(lead)} className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                            <ChevronRight className="w-5 h-5 text-gray-400" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                if (!window.confirm(`Delete lead "${lead.businessName}"? This cannot be undone.`)) return;
+                                leadActions.remove(lead.id);
+                                toast.success('Lead deleted');
+                              }}
+                              title="Delete lead"
+                              className="p-2 hover:bg-red-50 rounded-md transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </button>
+                            <button onClick={() => setSelectedLead(lead)} className="p-2 hover:bg-gray-100 rounded-md transition-colors">
+                              <ChevronRight className="w-5 h-5 text-gray-400" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
