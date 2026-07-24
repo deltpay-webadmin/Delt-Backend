@@ -81,9 +81,11 @@ BEGIN
     EXECUTE format('DROP POLICY IF EXISTS %I_staff_all ON public.%I', t, t);
     EXECUTE format('CREATE POLICY %I_staff_all ON public.%I FOR ALL TO authenticated USING (public.is_staff()) WITH CHECK (public.is_staff())', t, t);
     EXECUTE format('REVOKE ALL ON public.%I FROM anon', t);
-    -- Edge functions (sheet-lead-sync) connect as service_role; make sure
-    -- it keeps DML even if broader revokes ran on this database.
+    -- The live database alters default privileges to strip grants from new
+    -- tables, so re-grant explicitly: service_role for edge functions
+    -- (sheet-lead-sync), authenticated for the app (RLS gates rows to staff).
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO service_role', t);
+    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO authenticated', t);
   END LOOP;
 END $$;
 
