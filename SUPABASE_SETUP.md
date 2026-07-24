@@ -75,6 +75,48 @@ In your Vercel project: **Settings → Environment Variables** and add the same 
 - Realtime events from other clients flow into `applyRealtime()` and reconcile the local cache without a refetch.
 - When Supabase is not configured, the store returns a small fallback seed so dev/preview environments still render screens.
 
-## Tightening security later
+## Live deployment: "Delt Pay Database" project
 
-The current RLS policies are permissive because there's no user system yet. When you add Supabase Auth (or any other auth), replace the policies in `0001_init.sql` with per-user / per-org rules. The three columns most likely to be involved are `assigned_agent`, `reviewer`, and `referring_merchant` — add them to the `USING (...)` clause.
+The production Supabase project (`ytemrmpnwmzqeradbeoa`, **Delt Pay Database**) is shared with the Delt Pay / Delt Capital websites and the customer portal. The CRM schema was applied to it directly (as migrations `crm_staff_access`, `crm_core_tables`, `crm_leads_mirror`) — equivalent to this repo's `0001`–`0007` without demo seed data. Two naming facts to know:
+
+- The CRM's lead table is **`pipeline_leads`** (not `leads`) — `public.leads` was already taken by a view over the Capital site's raw leads.
+- CRM staff live in **`staff_profiles`** (not `profiles`) — `public.profiles` belongs to the customer portal. Portal customers share `auth.users` but have no staff row, so the CRM rejects them at login and RLS blocks them from all CRM tables.
+
+### Lead ingestion (all automatic, deduplicated by `external_id`)
+
+| Source | Path |
+|---|---|
+| Delt Pay website forms | `submit-lead` edge fn → `crm_leads` → mirror trigger → `pipeline_leads` |
+| Delt Capital site | `delt_capital.leads` → `crm_leads` → mirror trigger → `pipeline_leads` |
+| Meta lead ads | Google Sheet → Apps Script → `sheet-lead-sync` edge fn → `pipeline_leads` |
+| Manual / Quick Add / KYB intake | app UI → `pipeline_leads` |
+
+### Adding CRM staff
+
+Create the auth user (**Authentication → Users → Add user**), then:
+
+```sql
+INSERT INTO public.staff_profiles (id, email, full_name, role)
+SELECT id, email, 'Full Name', 'admin'   -- role: admin | manager | agent | employee
+FROM auth.users WHERE email = 'you@company.com';
+```
+
+There is deliberately **no** auto-provisioning trigger — website signups must not become staff.
+
+### Frontend env vars (local `.env.local` and Vercel)
+
+```bash
+VITE_SUPABASE_URL=https://ytemrmpnwmzqeradbeoa.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon / publishable key from Project Settings → API>
+```
+
+### Roles
+
+| Role | View |
+|---|---|
+| `admin`, `manager` | Full backend view, can switch to the agent view |
+| `agent`, `employee` | Agent view only |
+
+### Tightening further later
+
+CRM table policies are all-or-nothing per staff member. Next step is per-role scoping: agents restricted to rows where `assigned_agent` matches their profile, reviewers to `reviewer`, etc. — add those to the `USING (...)` clauses with `public.current_staff_role()`.
