@@ -4,8 +4,10 @@ import {
   Lightbulb, Trophy, RefreshCw, Copy, X, AlertTriangle, Clock,
   Zap, ArrowRight, CircleDot, Ban, Voicemail, CalendarCheck, FileText,
   Flame, User, Building2, Pencil, Save, RotateCcw, TrendingUp,
+  CalendarPlus, MessageSquare, Mail, Link2, MapPin, Video, ExternalLink,
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
+import { useAuth } from '../../../auth/AuthContext';
 
 // ══════════════════════════════════════
 // TYPES
@@ -42,7 +44,7 @@ interface CallSession {
 }
 interface LeadLite {
   id: string; business_name: string; contact_name: string | null;
-  contact_phone: string | null; industry: string | null;
+  contact_email: string | null; contact_phone: string | null; industry: string | null;
 }
 
 // ══════════════════════════════════════
@@ -201,7 +203,7 @@ export function BackendCallPlaybooks() {
       supabase.from('playbook_cards').select('*').eq('is_active', true).order('sort_order'),
       supabase.from('card_variants').select('*').order('created_at'),
       supabase.from('call_sessions').select('*').order('created_at', { ascending: false }).limit(2000),
-      supabase.from('pipeline_leads').select('id,business_name,contact_name,contact_phone,industry').order('business_name'),
+      supabase.from('pipeline_leads').select('id,business_name,contact_name,contact_email,contact_phone,industry').order('business_name'),
     ]);
     setPlaybooks((pb.data as Playbook[]) ?? []);
     setCards((cd.data as Card[]) ?? []);
@@ -289,6 +291,7 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
   playbooks: Playbook[]; cards: Card[]; variants: Variant[]; sessions: CallSession[];
   leads: LeadLite[]; onLogged: () => void;
 }) {
+  const { profile } = useAuth();
   const [product, setProduct] = useState<'deltpay' | 'deltcapital'>('deltpay');
   const [playbookId, setPlaybookId] = useState<string>('');
   const [leadId, setLeadId] = useState<string>('');
@@ -305,7 +308,14 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState(false);
+  const [actionsLog, setActionsLog] = useState<string[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Default the rep name from the signed-in profile
+  useEffect(() => {
+    if (!repName && profile?.name) setRepName(profile.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.name]);
 
   const productBooks = playbooks.filter(p => p.product === product);
   const playbook = playbooks.find(p => p.id === playbookId) ?? null;
@@ -362,6 +372,7 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
     setDisposition('');
     setMeetingBooked(false);
     setNotes('');
+    setActionsLog([]);
     setInCall(true);
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
   };
@@ -392,7 +403,7 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
       meeting_booked: meetingBooked || !!dispo?.meeting,
       objections_hit: objectionsHit,
       duration_seconds: elapsed,
-      notes: notes || null,
+      notes: [notes, actionsLog.length ? `Actions: ${actionsLog.join(' | ')}` : ''].filter(Boolean).join('\n') || null,
     });
     setSaving(false);
     if (error) {
@@ -511,6 +522,12 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
           </label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Notes — what worked, what stalled, exact words they used…"
             className="w-full border border-gray-200 rounded-[6px] px-3 py-2 text-[13px]" />
+          {actionsLog.length > 0 && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-[6px] px-3 py-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-700 mb-1">Actions taken on this call</p>
+              {actionsLog.map((a, i) => <p key={i} className="text-[12px] text-emerald-900">• {a}</p>)}
+            </div>
+          )}
           {objectionsHit.length > 0 && (
             <p className="text-[12px] text-gray-500">
               Objections hit: {objectionsHit.map(id => cards.find(c => c.id === id)?.title).filter(Boolean).join(' · ')}
@@ -535,7 +552,7 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
   const currentVariant = currentCard ? assignment[currentCard.id] : null;
 
   return (
-    <div className="max-w-4xl space-y-3">
+    <div className="max-w-6xl space-y-3">
       {/* Call header */}
       <div className="flex flex-wrap items-center justify-between gap-2 bg-white rounded-[8px] border border-gray-200 px-4 py-2.5">
         <div className="flex items-center gap-3 min-w-0">
@@ -561,6 +578,8 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
         </div>
       </div>
 
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-3 lg:items-start">
+      <div className="space-y-3 min-w-0">
       {/* Stage tabs */}
       <div className="flex items-center gap-1 overflow-x-auto">
         {STAGE_ORDER.map(s => {
@@ -639,6 +658,246 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
             </button>
           ))}
         </div>
+      </div>
+      </div>{/* /left column */}
+
+      {/* Right column — in-call actions */}
+      <div className="space-y-3 mt-3 lg:mt-0">
+        <ActionPanel
+          product={product}
+          lead={lead}
+          repName={repName}
+          onBooked={() => { setMeetingBooked(true); setDisposition('MEETING_BOOKED'); }}
+          onLog={entry => setActionsLog(prev => [...prev, entry])}
+        />
+        {actionsLog.length > 0 && (
+          <div className="bg-white rounded-[8px] border border-gray-200 px-4 py-3">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">This call</p>
+            <div className="space-y-1.5">
+              {actionsLog.map((a, i) => (
+                <p key={i} className="text-[12px] text-gray-700 flex items-start gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" /> {a}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      </div>{/* /grid */}
+    </div>
+  );
+}
+
+// ════════════════════════════════════
+// ACTION PANEL (in-call): book meeting · send app link
+// ════════════════════════════════════
+// Talks to the rep-actions edge function. Meetings send a confirmation
+// email + .ics invite immediately; 24h/2h reminders run on pg_cron.
+// Texts follow the house convention: we open the rep's SMS app
+// (Google Voice) with the message prefilled — nothing sends silently.
+
+async function invokeRepAction(body: Record<string, unknown>): Promise<{ ok?: boolean; error?: string;[k: string]: unknown }> {
+  if (!supabase) return { error: 'Supabase not configured' };
+  const { data, error } = await supabase.functions.invoke('rep-actions', { body });
+  if (error) {
+    // FunctionsHttpError carries the response — try to surface the real message
+    try {
+      const ctx = (error as { context?: Response }).context;
+      if (ctx) { const j = await ctx.json(); if (j?.error) return { error: String(j.error) }; }
+    } catch { /* fall through */ }
+    return { error: error.message || 'Request failed' };
+  }
+  return (data ?? {}) as { ok?: boolean; error?: string };
+}
+
+function openSms(uri: string, body: string) {
+  try { navigator.clipboard?.writeText(body); } catch { /* best effort */ }
+  window.open(uri, '_self');
+}
+
+function ActionPanel({ product, lead, repName, onBooked, onLog }: {
+  product: 'deltpay' | 'deltcapital';
+  lead: LeadLite | null;
+  repName: string;
+  onBooked: (when: string) => void;
+  onLog: (entry: string) => void;
+}) {
+  const [email, setEmail] = useState(lead?.contact_email ?? '');
+  const [phone, setPhone] = useState(lead?.contact_phone ?? '');
+  const business = lead?.business_name ?? 'this merchant';
+  const contactName = lead?.contact_name ?? '';
+
+  // ── book meeting state ──
+  const [showBook, setShowBook] = useState(false);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [duration, setDuration] = useState(30);
+  const [mode, setMode] = useState<'online' | 'in_person'>('online');
+  const [meetLink, setMeetLink] = useState(() => localStorage.getItem('delt_meet_link') ?? '');
+  const [location, setLocation] = useState('');
+  const [booking, setBooking] = useState(false);
+  const [bookedSms, setBookedSms] = useState<{ uri: string; body: string } | null>(null);
+  const [appProduct, setAppProduct] = useState<'pay' | 'capital'>(product === 'deltcapital' ? 'capital' : 'pay');
+  const [sending, setSending] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+
+  useEffect(() => { setEmail(lead?.contact_email ?? ''); setPhone(lead?.contact_phone ?? ''); }, [lead?.id]);
+  useEffect(() => { setAppProduct(product === 'deltcapital' ? 'capital' : 'pay'); }, [product]);
+
+  const flash = (msg: string) => { setDone(msg); setErr(null); setTimeout(() => setDone(null), 5000); };
+  const fail = (msg: string) => { setErr(msg); setDone(null); };
+
+  const book = async () => {
+    if (!date || !time) { fail('Pick a date and time'); return; }
+    const startsAt = new Date(`${date}T${time}`);
+    if (isNaN(startsAt.getTime())) { fail('Invalid date/time'); return; }
+    setBooking(true); setErr(null);
+    if (mode === 'online' && meetLink) localStorage.setItem('delt_meet_link', meetLink);
+    const r = await invokeRepAction({
+      action: 'book_meeting',
+      lead_id: lead?.id ?? null,
+      product,
+      merchant_business: business,
+      contact_name: contactName || null,
+      contact_email: email || null,
+      contact_phone: phone || null,
+      mode,
+      location: mode === 'in_person' ? location || null : null,
+      meeting_link: mode === 'online' ? meetLink || null : null,
+      starts_at: startsAt.toISOString(),
+      duration_min: duration,
+      rep_name: repName || null,
+    });
+    setBooking(false);
+    if (r.error) { fail(r.error); return; }
+    const when = String(r.when ?? `${date} ${time}`);
+    onBooked(when);
+    onLog(`Meeting booked — ${when}${r.confirmation_emailed ? ' · invite emailed' : email ? ' · email failed' : ' · no email on file'}`);
+    const sms = r.sms as { uri: string; body: string } | null;
+    setBookedSms(sms ?? null);
+    setShowBook(false);
+    flash(r.confirmation_emailed
+      ? `Booked — invite + reminders are on their way`
+      : `Booked — no confirmation email sent (${email ? 'send failed' : 'no email on file'})`);
+  };
+
+  const sendLink = async (channel: 'email' | 'sms') => {
+    if (channel === 'email' && !email) { fail('Add an email first'); return; }
+    if (channel === 'sms' && !phone) { fail('Add a phone number first'); return; }
+    setSending(channel); setErr(null);
+    const r = await invokeRepAction({
+      action: 'send_app_link',
+      product: appProduct,
+      channel,
+      business,
+      contact_name: contactName,
+      email, phone,
+      rep_name: repName,
+      lead_id: lead?.id ?? null,
+    });
+    setSending(null);
+    if (r.error) { fail(r.error); return; }
+    const label = appProduct === 'pay' ? 'DeltPay app' : 'Capital app';
+    if (channel === 'email') {
+      onLog(`${label} link emailed to ${email}`);
+      flash(`${label} link emailed`);
+    } else {
+      const sms = r.sms as { uri: string; body: string };
+      onLog(`${label} link texted to ${phone}`);
+      flash('Text ready — opening your SMS app (message copied too)');
+      openSms(sms.uri, sms.body);
+    }
+  };
+
+  const inputCls = 'w-full border border-gray-200 rounded-[6px] px-2.5 py-1.5 text-[13px]';
+
+  return (
+    <div className="bg-white rounded-[8px] border border-gray-200 p-4 space-y-4">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Take action</p>
+
+      {/* contact */}
+      <div className="space-y-1.5">
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="merchant@email.com" className={inputCls} type="email" />
+        <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(305) 555-0123" className={inputCls} type="tel" />
+      </div>
+
+      {err && <p className="text-[12px] text-red-600 bg-red-50 border border-red-200 rounded-[6px] px-2.5 py-1.5">{err}</p>}
+      {done && <p className="text-[12px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-[6px] px-2.5 py-1.5 flex items-center gap-1.5"><Check className="w-3.5 h-3.5 shrink-0" /> {done}</p>}
+
+      {/* ── Book meeting ── */}
+      {!showBook ? (
+        <button onClick={() => setShowBook(true)}
+          className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[13px] font-semibold rounded-[8px] px-3 py-2.5">
+          <CalendarPlus className="w-4 h-4" /> Book a meeting
+        </button>
+      ) : (
+        <div className="border border-indigo-200 bg-indigo-50/40 rounded-[8px] p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-semibold text-gray-900">Book a meeting</p>
+            <button onClick={() => setShowBook(false)} className="text-gray-400 hover:text-gray-600"><X className="w-3.5 h-3.5" /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputCls} min={new Date().toISOString().slice(0, 10)} />
+            <input type="time" value={time} onChange={e => setTime(e.target.value)} className={inputCls} />
+          </div>
+          <div className="flex rounded-[6px] border border-gray-200 overflow-hidden">
+            {([['online', Video, 'Online'], ['in_person', MapPin, 'In person']] as const).map(([v, Icon, label]) => (
+              <button key={v} onClick={() => setMode(v)}
+                className={`flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-1.5 whitespace-nowrap ${mode === v ? 'bg-gray-900 text-white' : 'bg-white text-gray-500'}`}>
+                <Icon className="w-3 h-3" /> {label}
+              </button>
+            ))}
+          </div>
+          <select value={duration} onChange={e => setDuration(Number(e.target.value))} className={inputCls}>
+            {[15, 30, 45, 60].map(d => <option key={d} value={d}>{d} minutes</option>)}
+          </select>
+          {mode === 'online'
+            ? <input value={meetLink} onChange={e => setMeetLink(e.target.value)} placeholder="Video link — optional" className={inputCls} />
+            : <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Address — e.g. their shop" className={inputCls} />}
+          <button onClick={book} disabled={booking}
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[13px] font-semibold rounded-[6px] px-3 py-2">
+            {booking ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CalendarCheck className="w-4 h-4" />}
+            Book + send invite
+          </button>
+          <p className="text-[11px] text-gray-500">Emails a calendar invite now · auto-reminds them 24h and 2h before.</p>
+        </div>
+      )}
+      {bookedSms && (
+        <button onClick={() => { openSms(bookedSms.uri, bookedSms.body); onLog('Confirmation text opened'); }}
+          className="w-full flex items-center justify-center gap-2 border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[13px] font-semibold rounded-[8px] px-3 py-2">
+          <MessageSquare className="w-4 h-4" /> Text them the confirmation too
+        </button>
+      )}
+
+      {/* ── App link ── */}
+      <div className="border-t border-gray-100 pt-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-[12px] font-semibold text-gray-900 flex items-center gap-1.5"><Link2 className="w-3.5 h-3.5 text-gray-400" /> Send the application</p>
+          <div className="flex rounded-full border border-gray-200 overflow-hidden">
+            {([['pay', 'Pay'], ['capital', 'Capital']] as const).map(([v, label]) => (
+              <button key={v} onClick={() => setAppProduct(v)}
+                className={`text-[11px] font-semibold px-2.5 py-1 ${appProduct === v ? 'bg-gray-900 text-white' : 'bg-white text-gray-500'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button onClick={() => sendLink('sms')} disabled={sending !== null}
+            className="flex items-center justify-center gap-1.5 border border-gray-200 hover:border-gray-400 disabled:opacity-50 text-gray-800 text-[12px] font-semibold rounded-[6px] px-2 py-2">
+            {sending === 'sms' ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageSquare className="w-3.5 h-3.5" />} Text link
+          </button>
+          <button onClick={() => sendLink('email')} disabled={sending !== null}
+            className="flex items-center justify-center gap-1.5 border border-gray-200 hover:border-gray-400 disabled:opacity-50 text-gray-800 text-[12px] font-semibold rounded-[6px] px-2 py-2">
+            {sending === 'email' ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />} Email link
+          </button>
+        </div>
+        <p className="text-[11px] text-gray-500">
+          {appProduct === 'pay'
+            ? 'Creates a real tokenized DeltPay application — saves as they go, 14-day link.'
+            : 'Pre-filled deltcapital.com application — their name and business are already in it.'}
+        </p>
       </div>
     </div>
   );
