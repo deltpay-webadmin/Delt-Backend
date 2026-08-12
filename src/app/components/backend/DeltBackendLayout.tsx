@@ -85,6 +85,8 @@ import {
   Wallet,
   BarChart3,
 } from 'lucide-react';
+import { PhoneCall } from 'lucide-react';
+import { BackendCallPlaybooks } from './pages/BackendCallPlaybooks';
 
 // ── Types ──
 type UserRole = 'admin' | 'agent';
@@ -133,6 +135,7 @@ const adminSections: NavSection[] = [
     icon: Send,
     children: [
       { label: 'Campaigns', path: '/outreach' },
+      { label: 'Call Playbooks', path: '/call-playbooks' },
     ],
   },
   {
@@ -190,6 +193,7 @@ const agentItems = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'My Merchants', path: '/merchants', icon: Store },
   { label: 'My Leads', path: '/leads', icon: Users },
+  { label: 'Call Playbooks', path: '/call-playbooks', icon: PhoneCall },
   { label: 'Commissions', path: '/commissions', icon: Banknote },
 ];
 
@@ -203,7 +207,7 @@ function sectionForPath(path: string): string | null {
   if (path.startsWith('/leads') || path.startsWith('/underwriting') || path.startsWith('/onboarding') || path.startsWith('/analysis')) return 'pipeline';
   if (path.startsWith('/merchants') || path.startsWith('/residuals') || path.startsWith('/capital') || path.startsWith('/retention') || path.startsWith('/documents') || path.startsWith('/payments')) return 'merchants';
   if (path.startsWith('/disputes')) return 'disputes';
-  if (path.startsWith('/outreach')) return 'outreach';
+  if (path.startsWith('/outreach') || path.startsWith('/call-playbooks')) return 'outreach';
   if (path.startsWith('/agents') || path.startsWith('/employees') || path.startsWith('/payroll') || path.startsWith('/commissions')) return 'team';
   if (path.startsWith('/lens-ai') || path.startsWith('/financials') || path.startsWith('/reports')) return 'intelligence';
   if (path.startsWith('/compliance')) return 'compliance';
@@ -256,6 +260,7 @@ const allCommands: CommandItem[] = [
   { label: 'Health & Retention', path: '/retention', group: 'Merchants', icon: Heart },
   { label: 'Dispute Center', path: '/disputes', group: 'Disputes', icon: ShieldAlert, keywords: 'chargeback representment evidence' },
   { label: 'Outreach Campaigns', path: '/outreach', group: 'Outreach', icon: Send, keywords: 'email sms campaign automation bulk send' },
+  { label: 'Call Playbooks', path: '/call-playbooks', group: 'Outreach', icon: PhoneCall, keywords: 'cold call script dialer objections talk track appointments ab test' },
   { label: 'Agents', path: '/agents', group: 'Team', icon: UserCircle },
   { label: 'Employees', path: '/employees', group: 'Team', icon: Briefcase },
   { label: 'Payroll', path: '/payroll', group: 'Team', icon: Receipt },
@@ -378,6 +383,7 @@ export function DeltBackendLayout() {
         case '/': return <AgentDashboard />;
         case '/merchants': return <BackendMerchants />;
         case '/leads': return <BackendLeads />;
+        case '/call-playbooks': return <BackendCallPlaybooks />;
         case '/commissions': return <AgentCommissions />;
         case '/my-residuals': return <AgentResiduals />;
         case '/support': return (
@@ -432,6 +438,7 @@ export function DeltBackendLayout() {
       case '/capital': return <BackendCapital />;
       case '/disputes': return <BackendDisputes />;
       case '/outreach': return <BackendOutreach />;
+      case '/call-playbooks': return <BackendCallPlaybooks />;
       case '/compliance': return <BackendCompliance />;
       case '/activity-timeline': return <BackendActivityTimeline />;
       case '/tasks': return <BackendTasks />;
