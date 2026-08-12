@@ -46,6 +46,15 @@ interface LeadLite {
   id: string; business_name: string; contact_name: string | null;
   contact_email: string | null; contact_phone: string | null; industry: string | null;
 }
+interface Meeting {
+  id: string; created_at: string; lead_id: string | null;
+  product: 'deltpay' | 'deltcapital'; merchant_business: string;
+  contact_name: string | null; contact_email: string | null; contact_phone: string | null;
+  mode: 'online' | 'in_person'; location: string | null; meeting_link: string | null;
+  starts_at: string; duration_min: number; rep_name: string | null; rep_email: string | null;
+  notes: string | null; status: 'scheduled' | 'completed' | 'no_show' | 'cancelled';
+  confirm_sent_at: string | null; remind_24h_sent_at: string | null; remind_2h_sent_at: string | null;
+}
 
 // ══════════════════════════════════════
 // CONSTANTS
@@ -188,28 +197,31 @@ function CoachingNote({ note, large }: { note: string; large?: boolean }) {
 // ══════════════════════════════════════
 
 export function BackendCallPlaybooks() {
-  const [tab, setTab] = useState<'live' | 'library' | 'performance'>('live');
+  const [tab, setTab] = useState<'live' | 'meetings' | 'library' | 'performance'>('live');
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [cards, setCards] = useState<Card[]>([]);
   const [variants, setVariants] = useState<Variant[]>([]);
   const [sessions, setSessions] = useState<CallSession[]>([]);
   const [leads, setLeads] = useState<LeadLite[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
     if (!supabase) { setLoading(false); return; }
-    const [pb, cd, vr, ss, ld] = await Promise.all([
+    const [pb, cd, vr, ss, ld, mt] = await Promise.all([
       supabase.from('call_playbooks').select('*').eq('is_active', true).order('product').order('industry'),
       supabase.from('playbook_cards').select('*').eq('is_active', true).order('sort_order'),
       supabase.from('card_variants').select('*').order('created_at'),
       supabase.from('call_sessions').select('*').order('created_at', { ascending: false }).limit(2000),
       supabase.from('pipeline_leads').select('id,business_name,contact_name,contact_email,contact_phone,industry').order('business_name'),
+      supabase.from('rep_meetings').select('*').order('starts_at', { ascending: true }).limit(500),
     ]);
     setPlaybooks((pb.data as Playbook[]) ?? []);
     setCards((cd.data as Card[]) ?? []);
     setVariants((vr.data as Variant[]) ?? []);
     setSessions((ss.data as CallSession[]) ?? []);
     setLeads((ld.data as LeadLite[]) ?? []);
+    setMeetings((mt.data as Meeting[]) ?? []);
     setLoading(false);
   }, []);
 
@@ -237,6 +249,7 @@ export function BackendCallPlaybooks() {
         <div className="flex items-center gap-1 bg-gray-100 rounded-[8px] p-1">
           {([
             { id: 'live', label: 'Live Call', icon: Phone },
+            { id: 'meetings', label: 'Meetings', icon: CalendarCheck },
             { id: 'library', label: 'Playbooks', icon: BookOpen },
             { id: 'performance', label: 'Performance', icon: FlaskConical },
           ] as const).map(t => (
@@ -254,6 +267,8 @@ export function BackendCallPlaybooks() {
         </div>
       ) : tab === 'live' ? (
         <LiveCall playbooks={playbooks} cards={cards} variants={variants} sessions={sessions} leads={leads} onLogged={reload} />
+      ) : tab === 'meetings' ? (
+        <MeetingsView meetings={meetings} onChanged={reload} />
       ) : tab === 'library' ? (
         <Library playbooks={playbooks} cards={cards} variants={variants} sessions={sessions} onChanged={reload} />
       ) : (
@@ -684,6 +699,175 @@ function LiveCall({ playbooks, cards, variants, sessions, leads, onLogged }: {
         )}
       </div>
       </div>{/* /grid */}
+    </div>
+  );
+}
+
+// ════════════════════════════════════
+// MEETINGS (booked pipeline + show rates)
+// ════════════════════════════════════
+
+function fmtMeetingEt(iso: string): { day: string; time: string } {
+  const d = new Date(iso);
+  const now = new Date();
+  const et = (x: Date) => x.toLocaleDateString('en-US', { timeZone: 'America/New_York' });
+  const tomorrow = new Date(now.getTime() + 86400000);
+  let day = d.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric' });
+  if (et(d) === et(now)) day = 'Today';
+  else if (et(d) === et(tomorrow)) day = 'Tomorrow';
+  const time = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }) + ' ET';
+  return { day, time };
+}
+
+const MEETING_STATUS_META: Record<Meeting['status'], { label: string; cls: string }> = {
+  scheduled: { label: 'Scheduled', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
+  completed: { label: 'Showed', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  no_show: { label: 'No-show', cls: 'bg-red-50 text-red-700 border-red-200' },
+  cancelled: { label: 'Cancelled', cls: 'bg-gray-100 text-gray-500 border-gray-200' },
+};
+
+function MeetingsView({ meetings, onChanged }: { meetings: Meeting[]; onChanged: () => void }) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const now = Date.now();
+
+  const upcoming = meetings.filter(m => m.status === 'scheduled' && new Date(m.starts_at).getTime() >= now);
+  const needsOutcome = meetings.filter(m => m.status === 'scheduled' && new Date(m.starts_at).getTime() < now)
+    .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime());
+  const decided = meetings.filter(m => m.status === 'completed' || m.status === 'no_show');
+  const showed = decided.filter(m => m.status === 'completed').length;
+  const weekAhead = upcoming.filter(m => new Date(m.starts_at).getTime() < now + 7 * 86400000);
+  const recent = meetings.filter(m => m.status !== 'scheduled')
+    .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime()).slice(0, 10);
+
+  const setStatus = async (m: Meeting, status: Meeting['status']) => {
+    if (!supabase) return;
+    if (status === 'cancelled' && !window.confirm(`Cancel the meeting with ${m.merchant_business}? (No email is sent — let them know yourself.)`)) return;
+    setBusy(m.id);
+    const { error } = await supabase.from('rep_meetings').update({ status }).eq('id', m.id);
+    setBusy(null);
+    if (error) { window.alert(`Could not update: ${error.message}`); return; }
+    onChanged();
+  };
+
+  const reminderSms = (m: Meeting) => {
+    const { day, time } = fmtMeetingEt(m.starts_at);
+    const where = m.mode === 'online'
+      ? (m.meeting_link ? ` Join link: ${m.meeting_link}` : '')
+      : (m.location ? ` Address: ${m.location}` : '');
+    return `Hi ${(m.contact_name || '').split(' ')[0] || 'there'}, it's ${m.rep_name || 'your rep'} with Delt — quick reminder we're on for ${day === 'Today' ? `today at ${time}` : `${day} at ${time}`}.${where} Reply here if anything changes.`;
+  };
+
+  const MeetingRow = ({ m, outcome }: { m: Meeting; outcome?: boolean }) => {
+    const { day, time } = fmtMeetingEt(m.starts_at);
+    const phone = (m.contact_phone || '').replace(/[^+\d]/g, '');
+    return (
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-t border-gray-100 first:border-t-0">
+        <div className="w-28 shrink-0">
+          <p className={`text-[13px] font-semibold ${day === 'Today' ? 'text-indigo-700' : 'text-gray-900'}`}>{day}</p>
+          <p className="text-[12px] text-gray-500">{time}</p>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-semibold text-gray-900 truncate">
+            {m.merchant_business}
+            {m.contact_name && <span className="font-normal text-gray-500"> — {m.contact_name}</span>}
+          </p>
+          <p className="text-[12px] text-gray-500 flex items-center gap-2 flex-wrap">
+            <span className={`inline-block text-[10px] font-semibold uppercase rounded px-1 py-0.5 border ${PRODUCT_META[m.product].chip}`}>{PRODUCT_META[m.product].label}</span>
+            <span className="flex items-center gap-1">{m.mode === 'online' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}{m.mode === 'online' ? 'Online' : (m.location || 'In person')}</span>
+            {m.rep_name && <span>· {m.rep_name}</span>}
+          </p>
+        </div>
+        {!outcome && m.status === 'scheduled' && (
+          <div className="flex items-center gap-1 text-[10px] font-medium" title="Confirmation / 24h reminder / 2h reminder">
+            {[['Invite', m.confirm_sent_at], ['24h', m.remind_24h_sent_at], ['2h', m.remind_2h_sent_at]].map(([label, sent]) => (
+              <span key={label as string} className={`rounded px-1.5 py-0.5 border ${sent ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-400 border-gray-200'}`}>
+                {label as string}{sent ? ' ✓' : ''}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="flex items-center gap-1.5">
+          {m.status === 'scheduled' && m.mode === 'online' && m.meeting_link && !outcome && (
+            <a href={m.meeting_link} target="_blank" rel="noreferrer"
+              className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 px-1.5">
+              <ExternalLink className="w-3 h-3" /> Join
+            </a>
+          )}
+          {m.status === 'scheduled' && phone && !outcome && (
+            <button onClick={() => openSms(`sms:${phone}?&body=${encodeURIComponent(reminderSms(m))}`, reminderSms(m))}
+              className="flex items-center gap-1 text-[11px] font-semibold text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 rounded-[6px] px-2 py-1">
+              <MessageSquare className="w-3 h-3" /> Text
+            </button>
+          )}
+          {outcome ? (
+            <>
+              <button onClick={() => setStatus(m, 'completed')} disabled={busy === m.id}
+                className="text-[11px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-[6px] px-2.5 py-1">Showed</button>
+              <button onClick={() => setStatus(m, 'no_show')} disabled={busy === m.id}
+                className="text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 rounded-[6px] px-2.5 py-1">No-show</button>
+            </>
+          ) : m.status === 'scheduled' ? (
+            <button onClick={() => setStatus(m, 'cancelled')} disabled={busy === m.id}
+              className="text-[11px] text-gray-400 hover:text-red-600 px-1.5">Cancel</button>
+          ) : (
+            <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 border ${MEETING_STATUS_META[m.status].cls}`}>{MEETING_STATUS_META[m.status].label}</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-5 max-w-4xl">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Upcoming', v: String(upcoming.length), sub: 'scheduled meetings on the books' },
+          { label: 'Next 7 days', v: String(weekAhead.length), sub: 'this week\u2019s pipeline' },
+          { label: 'Show rate', v: decided.length ? `${((showed / decided.length) * 100).toFixed(0)}%` : '—', sub: `${showed} showed · ${decided.length - showed} no-show`, warn: decided.length >= 5 && showed / decided.length < 0.6 },
+          { label: 'Awaiting outcome', v: String(needsOutcome.length), sub: 'past meetings — mark showed / no-show', warn: needsOutcome.length > 0 },
+        ].map(k => (
+          <div key={k.label} className={`bg-white rounded-[8px] border px-4 py-3 ${k.warn ? 'border-amber-300' : 'border-gray-200'}`}>
+            <p className="text-[11px] text-gray-400 uppercase tracking-wide font-semibold">{k.label}</p>
+            <p className="text-xl font-bold text-gray-900">{k.v}</p>
+            <p className="text-[11px] text-gray-500">{k.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {needsOutcome.length > 0 && (
+        <div>
+          <p className="text-[12px] font-bold uppercase tracking-wider text-amber-600 mb-2">Did they show?</p>
+          <div className="bg-white rounded-[8px] border border-amber-200">
+            {needsOutcome.map(m => <MeetingRow key={m.id} m={m} outcome />)}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <p className="text-[12px] font-bold uppercase tracking-wider text-gray-400 mb-2">Upcoming</p>
+        {upcoming.length === 0 ? (
+          <div className="bg-white rounded-[8px] border border-gray-200 p-8 text-center text-[13px] text-gray-400">
+            Nothing on the books yet — book meetings from the Live Call action panel and they'll show up here with automatic reminders.
+          </div>
+        ) : (
+          <div className="bg-white rounded-[8px] border border-gray-200">
+            {upcoming.map(m => <MeetingRow key={m.id} m={m} />)}
+          </div>
+        )}
+      </div>
+
+      {recent.length > 0 && (
+        <div>
+          <p className="text-[12px] font-bold uppercase tracking-wider text-gray-400 mb-2">Recent outcomes</p>
+          <div className="bg-white rounded-[8px] border border-gray-200">
+            {recent.map(m => <MeetingRow key={m.id} m={m} />)}
+          </div>
+        </div>
+      )}
+
+      <div className="bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-3 text-[12px] text-gray-500">
+        Reminders go out automatically — invite on booking, then 24h and 2h before (badges above turn green as each lands). A personal text on top of the emails is the single best show-rate booster: use the Text button.
+      </div>
     </div>
   );
 }
