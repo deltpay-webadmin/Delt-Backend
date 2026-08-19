@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import {
   Banknote, TrendingUp, CalendarClock, Plus, Search, Building2,
   ArrowUpRight, ArrowDownRight, Activity, AlertTriangle, CheckCircle,
-  Shield, RefreshCw, Clock, ChevronRight, Upload,
+  Shield, RefreshCw, Clock, ChevronRight, Upload, Flame,
 } from 'lucide-react';
 import { useAppNavigate } from '../NavigationContext';
 import { NewCapitalDealFlow } from '../flows/NewCapitalDealFlow';
 import { AchImportFlow } from '../flows/AchImportFlow';
 import { useCapital, capitalActions, type CapitalDeal, type CapitalDealStatus, type CapitalChannel, type LoanPaymentCategory } from '../capitalStore';
+import { PortfolioCharts } from './CapitalCharts';
 import { useAchActivity, type AchDailyActivity } from '../achStore';
 
 // ══════════════════════════════════════════
@@ -40,7 +41,7 @@ const achLabels: Record<string, string> = {
   current: 'Current', completed: 'Completed', 'nsf-retry': 'NSF Retry', suspended: 'Suspended',
 };
 
-type TabKey = 'portfolio' | 'activity' | 'risk' | 'collections' | 'renewals' | 'concentration';
+type TabKey = 'portfolio' | 'activity' | 'riskcoll' | 'renewals' | 'analytics';
 
 const PAYMENT_CATEGORIES: { key: LoanPaymentCategory; label: string }[] = [
   { key: 'debit', label: 'ACH Debit' },
@@ -178,6 +179,95 @@ export function BackendCapital() {
     const byVertical = Object.entries(vertMap).map(([k, v]) => ({ label: k, value: v })).sort((a, b) => b.value - a.value);
     const channelSplit = [{ label: 'Self-Funded', value: selfDeployed }, { label: 'Fundomate Referred', value: refFunded }];
 
+    // ── Risk Pulse ─────────────────────────────────────────────────────
+    // Capital at risk = outstanding principal on slow + default (self only)
+    const capitalAtRisk = self
+      .filter(m => m.status === 'default' || m.status === 'slow')
+      .reduce((s, m) => s + Math.max(m.totalOwed - m.collected, 0), 0);
+    const defaultedOutstanding = self
+      .filter(m => m.status === 'default')
+      .reduce((s, m) => s + Math.max(m.totalOwed - m.collected, 0), 0);
+
+    // NSF / bounce ledger pass
+    const allPayments = DEALS.flatMap(m => (m.payments || []).map(p => ({ ...p, channel: m.channel })));
+    const debitLike = allPayments.filter(p => p.category === 'debit' || p.category === 'bounce');
+    const bounceCount = allPayments.filter(p => p.category === 'bounce').length;
+    const nsfRate = debitLike.length > 0 ? bounceCount / debitLike.length : 0;
+
+    const last7 = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    const last30 = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const recent7 = allPayments.filter(p => p.payment_date >= last7);
+    const recent30 = allPayments.filter(p => p.payment_date >= last30);
+    const nsf7 = recent7.filter(p => p.category === 'bounce').length;
+    const nsf30 = recent30.filter(p => p.category === 'bounce').length;
+    const debit7 = recent7.filter(p => p.category === 'debit' || p.category === 'bounce').length;
+    const debit30 = recent30.filter(p => p.category === 'debit' || p.category === 'bounce').length;
+    const nsfRate7 = debit7 > 0 ? nsf7 / debit7 : 0;
+    const nsfRate30 = debit30 > 0 ? nsf30 / debit30 : 0;
+
+    // Average days-past-due across slow + default
+    const overdueDeals = DEALS.filter(m => m.status === 'slow' || m.status === 'default');
+    const avgDPD = overdueDeals.length > 0
+      ? overdueDeals.reduce((s, m) => s + (m.daysInDefault || 0), 0) / overdueDeals.length
+      : 0;
+
+    // Time-cost-of-money daily burn rate (carrying cost across the active book)
+    const dailyBorrowBurn = selfActive.reduce((s, m) => {
+      const pct = (m.borrowingCostPct ?? 2.0) / 100;
+      const outstanding = Math.max(m.fundedAmt - m.collected, 0);
+      return s + (outstanding * pct) / 30;
+    }, 0);
+
+    // ── Chart series (zero-safe) ───────────────────────────────────────
+    // 30-day collections trend from payments ledger
+    const trendDays: { date: string; collected: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      const collected = allPayments
+        .filter(p => p.payment_date === d && p.amount > 0)
+        .reduce((s, p) => s + p.amount, 0);
+      trendDays.push({ date: d.slice(5), collected });
+    }
+
+    // Default-rate trend by vintage month
+    const vintageTrend = Object.entries(vintages)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([mo, v]) => ({
+        month: mo.slice(2),
+        defaultRate: v.count > 0 ? (v.defaults / v.count) * 100 : 0,
+        deployed: v.deployed,
+      }));
+
+    // Aging buckets across active+slow+default by daysInDefault
+    const agingBuckets = [
+      { label: 'Current', count: 0, outstanding: 0 },
+      { label: '1-7d', count: 0, outstanding: 0 },
+      { label: '8-30d', count: 0, outstanding: 0 },
+      { label: '30d+', count: 0, outstanding: 0 },
+    ];
+    DEALS.filter(m => m.status !== 'paid').forEach(m => {
+      const dpd = m.daysInDefault || 0;
+      const out = Math.max(m.totalOwed - m.collected, 0);
+      const idx = dpd === 0 ? 0 : dpd <= 7 ? 1 : dpd <= 30 ? 2 : 3;
+      agingBuckets[idx].count++;
+      agingBuckets[idx].outstanding += out;
+    });
+
+    // NSF / bounces by ISO-week for the last 8 weeks
+    const nsfWeeks: { week: string; bounces: number; debits: number }[] = [];
+    for (let i = 7; i >= 0; i--) {
+      const end = new Date(Date.now() - i * 7 * 86400000);
+      const start = new Date(end.getTime() - 6 * 86400000);
+      const startStr = start.toISOString().slice(0, 10);
+      const endStr = end.toISOString().slice(0, 10);
+      const slice = allPayments.filter(p => p.payment_date >= startStr && p.payment_date <= endStr);
+      nsfWeeks.push({
+        week: endStr.slice(5),
+        bounces: slice.filter(p => p.category === 'bounce').length,
+        debits: slice.filter(p => p.category === 'debit').length,
+      });
+    }
+
     return {
       selfDeployed, selfCollected, selfCOC, selfOutstanding, selfGross, selfNet, selfRTR, selfWAF, selfDaily,
       refFunded, refCommTotal, refCommPaid, refCommPending, refAvgRate,
@@ -186,6 +276,10 @@ export function BackendCapital() {
       selfCount: self.length, refCount: ref.length,
       totalFunded, totalCollected, totalOutstanding, countActive, countSlow, countPaid,
       avgWeeksBehind, totalBounces,
+      // Risk Pulse
+      capitalAtRisk, defaultedOutstanding, nsfRate, nsfRate7, nsfRate30, avgDPD, dailyBorrowBurn,
+      // Chart series
+      trendDays, vintageTrend, agingBuckets, nsfWeeks,
     };
   }, [DEALS]);
 
@@ -211,6 +305,9 @@ export function BackendCapital() {
   };
 
   // ── Empty state when no deals yet ──
+  // Note: we no longer hide the dashboard. The full Capital UI is rendered at
+  // all times so the layout is reviewable in Local mode — KPIs, charts, and
+  // the deal table degrade gracefully to $0 / 0 / 0.0% when DEALS = [].
   const isEmpty = !isLoading && DEALS.length === 0;
 
   return (
@@ -235,21 +332,20 @@ export function BackendCapital() {
           </div>
         </div>
 
-        {/* ── Empty state ── */}
-        {isEmpty && <EmptyState onAdd={() => setNewDealOpen(true)} />}
+        {/* ── Inline empty-portfolio banner (non-blocking) ── */}
+        {isEmpty && <EmptyBanner onAdd={() => setNewDealOpen(true)} />}
 
-        {!isEmpty && (
+        {(
           <>
             {/* ── View Tabs ── */}
             <div className="border-b border-gray-200">
               <div className="flex gap-1">
                 {([
-                  { key: 'portfolio' as TabKey, label: 'Portfolio Overview' },
-                  { key: 'activity' as TabKey, label: 'ACH Activity' },
-                  { key: 'risk' as TabKey, label: 'Risk & Fraud' },
-                  { key: 'collections' as TabKey, label: 'Collections' },
+                  { key: 'portfolio' as TabKey, label: 'Portfolio' },
+                  { key: 'activity' as TabKey, label: 'Activity' },
+                  { key: 'riskcoll' as TabKey, label: 'Risk & Collections' },
                   { key: 'renewals' as TabKey, label: 'Renewals' },
-                  { key: 'concentration' as TabKey, label: 'Concentration & Vintage' },
+                  { key: 'analytics' as TabKey, label: 'Analytics' },
                 ]).map(t => (
                   <button
                     key={t.key}
@@ -324,6 +420,53 @@ export function BackendCapital() {
                     <MiniKpi label="Paid" value={String(M.countPaid)} accent="emerald" />
                     <MiniKpi label="Avg Weeks Behind" value={M.avgWeeksBehind.toFixed(1)} accent={M.avgWeeksBehind > 0 ? 'red' : 'emerald'} />
                     <MiniKpi label="Total Bounces" value={String(M.totalBounces)} accent={M.totalBounces > 0 ? 'red' : 'emerald'} />
+                  </div>
+                </div>
+
+                {/* Risk Pulse */}
+                <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Flame className="w-4 h-4 text-red-500" />
+                    <span className="text-sm font-semibold text-gray-900">Risk Pulse</span>
+                    <span className="text-xs text-gray-400">NSF, DPD, capital-at-risk, time-cost burn</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <MiniKpi
+                      label="Capital at Risk"
+                      value={fmt(M.capitalAtRisk)}
+                      sub={`Default: ${fmt(M.defaultedOutstanding)}`}
+                      accent={M.capitalAtRisk > 0 ? 'red' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Default Rate"
+                      value={fmtPct(M.defaultRate)}
+                      sub={`${DEALS.filter(m => m.status === 'default').length} of ${M.totalDeals}`}
+                      accent={M.defaultRate > 0.1 ? 'red' : M.defaultRate > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="NSF Rate (30d)"
+                      value={fmtPct(M.nsfRate30)}
+                      sub={`7d: ${fmtPct(M.nsfRate7)} · LTD: ${fmtPct(M.nsfRate)}`}
+                      accent={M.nsfRate30 > 0.05 ? 'red' : M.nsfRate30 > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Avg DPD"
+                      value={M.avgDPD > 0 ? `${M.avgDPD.toFixed(1)}d` : '0d'}
+                      sub="On slow + default"
+                      accent={M.avgDPD > 14 ? 'red' : M.avgDPD > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="TCM Burn /day"
+                      value={fmt(M.dailyBorrowBurn)}
+                      sub="Borrow cost on outstanding"
+                      accent={M.dailyBorrowBurn > 0 ? 'amber' : 'emerald'}
+                    />
+                    <MiniKpi
+                      label="Stacked / Behind"
+                      value={`${M.stacked} / ${DEALS.filter(m => (m.weeksBehind ?? 0) > 0).length}`}
+                      sub={`Avg ${M.avgWeeksBehind.toFixed(1)}w behind`}
+                      accent={M.stacked > 0 || M.avgWeeksBehind > 0 ? 'amber' : 'emerald'}
+                    />
                   </div>
                 </div>
 
@@ -544,7 +687,21 @@ export function BackendCapital() {
                       })}
                       {filtered.length === 0 && (
                         <tr>
-                          <td colSpan={12} className="py-16 text-center text-sm text-gray-400">No deals match the current filters.</td>
+                          <td colSpan={12} className="py-16 text-center">
+                            {DEALS.length === 0 ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <span className="text-sm text-gray-500">No capital deals yet — your portfolio table will populate here.</span>
+                                <button
+                                  onClick={() => setNewDealOpen(true)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-brand text-white rounded-[6px] hover:bg-brand-hover"
+                                >
+                                  <Plus className="w-3.5 h-3.5" /> Add your first deal
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">No deals match the current filters.</span>
+                            )}
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -564,16 +721,16 @@ export function BackendCapital() {
             {activeTab === 'activity' && <ActivityTab onImport={() => setAchImportOpen(true)} />}
 
             {/* ═══ RISK & FRAUD TAB (consolidated: Risk Signals + Fraud + Stacking & UCC) ═══ */}
-            {activeTab === 'risk' && <RiskTab DEALS={DEALS} />}
+            {activeTab === 'riskcoll' && <RiskCollectionsTab DEALS={DEALS} onEscalate={setCollectionModal} />}
 
             {/* ═══ COLLECTIONS TAB ═══ */}
-            {activeTab === 'collections' && <CollectionsTab DEALS={DEALS} onEscalate={setCollectionModal} />}
+
 
             {/* ═══ RENEWALS TAB ═══ */}
             {activeTab === 'renewals' && <RenewalsTab DEALS={DEALS} />}
 
             {/* ═══ CONCENTRATION TAB ═══ */}
-            {activeTab === 'concentration' && <ConcentrationTab M={M} />}
+            {activeTab === 'analytics' && <AnalyticsTab M={M} />}
           </>
         )}
       </div>
@@ -762,36 +919,28 @@ function AddPaymentModal({ deal, onClose }: { deal: CapitalDeal; onClose: () => 
 }
 
 // ══════════════════════════════════════════
-// EMPTY STATE
+// EMPTY BANNER (inline, non-blocking)
 // ══════════════════════════════════════════
-function EmptyState({ onAdd }: { onAdd: () => void }) {
+function EmptyBanner({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="bg-white border-2 border-dashed border-gray-200 rounded-[12px] p-12 text-center">
-      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-brand/5 flex items-center justify-center">
-        <Banknote className="w-7 h-7 text-brand" />
+    <div className="bg-gradient-to-r from-indigo-50 via-white to-orange-50 border border-indigo-100 rounded-[10px] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-white border border-indigo-100 flex items-center justify-center shadow-sm">
+          <Banknote className="w-5 h-5 text-brand" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-gray-900">Portfolio is empty — preview mode active</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Every KPI, chart, and tab below renders with $0. Add a deal to populate the portfolio. ACH.com / DataMerch / FiCoSo / Fundomate automation wires in later.
+          </p>
+        </div>
       </div>
-      <h2 className="text-lg font-bold text-gray-900 mb-1.5">No capital deals yet</h2>
-      <p className="text-sm text-gray-500 max-w-md mx-auto mb-5">
-        Add deals manually to build your portfolio. Once automation (ACH.com, DataMerch, FiCoSo, Fundomate) is wired up, new deals will flow in automatically.
-      </p>
       <button
         onClick={onAdd}
-        className="px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2"
+        className="px-4 py-2 bg-brand text-white text-sm font-semibold rounded-[6px] hover:bg-brand-hover transition-colors inline-flex items-center gap-2 shrink-0"
       >
         <Plus className="w-4 h-4" /> Add your first deal
       </button>
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
-        {[
-          { title: 'Self-Funded', body: 'Family office capital deployed at 2%/mo. Tracks RTR, WAF, daily ACH, and net P&L after cost of capital.' },
-          { title: 'Fundomate Referrals', body: 'Zero-risk referrals. Tracks commission earned and pending. No capital exposure.' },
-          { title: 'Risk + Renewals', body: 'Stacking, NSF, defaults, UCC, and renewal scoring kick in as soon as you have deals.' },
-        ].map((c, i) => (
-          <div key={i} className="bg-gray-50 rounded-[8px] p-3 border border-gray-100">
-            <p className="text-xs font-bold text-gray-900 mb-1">{c.title}</p>
-            <p className="text-[11px] text-gray-500 leading-relaxed">{c.body}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -1068,7 +1217,132 @@ function ActivityTab({ onImport }: { onImport: () => void }) {
 // ══════════════════════════════════════════
 // RISK & FRAUD TAB (merged)
 // ══════════════════════════════════════════
-function RiskTab({ DEALS }: { DEALS: CapitalDeal[] }) {
+function RiskCollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
+  const active = DEALS.filter(m => m.status !== 'paid');
+  const tiers = {
+    low: active.filter(m => m.achStatus === 'current' && m.stackCount === 0 && (m.avg30d === 0 || m.avg7d >= m.avg30d * 0.9)),
+    moderate: active.filter(m => m.achStatus === 'current' && (m.stackCount > 0 || (m.avg30d > 0 && m.avg7d < m.avg30d * 0.9))),
+    elevated: active.filter(m => m.achStatus === 'nsf-retry'),
+    critical: active.filter(m => m.achStatus === 'suspended' || m.status === 'default'),
+  };
+  const fraudRules = [
+    { rule: 'Multiple MCAs across business names', flagged: DEALS.filter(m => m.stackCount >= 2), severity: 'high' as const, detail: 'Owner may have MCAs under multiple DBAs', source: 'DataMerch' },
+    { rule: 'Stopped processing after MCA funded', flagged: DEALS.filter(m => m.avg7d === 0 && m.status !== 'paid' && m.status !== 'default'), severity: 'critical' as const, detail: 'MCA underwritten on volume, but processing has ceased', source: 'ACH.com' },
+    { rule: 'Single additional stack position', flagged: DEALS.filter(m => m.stackCount === 1), severity: 'medium' as const, detail: 'One overlapping MCA detected', source: 'DataMerch' },
+    { rule: 'UCC expiring in <12 months', flagged: DEALS.filter(m => m.uccExpires && daysBetween(today, m.uccExpires) < 365 && daysBetween(today, m.uccExpires) > 0), severity: 'medium' as const, detail: 'Lien position needs renewal', source: 'FiCoSo' },
+  ];
+  const totalFlags = fraudRules.reduce((s, r) => s + r.flagged.length, 0);
+  const delinquent = DEALS.filter(m => m.status === 'slow' || m.status === 'default');
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Low Risk', count: tiers.low.length, bal: tiers.low.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'emerald' },
+          { label: 'Moderate', count: tiers.moderate.length, bal: tiers.moderate.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'amber' },
+          { label: 'Elevated', count: tiers.elevated.length, bal: tiers.elevated.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'orange' },
+          { label: 'Critical', count: tiers.critical.length, bal: tiers.critical.reduce((s, m) => s + (m.totalOwed - m.collected), 0), accent: 'red' },
+        ].map(t => <KpiCard key={t.label} label={t.label} value={t.count.toString()} sub={`${fmt(t.bal)} outstanding`} accent={t.accent} />)}
+      </div>
+
+      <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-red-500" />
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Risk & Fraud Signals</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Auto-flagged patterns across portfolio · DataMerch, ACH.com, FiCoSo (when wired)</p>
+            </div>
+          </div>
+          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${totalFlags > 0 ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
+            {totalFlags > 0 ? `${totalFlags} flags` : 'All clear'}
+          </span>
+        </div>
+        <div className="px-5 py-4 space-y-3">
+          {fraudRules.map((flag, i) => {
+            const sevColors = { critical: 'bg-red-100 text-red-800 border-red-200', high: 'bg-red-50 text-red-700 border-red-100', medium: 'bg-amber-50 text-amber-700 border-amber-100' };
+            return (
+              <div key={i} className={`rounded-[6px] border p-3 ${flag.flagged.length > 0 ? sevColors[flag.severity] : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {flag.flagged.length > 0 ? <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" /> : <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                      <p className="text-sm font-semibold">{flag.rule}</p>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/80 text-gray-500 border border-gray-200">{flag.source}</span>
+                    </div>
+                    <p className="text-xs opacity-80 ml-[22px]">{flag.detail}</p>
+                    {flag.flagged.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2 ml-[22px]">
+                        {flag.flagged.map(m => (
+                          <span key={m.id} className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/60 border border-gray-300">{m.merchant} ({m.id})</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${flag.flagged.length > 0 ? 'bg-white/50' : 'bg-emerald-100 text-emerald-700'}`}>
+                    {flag.flagged.length > 0 ? `${flag.flagged.length} flagged` : 'Clear'}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <KpiCard label="Delinquent" value={delinquent.length.toString()} sub={`${DEALS.filter(m => m.status === 'default').length} defaulted`} accent={DEALS.filter(m => m.status === 'default').length > 0 ? 'red' : 'emerald'} />
+        <KpiCard label="NSF/Retry" value={DEALS.filter(m => m.achStatus === 'nsf-retry').length.toString()} sub="ACH failures pending" accent="amber" />
+        <KpiCard label="Suspended" value={DEALS.filter(m => m.achStatus === 'suspended').length.toString()} sub="ACH debits halted" accent="red" />
+        <KpiCard label="Daily ACH Active" value={fmt(DEALS.filter(m => m.achStatus === 'current').reduce((s, m) => s + m.dailyDebit, 0))} sub={`${DEALS.filter(m => m.achStatus === 'current').length} merchants`} accent="emerald" />
+        <KpiCard label="At Risk Balance" value={fmt(delinquent.reduce((s, m) => s + (m.totalOwed - m.collected), 0))} sub="Outstanding on delinquent" accent="red" />
+      </div>
+
+      <div className="bg-white rounded-[8px] border border-gray-200">
+        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-amber-500" />
+          <div><h3 className="text-sm font-semibold text-gray-900">Collection Escalation Workflow</h3><p className="text-xs text-gray-500 mt-0.5">Automated escalation stages for delinquent accounts</p></div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full"><thead><tr className="border-b border-gray-100 bg-gray-50">
+            <Th className="pl-5">Merchant</Th><Th>Status</Th><Th>Current Stage</Th><Th>Days Overdue</Th><Th>Stage Timeline</Th><Th>Next Action</Th>
+          </tr></thead>
+            <tbody>{delinquent.map(m => {
+              const stages = [
+                { name: 'ACH Retry', icon: '↻', daysIn: 0, active: m.achStatus === 'nsf-retry', done: m.daysInDefault > 3 },
+                { name: 'Email Notice', icon: '✉', daysIn: 3, active: m.daysInDefault >= 3 && m.daysInDefault < 7, done: m.daysInDefault >= 7 },
+                { name: 'Agent Call', icon: '☎', daysIn: 7, active: m.daysInDefault >= 7 && m.daysInDefault < 14, done: m.daysInDefault >= 14 },
+                { name: 'Demand Letter', icon: '⚠', daysIn: 14, active: m.daysInDefault >= 14 && m.daysInDefault < 30, done: m.daysInDefault >= 30 },
+                { name: 'Legal', icon: '⚖', daysIn: 30, active: m.daysInDefault >= 30, done: false },
+              ];
+              const currentStage = [...stages].reverse().find(s => s.active || s.done) || stages[0];
+              const nextStage = stages.find(s => !s.active && !s.done) || stages[stages.length - 1];
+              return (<tr key={m.id} className="border-b border-gray-50 hover:bg-amber-50/20">
+                <td className="pl-5 py-3"><p className="text-sm font-semibold text-gray-900">{m.merchant}</p><p className="text-[10px] text-gray-400 font-mono">{m.id}</p></td>
+                <td className="py-3"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusConfig[m.status].bg} ${statusConfig[m.status].text}`}><span className={`w-1.5 h-1.5 rounded-full ${statusConfig[m.status].dot}`} />{statusConfig[m.status].label}</span></td>
+                <td className="py-3"><span className="text-sm font-semibold text-gray-900">{currentStage.icon} {currentStage.name}</span></td>
+                <td className="py-3"><span className={`text-sm font-bold tabular-nums ${m.daysInDefault >= 14 ? 'text-red-600' : m.daysInDefault >= 7 ? 'text-amber-600' : 'text-gray-700'}`}>{m.daysInDefault}d</span></td>
+                <td className="py-3">
+                  <div className="flex items-center gap-1">{stages.map((s, i) => (
+                    <div key={i} className="flex items-center gap-0.5">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] ${s.done ? 'bg-emerald-100 text-emerald-700' : s.active ? 'bg-brand text-white ring-2 ring-brand/20' : 'bg-gray-100 text-gray-400'}`} title={s.name}>{s.done ? '✓' : s.icon}</div>
+                      {i < stages.length - 1 && <div className={`w-3 h-0.5 ${s.done ? 'bg-emerald-300' : 'bg-gray-200'}`} />}
+                    </div>
+                  ))}</div>
+                </td>
+                <td className="py-3"><button onClick={(e) => { e.stopPropagation(); onEscalate(m.id); }} className="px-2.5 py-1.5 bg-brand text-white text-[10px] font-semibold rounded-[6px] hover:bg-brand-hover transition-colors">{nextStage.name} →</button></td>
+              </tr>);
+            })}{delinquent.length === 0 && (
+              <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">No delinquent accounts — all collections current</td></tr>
+            )}</tbody></table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function RiskTab_unused({ DEALS }: { DEALS: CapitalDeal[] }) {
+
   const active = DEALS.filter(m => m.status !== 'paid');
   const tiers = {
     low: active.filter(m => m.achStatus === 'current' && m.stackCount === 0 && (m.avg30d === 0 || m.avg7d >= m.avg30d * 0.9)),
@@ -1198,7 +1472,8 @@ function RiskTab({ DEALS }: { DEALS: CapitalDeal[] }) {
 // ══════════════════════════════════════════
 // COLLECTIONS TAB
 // ══════════════════════════════════════════
-function CollectionsTab({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function CollectionsTab_unused({ DEALS, onEscalate }: { DEALS: CapitalDeal[]; onEscalate: (id: string) => void }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -1317,9 +1592,12 @@ function RenewalsTab({ DEALS }: { DEALS: CapitalDeal[] }) {
 // ══════════════════════════════════════════
 // CONCENTRATION TAB
 // ══════════════════════════════════════════
-function ConcentrationTab({ M }: { M: any }) {
+function AnalyticsTab({ M }: { M: any }) {
   return (
     <div className="space-y-6">
+      {/* Performance charts strip (moved from Portfolio Overview) */}
+      <PortfolioCharts M={M} />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ConcentrationCard
           title="Channel Split"
